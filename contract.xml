@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<tryton>
+    <data>
+
+        <record model="res.group" id="group_contract_admin">
+            <field name="name">Contract Administration</field>
+        </record>
+        <record model="res.user-res.group" id="user_admin_group_contract_admin">
+            <field name="user" ref="res.user_admin"/>
+            <field name="group" ref="group_contract_admin"/>
+        </record>
+        <record model="res.user-res.group" id="user_trigger_group_contract_admin">
+            <field name="user" ref="res.user_trigger"/>
+            <field name="group" ref="group_contract_admin"/>
+        </record>
+        <record model="res.group" id="group_contract">
+            <field name="name">Contract</field>
+        </record>
+        <record model="res.user-res.group" id="user_admin_group_contract">
+            <field name="user" ref="res.user_admin"/>
+            <field name="group" ref="group_contract"/>
+        </record>
+        <record model="res.user-res.group" id="user_trigger_group_contract">
+            <field name="user" ref="res.user_trigger"/>
+            <field name="group" ref="group_contract"/>
+        </record>
+        <record model="ir.ui.view" id="contract_view_form">
+            <field name="model">contract</field>
+            <field name="type">form</field>
+            <field name="name">contract_form</field>
+        </record>
+        <record model="ir.ui.view" id="contract_view_list">
+            <field name="model">contract</field>
+            <field name="type">tree</field>
+            <field name="name">contract_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_contract">
+            <field name="name">Contract</field>
+            <field name="res_model">contract</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_contract_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="contract_view_list"/>
+            <field name="act_window" ref="act_contract"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_contract_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="contract_view_form"/>
+            <field name="act_window" ref="act_contract"/>
+        </record>
+        <record model="ir.action.act_window.domain"
+                id="act_contract_domain_draft">
+            <field name="name">Draft</field>
+            <field name="sequence" eval="10"/>
+            <field name="domain">[('state', '=', 'draft')]</field>
+            <field name="act_window" ref="act_contract"/>
+        </record>
+        <record model="ir.action.act_window.domain"
+                id="act_contract_domain_validated">
+            <field name="name">Validated</field>
+            <field name="sequence" eval="20"/>
+            <field name="domain">[('state', '=', 'validated')]</field>
+            <field name="act_window" ref="act_contract"/>
+        </record>
+        <record model="ir.action.act_window.domain"
+                id="act_contract_domain_all">
+            <field name="name">All</field>
+            <field name="sequence" eval="9999"/>
+            <field name="act_window" ref="act_contract"/>
+        </record>
+        <record model="ir.model.access" id="access_contract">
+            <field name="model" search="[('model', '=', 'contract')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_contract_admin">
+            <field name="model" search="[('model', '=', 'contract')]"/>
+            <field name="group" ref="group_contract_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.ui.view" id="contract_consumption_view_form">
+            <field name="model">contract.consumption</field>
+            <field name="type">form</field>
+            <field name="name">contract_consumption_form</field>
+        </record>
+        <record model="ir.ui.view" id="contract_consumption_view_list">
+            <field name="model">contract.consumption</field>
+            <field name="type">tree</field>
+            <field name="name">contract_consumption_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_contract_consumption">
+            <field name="name">Contract Consumption</field>
+            <field name="res_model">contract.consumption</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_contract_consumption_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="contract_consumption_view_list"/>
+            <field name="act_window" ref="act_contract_consumption"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_contract_consumption_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="contract_consumption_view_form"/>
+            <field name="act_window" ref="act_contract_consumption"/>
+        </record>
+        <record model="ir.action.act_window.domain"
+                id="act_contract_consumption_domain_to_invoiced">
+            <field name="name">To Invoice</field>
+            <field name="sequence" eval="10"/>
+            <field name="domain">[('invoice_line', '=', None)]</field>
+            <field name="act_window" ref="act_contract_consumption"/>
+        </record>
+        <record model="ir.action.act_window.domain"
+                id="act_contract_consumption_domain_all">
+            <field name="name">All</field>
+            <field name="sequence" eval="9999"/>
+            <field name="act_window" ref="act_contract_consumption"/>
+        </record>
+        <!-- TODO: Add relate from consumption to invoices
+        <record model="ir.action.act_window" id="act_invoices">
+            <field name="name">Invoices</field>
+            <field name="res_model">account.invoice</field>
+            <field name="domain">[('lines.origin.id', 'in', Eval('active_ids'), Eval('active_model'))]</field>
+        </record>
+        <record model="ir.action.keyword" id="act_invoices_keyword1">
+            <field name="keyword">form_relate</field>
+            <field name="model">contract.consumption,-1</field>
+            <field name="action" ref="act_invoices"/>
+        </record>
+        -->
+        <record model="ir.model.access" id="access_contract_consumption">
+            <field name="model" search="[('model', '=', 'contract.consumption')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_contract_consumption_admin">
+            <field name="model" search="[('model', '=', 'contract.consumption')]"/>
+            <field name="group" ref="group_contract_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.ui.view" id="contract_line_view_form">
+            <field name="model">contract.line</field>
+            <field name="type">form</field>
+            <field name="name">contract_line_form</field>
+        </record>
+        <record model="ir.ui.view" id="contract_line_view_list">
+            <field name="model">contract.line</field>
+            <field name="type">tree</field>
+            <field name="name">contract_line_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_contract_line">
+            <field name="name">Contract Line</field>
+            <field name="res_model">contract.line</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_contract_line_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="contract_line_view_list"/>
+            <field name="act_window" ref="act_contract_line"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_contract_line_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="contract_line_view_form"/>
+            <field name="act_window" ref="act_contract_line"/>
+        </record>
+        <record model="ir.model.access" id="access_contract_line">
+            <field name="model" search="[('model', '=', 'contract.line')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_contract_line_admin">
+            <field name="model" search="[('model', '=', 'contract.line')]"/>
+            <field name="group" ref="group_contract_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+        <record model="ir.ui.view" id="contract_service_view_form">
+            <field name="model">contract.service</field>
+            <field name="type">form</field>
+            <field name="name">contract_service_form</field>
+        </record>
+        <record model="ir.ui.view" id="contract_service_view_list">
+            <field name="model">contract.service</field>
+            <field name="type">tree</field>
+            <field name="name">contract_service_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_contract_service">
+            <field name="name">Contract Service</field>
+            <field name="res_model">contract.service</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_contract_service_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="contract_service_view_list"/>
+            <field name="act_window" ref="act_contract_service"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_contract_service_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="contract_service_view_form"/>
+            <field name="act_window" ref="act_contract_service"/>
+        </record>
+        <record model="ir.model.access" id="access_contract_service">
+            <field name="model" search="[('model', '=', 'contract.service')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_contract_service_admin">
+            <field name="model" search="[('model', '=', 'contract.service')]"/>
+            <field name="group" ref="group_contract_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <record model="ir.ui.view" id="create_consumptions_start_view_form">
+            <field name="model">contract.create_consumptions.start</field>
+            <field name="type">form</field>
+            <field name="name">create_consumptions_start_form</field>
+        </record>
+
+        <record model="ir.action.wizard" id="wizard_create_consumptions">
+            <field name="name">Create Consumptions</field>
+            <field name="wiz_name">contract.create_consumptions</field>
+        </record>
+        <record model="ir.sequence.type" id="sequence_type_contract">
+            <field name="name">Contract</field>
+            <field name="code">contract</field>
+        </record>
+        <record model="ir.sequence.type-res.group"
+            id="sequence_type_contract_group_admin">
+            <field name="sequence_type" ref="sequence_type_contract"/>
+            <field name="group" ref="res.group_admin"/>
+        </record>
+        <record model="ir.sequence.type-res.group"
+            id="sequence_type_contract_group_sale_admin">
+            <field name="sequence_type" ref="sequence_type_contract"/>
+            <field name="group" ref="group_contract_admin"/>
+        </record>
+
+        <record model="ir.sequence" id="sequence_contract">
+            <field name="name">Contract</field>
+            <field name="code">contract</field>
+        </record>
+        <!-- Menus -->
+        <record model="ir.ui.icon" id="contract_icon">
+            <field name="name">tryton-contract</field>
+            <field name="path">icons/tryton-contract.svg</field>
+        </record>
+        <menuitem id="menu_contract" name="Contract" icon="tryton-contract"/>
+
+        <record model="ir.ui.menu-res.group" id="menu_contract_group_contract">
+            <field name="menu" ref="menu_contract"/>
+            <field name="group" ref="group_contract"/>
+        </record>
+
+        <record model="ir.ui.menu-res.group"
+                id="menu_contract_group_contract_admin">
+            <field name="menu" ref="menu_contract"/>
+            <field name="group" ref="group_contract_admin"/>
+        </record>
+
+        <menuitem name="Configuration" parent="menu_contract"
+            id="menu_configuration" sequence="0" icon="tryton-preferences"/>
+        <record model="ir.ui.menu-res.group"
+            id="menu_configuration_group_contract_admin">
+            <field name="menu" ref="menu_configuration"/>
+            <field name="group" ref="group_contract_admin"/>
+        </record>
+
+        <menuitem action="act_contract_service" id="menu_contract_service"
+          parent="menu_configuration" sequence="10" name="Contract Service"/>
+
+        <menuitem action="act_contract" id="menu_contract_form"
+            parent="menu_contract" sequence="20" name="Contract"/>
+        <menuitem action="act_contract_consumption"
+            id="menu_contract_consumption" parent="menu_contract"
+            sequence="30" name="Contract Consumption"/>
+
+        <menuitem name="Create Consumptions" parent="menu_contract"
+            sequence="40" action="wizard_create_consumptions"
+            id="menu_create_consumptions"/>
+    </data>
+</tryton>
