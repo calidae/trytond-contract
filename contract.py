@@ -3,7 +3,7 @@
 from datetime import datetime
 from dateutil.rrule import rrule, SECONDLY, MINUTELY, HOURLY, DAILY, WEEKLY, \
     MONTHLY, YEARLY
-from itertools import groupby, chain
+from itertools import groupby
 from sql.aggregate import Max
 
 from trytond.config import config
@@ -224,16 +224,21 @@ class RRuleMixin(Model):
                 continue
             if field in mappings:
                 if isinstance(mappings[field], str):
-                    values[mappings[fields]] = value
+                    values[mappings[field]] = value
                 else:
                     value = mappings[field][value]
             values[field] = value
+        # Convert string to list of tuples
+        for field in ('bymonthday', 'byyearday', 'byweekno', 'bymonth'):
+            if field in values:
+                values[field] = tuple(map(int, values[field].split(',')))
         return values
 
     @property
     def rrule(self):
         'Returns rrule instance from current values'
-        return rrule(**self.rrule_values())
+        values = self.rrule_values()
+        return rrule(**values)
 
 
 class ContractService(RRuleMixin, ModelSQL, ModelView):
@@ -266,9 +271,9 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     party = fields.Many2One('party.party', 'Party', required=True,
         states=_STATES, depends=_DEPENDS)
     reference = fields.Char('Reference', readonly=True, select=True)
-    start_date = fields.DateTime('Start Date', required=True,
+    start_date = fields.Date('Start Date', required=True,
         states=_STATES, depends=_DEPENDS)
-    end_date = fields.DateTime('End Date')
+    end_date = fields.Date('End Date')
     first_invoice_date = fields.Date('First Invoice Date', states=_STATES,
         depends=_DEPENDS)
     lines = fields.One2Many('contract.line', 'contract', 'Lines',
@@ -380,7 +385,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
     def rrule_values(self):
         values = super(Contract, self).rrule_values()
-        values['dtstart'] = self.start_date
+        values['dtstart'] = datetime.combine(self.start_date,
+            datetime.min.time())
         return values
 
     def get_consumptions(self, end_date=None):
@@ -388,14 +394,19 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         Date = pool.get('ir.date')
 
         if end_date is None:
-            end_date = datetime.combine(Date.today(), datetime.max.time())
+            end_date = Date.today()
 
+        end_date = datetime.combine(end_date, datetime.min.time())
         consumptions = []
         for line in self.lines:
             if line.state != 'active':
                 continue
-            start_date = (line.last_consumption_date or line.start_date or
-                line.contract.start_date)
+            start_date = datetime.combine(line.last_consumption_date
+                or line.start_date or line.contract.start_date,
+                datetime.min.time())
+            print self.rrule_values()
+            print start_date, end_date
+            print self.rrule.between(start_date, end_date)
             for date in self.rrule.between(start_date, end_date):
                 consumptions.append(line.get_consumption(start_date, date))
                 start_date = date
@@ -424,8 +435,8 @@ class ContractLine(Workflow, ModelSQL, ModelView):
     description = fields.Text('Description', required=True)
     unit_price = fields.Numeric('Unit Price', digits=(16, DIGITS),
         required=True)
-    start_date = fields.DateTime('Start Date', required=True)
-    end_date = fields.DateTime('End Date')
+    start_date = fields.Date('Start Date', required=True)
+    end_date = fields.Date('End Date')
     state = fields.Selection([
             ('draft', 'Draft'),
             ('active', 'Active'),
@@ -558,10 +569,10 @@ class ContractLine(Workflow, ModelSQL, ModelView):
         consumption.contract_line = self
         consumption.start_date = start_date
         consumption.end_date = end_date
-        invoice_date = end_date.date()
+        invoice_date = end_date
         if self.contract.first_invoice_date:
             invoice_date += (self.contract.first_invoice_date -
-                self.contract.start_date.date())
+                self.contract.start_date)
         consumption.invoice_date = invoice_date
         return consumption
 
@@ -736,11 +747,12 @@ class ContractConsumption(ModelSQL, ModelView):
 class CreateConsumptionsStart(ModelView):
     'Create Consumptions Start'
     __name__ = 'contract.create_consumptions.start'
-    date = fields.DateTime('Date')
+    date = fields.Date('Date')
 
     @staticmethod
     def default_date():
-        return datetime.now()
+        Date = Pool().get('ir.date')
+        return Date.today()
 
 
 class CreateConsumptions(Wizard):
