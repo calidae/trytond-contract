@@ -4,36 +4,4 @@
 <form string="Contract Service">
     <label name="product"/>
     <field name="product"/>
-    <newline/>
-    <label name="freq"/>
-    <field name="freq"/>
-    <label name="interval"/>
-    <field name="interval"/>
-    <label name="count"/>
-    <field name="count"/>
-    <newline/>
-    <label name="until"/>
-    <field name="until"/>
-    <label name="until_date"/>
-    <field name="until_date"/>
-    <label name="byday"/>
-    <field name="byday"/>
-    <label name="byhour"/>
-    <field name="byhour"/>
-    <label name="byminute"/>
-    <field name="byminute"/>
-    <label name="bymonth"/>
-    <field name="bymonth"/>
-    <label name="bymonthday"/>
-    <field name="bymonthday"/>
-    <label name="bysecond"/>
-    <field name="bysecond"/>
-    <label name="bysetpos"/>
-    <field name="bysetpos"/>
-    <label name="byweekno"/>
-    <field name="byweekno"/>
-    <label name="byyearday"/>
-    <field name="byyearday"/>
-    <label name="wkst"/>
-    <field name="wkst"/>
 </form>

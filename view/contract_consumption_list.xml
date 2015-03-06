@@ -7,5 +7,7 @@ this repository contains the full copyright notices and license terms. -->
     <field name="end_date"/>
     <field name="invoice_date"/>
     <field name="invoice_line"/>
+    <field name="init_period_date"/>
+    <field name="end_period_date"/>
     <button name="invoice" string="Invoice" tree_invisible="1"/>
 </tree>

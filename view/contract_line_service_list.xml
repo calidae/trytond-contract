@@ -4,6 +4,4 @@ this repository contains the full copyright notices and license terms. -->
 <tree string="Contract Line Service">
     <field name="product"/>
     <field name="interval"/>
-    <field name="until"/>
-    <field name="count"/>
 </tree>

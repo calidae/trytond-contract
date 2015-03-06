@@ -3,7 +3,4 @@
      copyright notices and license terms. -->
 <tree string="Contract Service">
     <field name="product"/>
-    <field name="freq"/>
-    <field name="interval"/>
-    <field name="count"/>
 </tree>

@@ -10,50 +10,21 @@
     <field name="party"/>
     <label name="currency"/>
     <field name="currency"/>
+    <label name="start_period_date"/>
+    <field name="start_period_date"/>
+    <label name="first_invoice_date"/>
+    <field name="first_invoice_date"/>
     <label name="start_date"/>
     <field name="start_date"/>
     <label name="end_date"/>
     <field name="end_date"/>
-    <label name="first_invoice_date"/>
-    <field name="first_invoice_date"/>
-    <notebook>
-        <page id="recurrence" string="Invoice recurrence">
-            <label name="freq"/>
-            <field name="freq"/>
-            <label name="interval"/>
-            <field name="interval"/>
-            <label name="count"/>
-            <field name="count"/>
-            <newline/>
-            <label name="until"/>
-            <field name="until"/>
-            <label name="until_date"/>
-            <field name="until_date"/>
-            <label name="byday"/>
-            <field name="byday"/>
-            <label name="byhour"/>
-            <field name="byhour"/>
-            <label name="byminute"/>
-            <field name="byminute"/>
-            <label name="bymonth"/>
-            <field name="bymonth"/>
-            <label name="bymonthday"/>
-            <field name="bymonthday"/>
-            <label name="bysecond"/>
-            <field name="bysecond"/>
-            <label name="bysetpos"/>
-            <field name="bysetpos"/>
-            <label name="byweekno"/>
-            <field name="byweekno"/>
-            <label name="byyearday"/>
-            <field name="byyearday"/>
-            <label name="wkst"/>
-            <field name="wkst"/>
-        </page>
-        <page name="lines">
-            <field name="lines" colspan="4"/>
-        </page>
-    </notebook>
+    <separator id="recurrence" string="Invoice recurrence" colspan="4"/>
+    <label name="freq"/>
+    <field name="freq"/>
+    <label name="interval"/>
+    <field name="interval"/>
+    <newline/>
+    <field name="lines" colspan="4"/>
     <label name="state"/>
     <field name="state"/>
     <group id="buttons" colspan="2">

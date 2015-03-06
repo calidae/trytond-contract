@@ -1,8 +1,8 @@
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
-from datetime import datetime
-from dateutil.rrule import rrule, SECONDLY, MINUTELY, HOURLY, DAILY, WEEKLY, \
-    MONTHLY, YEARLY
+import datetime
+from dateutil.relativedelta import relativedelta
+from dateutil.rrule import rrule, DAILY, WEEKLY, MONTHLY, YEARLY
 from itertools import groupby
 from sql.aggregate import Max
 
@@ -15,190 +15,24 @@ from trytond.tools import reduce_ids
 from trytond.wizard import Wizard, StateView, StateAction, Button
 DIGITS = config.getint('digits', 'unit_price_digits', 4)
 
-__all__ = ['ContractService', 'Contract', 'ContractLine',
+__all__ = ['ContractService', 'Contract', 'ContractLine', 'RRuleMixin',
     'ContractConsumption', 'CreateConsumptionsStart', 'CreateConsumptions']
 
 
 class RRuleMixin(Model):
     _rec_name = 'freq'
     freq = fields.Selection([
-        ('secondly', 'Secondly'),
-        ('minutely', 'Minutely'),
-        ('hourly', 'Hourly'),
+        (None, 'None'),
         ('daily', 'Daily'),
         ('weekly', 'Weekly'),
         ('monthly', 'Monthly'),
         ('yearly', 'Yearly'),
-        ], 'Frequency', required=True)
-    until_date = fields.Boolean('Is Date',
-        help='Ignore time of field "Until Date", but handle as date only.')
-    until = fields.DateTime('Until Date')
-    count = fields.Integer('Count')
+        ], 'Frequency')
     interval = fields.Integer('Interval')
-    bysecond = fields.Char('By Second')
-    byminute = fields.Char('By Minute')
-    byhour = fields.Char('By Hour')
-    byday = fields.Char('By Day')
-    bymonthday = fields.Char('By Month Day')
-    byyearday = fields.Char('By Year Day')
-    byweekno = fields.Char('By Week Number')
-    bymonth = fields.Char('By Month')
-    bysetpos = fields.Char('By Position')
-    wkst = fields.Selection([
-        (None, ''),
-        ('su', 'Sunday'),
-        ('mo', 'Monday'),
-        ('tu', 'Tuesday'),
-        ('we', 'Wednesday'),
-        ('th', 'Thursday'),
-        ('fr', 'Friday'),
-        ('sa', 'Saturday'),
-        ], 'Week Day', sort=False)
-
-    @classmethod
-    def __setup__(cls):
-        super(RRuleMixin, cls).__setup__()
-        cls._sql_constraints += [
-            ('until_count_only_one',
-                'CHECK(until IS NULL OR count IS NULL OR count = 0)',
-                'Only one of "until" and "count" can be set.'),
-            ]
-        cls._error_messages.update({
-                'invalid_bysecond': ('Invalid "By Second" in recurrence rule '
-                    '"%s"'),
-                'invalid_byminute': ('Invalid "By Minute" in recurrence rule '
-                    '"%s"'),
-                'invalid_byhour': 'Invalid "By Hour" in recurrence rule "%s"',
-                'invalid_byday': 'Invalid "By Day" in recurrence rule "%s"',
-                'invalid_bymonthday': ('Invalid "By Month Day" in recurrence '
-                    'rule "%s"'),
-                'invalid_byyearday': ('Invalid "By Year Day" in recurrence '
-                    'rule "%s"'),
-                'invalid_byweekno': ('Invalid "By Week Number" in recurrence '
-                    'rule "%s"'),
-                'invalid_bymonth': (
-                    'Invalid "By Month" in recurrence rule "%s"'),
-                'invalid_bysetpos': (
-                    'Invalid "By Position" in recurrence rule "%s"'),
-                })
-
-    @classmethod
-    def validate(cls, rules):
-        super(RRuleMixin, cls).validate(rules)
-        for rule in rules:
-            rule.check_bysecond()
-            rule.check_byminute()
-            rule.check_byhour()
-            rule.check_byday()
-            rule.check_bymonthday()
-            rule.check_byyearday()
-            rule.check_byweekno()
-            rule.check_bymonth()
-            rule.check_bysetpos()
-
-    def check_bysecond(self):
-        if self.bysecond:
-            for second in self.bysecond.split(','):
-                try:
-                    second = int(second)
-                except Exception:
-                    second = -1
-                if not (second >= 0 and second <= 59):
-                    self.raise_user_error('invalid_bysecond', (self.rec_name,))
-
-    def check_byminute(self):
-        if self.byminute:
-            for minute in self.byminute.split(','):
-                try:
-                    minute = int(minute)
-                except Exception:
-                    minute = -1
-                if not (minute >= 0 and minute <= 59):
-                    self.raise_user_error('invalid_byminute', (self.rec_name,))
-
-    def check_byhour(self):
-        if self.byhour:
-            for hour in self.byhour.split(','):
-                try:
-                    hour = int(hour)
-                except Exception:
-                    hour = -1
-                if not (hour >= 0 and hour <= 23):
-                    self.raise_user_error('invalid_byhour', (self.rec_name,))
-
-    def check_byday(self):
-        if self.byday:
-            for weekdaynum in self.byday.split(','):
-                weekday = weekdaynum[-2:]
-                if weekday not in ('SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'):
-                    self.raise_user_error('invalid_byday', (self.rec_name,))
-                ordwk = weekday[:-2]
-                if not ordwk:
-                    continue
-                try:
-                    ordwk = int(ordwk)
-                except Exception:
-                    ordwk = -1
-                if not (abs(ordwk) >= 1 and abs(ordwk) <= 53):
-                    self.raise_user_error('invalid_byday', (self.rec_name,))
-
-    def check_bymonthday(self):
-        if self.bymonthday:
-            for monthdaynum in self.bymonthday.split(','):
-                try:
-                    monthdaynum = int(monthdaynum)
-                except Exception:
-                    monthdaynum = -100
-                if not (abs(monthdaynum) >= 1 and abs(monthdaynum) <= 31):
-                    self.raise_user_error('invalid_bymonthday', (
-                            self.rec_name,))
-
-    def check_byyearday(self):
-        if self.byyearday:
-            for yeardaynum in self.byyearday.split(','):
-                try:
-                    yeardaynum = int(yeardaynum)
-                except Exception:
-                    yeardaynum = -1000
-                if not (abs(yeardaynum) >= 1 and abs(yeardaynum) <= 366):
-                    self.raise_user_error('invalid_byyearday',
-                        (self.rec_name,))
-
-    def check_byweekno(self):
-        if self.byweekno:
-            for weeknum in self.byweekno.split(','):
-                try:
-                    weeknum = int(weeknum)
-                except Exception:
-                    weeknum = -100
-                if not (abs(weeknum) >= 1 and abs(weeknum) <= 53):
-                    self.raise_user_error('invalid_byweekno', (self.rec_name,))
-
-    def check_bymonth(self):
-        if self.bymonth:
-            for monthnum in self.bymonth.split(','):
-                try:
-                    monthnum = int(monthnum)
-                except Exception:
-                    monthnum = -1
-                if not (monthnum >= 1 and monthnum <= 12):
-                    self.raise_user_error('invalid_bymonth', (self.rec_name,))
-
-    def check_bysetpos(self):
-        if self.bysetpos:
-            for setposday in self.bysetpos.split(','):
-                try:
-                    setposday = int(setposday)
-                except Exception:
-                    setposday = -1000
-                if not (abs(setposday) >= 1 and abs(setposday) <= 366):
-                    self.raise_user_error('invalid_bysetpos', (self.rec_name,))
 
     def _rule2update(self):
         res = {}
-        for field in ('freq', 'until_date', 'until', 'count', 'interval',
-                'bysecond', 'byminute', 'byhour', 'byday', 'bymonthday',
-                'byyearday', 'byweekno', 'bymonth', 'bysetpos', 'wkst'):
+        for field in ('freq', 'interval'):
             res[field] = getattr(self, field)
         return res
 
@@ -206,19 +40,13 @@ class RRuleMixin(Model):
         values = {}
         mappings = {
             'freq': {
-                'secondly': SECONDLY,
-                'minutely': MINUTELY,
-                'hourly': HOURLY,
                 'daily': DAILY,
                 'weekly': WEEKLY,
                 'monthly': MONTHLY,
                 'yearly': YEARLY,
                 },
-            'byday': 'bymonthday',
             }
-        for field in ('freq', 'until_date', 'until', 'count', 'interval',
-                'bysecond', 'byminute', 'byhour', 'byday', 'bymonthday',
-                'byyearday', 'byweekno', 'bymonth', 'bysetpos', 'wkst'):
+        for field in ('freq', 'interval'):
             value = getattr(self, field)
             if not value:
                 continue
@@ -228,10 +56,6 @@ class RRuleMixin(Model):
                 else:
                     value = mappings[field][value]
             values[field] = value
-        # Convert string to list of tuples
-        for field in ('bymonthday', 'byyearday', 'byweekno', 'bymonth'):
-            if field in values:
-                values[field] = tuple(map(int, values[field].split(',')))
         return values
 
     @property
@@ -241,7 +65,7 @@ class RRuleMixin(Model):
         return rrule(**values)
 
 
-class ContractService(RRuleMixin, ModelSQL, ModelView):
+class ContractService(ModelSQL, ModelView):
     'Contract Service'
     __name__ = 'contract.service'
 
@@ -260,6 +84,10 @@ _STATES = {
 _DEPENDS = ['state']
 
 
+def todatetime(date):
+    return datetime.datetime.combine(date, datetime.datetime.min.time())
+
+
 class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     'Contract'
     __name__ = 'contract'
@@ -274,6 +102,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     start_date = fields.Date('Start Date', required=True,
         states=_STATES, depends=_DEPENDS)
     end_date = fields.Date('End Date')
+    start_period_date = fields.Date('Start Period Date', required=True,
+        states=_STATES, depends=_DEPENDS)
     first_invoice_date = fields.Date('First Invoice Date', states=_STATES,
         depends=_DEPENDS)
     lines = fields.One2Many('contract.line', 'contract', 'Lines',
@@ -291,9 +121,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     @classmethod
     def __setup__(cls):
         super(Contract, cls).__setup__()
-        for field_name in ('freq', 'until_date', 'until', 'count', 'interval',
-                'bysecond', 'byminute', 'byhour', 'byday', 'bymonthday',
-                'byyearday', 'byweekno', 'bymonth', 'bysetpos', 'wkst'):
+        for field_name in ('freq', 'interval'):
             field = getattr(cls, field_name)
             field.states = _STATES
             field.depends = _DEPENDS
@@ -316,6 +144,10 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                     'invisible': Eval('state') == 'cancel',
                     'icon': 'tryton-cancel',
                     },
+                })
+        cls._error_messages.update({
+                'start_date_not_valid': ('Contract %(contract)s with '
+                    'invalid date "%(date)s"'),
                 })
 
     @staticmethod
@@ -364,18 +196,13 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     @ModelView.button
     @Workflow.transition('draft')
     def draft(cls, contracts):
-        pool = Pool()
-        ContractLine = pool.get('contract.line')
-        ContractLine.hold([l for c in contracts for l in c.lines])
+        pass
 
     @classmethod
     @ModelView.button
     @Workflow.transition('validated')
     def validate_contract(cls, contracts):
-        pool = Pool()
-        ContractLine = pool.get('contract.line')
         cls.set_reference(contracts)
-        ContractLine.active([l for c in contracts for l in c.lines])
 
     @classmethod
     @ModelView.button
@@ -385,9 +212,14 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
     def rrule_values(self):
         values = super(Contract, self).rrule_values()
-        values['dtstart'] = datetime.combine(self.start_date,
-            datetime.min.time())
+        values['dtstart'] = todatetime(self.start_period_date)
         return values
+
+    def get_invoice_date(self, last_invoice_date):
+        last_invoice_date = todatetime(last_invoice_date)
+        r = rrule(self.rrule._freq, dtstart=last_invoice_date)
+        date = r.after(last_invoice_date)
+        return date.date()
 
     def get_consumptions(self, end_date=None):
         pool = Pool()
@@ -396,20 +228,53 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         if end_date is None:
             end_date = Date.today()
 
-        end_date = datetime.combine(end_date, datetime.min.time())
+        end_date = todatetime(end_date)
         consumptions = []
+
         for line in self.lines:
-            if line.state != 'active':
-                continue
-            start_date = datetime.combine(line.last_consumption_date
-                or line.start_date or line.contract.start_date,
-                datetime.min.time())
-            print self.rrule_values()
-            print start_date, end_date
-            print self.rrule.between(start_date, end_date)
-            for date in self.rrule.between(start_date, end_date):
-                consumptions.append(line.get_consumption(start_date, date))
-                start_date = date
+
+            start_period_date = self.start_period_date
+
+            last_consumption_date = line.last_consumption_date
+            if last_consumption_date:
+                last_consumption_date = todatetime(line.last_consumption_date)
+                last_consumption_date += relativedelta(days=+1)
+
+            start = start_period_date
+            if last_consumption_date:
+                start = (last_consumption_date + relativedelta(days=+1)).date()
+
+            end_contract = None
+            if end_contract:
+                end_contract = todatetime(self.end)
+                self.rrule.until = end_contract
+
+            last_invoice_date = line.last_consumption_invoice_date
+
+            for date in self.rrule.between(todatetime(start), end_date):
+                date -= relativedelta(days=+1)
+                date = date.date()
+                invoice_date = last_invoice_date or self.first_invoice_date \
+                    or date
+                if last_invoice_date:
+                    invoice_date = self.get_invoice_date(last_invoice_date)
+
+                finish_date = date
+                if end_contract and end_contract <= date:
+                    date = end_contract
+
+                start_period = start
+                if last_consumption_date is None:
+                    start_period = start_period_date
+                    start = self.start_date
+
+                consumptions.append(line.get_consumption(start, date,
+                        invoice_date, start_period, finish_date))
+                date += relativedelta(days=+1)
+                start_period = date
+                start = date
+                last_invoice_date = invoice_date
+                last_consumption_date = date
         return consumptions
 
     @classmethod
@@ -418,10 +283,30 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         pool = Pool()
         ContractConsumption = pool.get('contract.consumption')
 
+        date += relativedelta(days=+1)  # to support included.
         to_create = []
         for contract in contracts:
             to_create += contract.get_consumptions(date)
+
         return ContractConsumption.create([c._save_values for c in to_create])
+
+    def check_start_date(self):
+        if not hasattr(self, 'rrule'):
+            return
+        d = self.rrule.after(todatetime(self.start_period_date)).date()
+        if self.start_date >= self.start_period_date and self.start_date < d:
+            return True
+        self.raise_user_error('start_date_not_valid', {
+                    'contract': self.rec_name,
+                    'date': self.start_date,
+                    })
+
+    @classmethod
+    def validate(cls, contracts):
+        super(Contract, cls).validate(contracts)
+        for contract in contracts:
+            contract.check_start_date()
+            pass
 
 
 class ContractLine(Workflow, ModelSQL, ModelView):
@@ -435,58 +320,14 @@ class ContractLine(Workflow, ModelSQL, ModelView):
     description = fields.Text('Description', required=True)
     unit_price = fields.Numeric('Unit Price', digits=(16, DIGITS),
         required=True)
-    start_date = fields.Date('Start Date', required=True)
-    end_date = fields.Date('End Date')
-    state = fields.Selection([
-            ('draft', 'Draft'),
-            ('active', 'Active'),
-            ('hold', 'Hold'),
-            ], 'State', required=True, readonly=True)
     last_consumption_date = fields.Function(fields.Date(
             'Last Consumption Date'), 'get_last_consumption_date')
-
-    @classmethod
-    def __setup__(cls):
-        super(ContractLine, cls).__setup__()
-        for attr in dir(RRuleMixin):
-            if not hasattr(cls, attr):
-                continue
-            if isinstance(getattr(cls, attr), fields.Field):
-                field = getattr(cls, attr)
-                field.states = _STATES
-                field.depends = _DEPENDS
-
-        cls._transitions |= set((
-                ('draft', 'active'),
-                ('active', 'hold'),
-                ('hold', 'active'),
-                ))
-        cls._buttons.update({
-                'active': {
-                    'invisible': Eval('state') == 'active',
-                    'icon': 'tryton-go-next',
-                    },
-                'hold': {
-                    'invisible': Eval('state') != 'hold',
-                    'icon': 'tryton-go-previous',
-                    },
-                })
-        cls._error_messages.update({
-                'line_outside_contract': ('Line "%(line)s" is outside its '
-                    'contract "%(contract)s" period')
-                })
+    last_consumption_invoice_date = fields.Function(fields.Date(
+            'Last Consumption Date'), 'get_last_consumption_date')
 
     @staticmethod
     def default_state():
         return 'draft'
-
-    @staticmethod
-    def default_start_date():
-        return Transaction().context.get('start_date')
-
-    @staticmethod
-    def default_end_date():
-        return Transaction().context.get('end_date')
 
     @fields.depends('service', 'unit_price', 'description')
     def on_change_service(self):
@@ -501,14 +342,6 @@ class ContractLine(Workflow, ModelSQL, ModelView):
                 changes['description'] = self.service.product.rec_name
         return changes
 
-    @property
-    def rrule(self):
-        if not self.service:
-            return
-        values = self.service.rrule_values()
-        values['dtstart'] = self.start_date
-        return rrule(**values)
-
     @classmethod
     def get_last_consumption_date(cls, lines, name):
         pool = Pool()
@@ -518,50 +351,31 @@ class ContractLine(Workflow, ModelSQL, ModelView):
 
         line_ids = [l.id for l in lines]
         values = dict.fromkeys(line_ids, None)
-        cursor.execute(*table.select(table.contract_line, Max(table.end_date),
+        cursor.execute(*table.select(table.contract_line,
+                    Max(table.end_period_date),
                 where=reduce_ids(table.contract_line, line_ids),
                 group_by=table.contract_line))
         values.update(dict(cursor.fetchall()))
         return values
 
     @classmethod
-    def validate(cls, lines):
-        super(ContractLine, cls).validate(lines)
-        for line in lines:
-            line.check_contract_period()
+    def get_last_consumption_invoice_date(cls, lines, name):
+        pool = Pool()
+        Consumption = pool.get('contract.consumption')
+        table = Consumption.__table__()
+        cursor = Transaction().cursor
 
-    def check_contract_period(self):
-        if self.start_date < self.contract.start_date:
-            self.raise_user_error('line_outside_contract', {
-                    'line': self.rec_name,
-                    'contract': self.contract.rec_name,
-                    })
-        if (self.contract.end_date and
-                self.end_date > self.contract.end_date):
-            self.raise_user_error('line_outside_contract', {
-                    'line': self.rec_name,
-                    'contract': self.contract.rec_name,
-                    })
+        line_ids = [l.id for l in lines]
+        values = dict.fromkeys(line_ids, None)
+        cursor.execute(*table.select(table.contract_line,
+                Max(table.invoice_date),
+                where=reduce_ids(table.contract_line, line_ids),
+                group_by=table.contract_line))
+        values.update(dict(cursor.fetchall()))
+        return values
 
-    @classmethod
-    @ModelView.button
-    @Workflow.transition('draft')
-    def draft(cls, lines):
-        pass
-
-    @classmethod
-    @ModelView.button
-    @Workflow.transition('active')
-    def active(cls, lines):
-        pass
-
-    @classmethod
-    @ModelView.button
-    @Workflow.transition('hold')
-    def hold(cls, lines):
-        pass
-
-    def get_consumption(self, start_date, end_date):
+    def get_consumption(self, start_date, end_date, invoice_date, start_period,
+            finish_period):
         'Returns the consumption for date date'
         pool = Pool()
         Consumption = pool.get('contract.consumption')
@@ -569,10 +383,8 @@ class ContractLine(Workflow, ModelSQL, ModelView):
         consumption.contract_line = self
         consumption.start_date = start_date
         consumption.end_date = end_date
-        invoice_date = end_date
-        if self.contract.first_invoice_date:
-            invoice_date += (self.contract.first_invoice_date -
-                self.contract.start_date)
+        consumption.init_period_date = start_period
+        consumption.end_period_date = finish_period
         consumption.invoice_date = invoice_date
         return consumption
 
@@ -584,8 +396,10 @@ class ContractConsumption(ModelSQL, ModelView):
     contract_line = fields.Many2One('contract.line', 'Contract Line',
         required=True)
     invoice_line = fields.Many2One('account.invoice.line', 'Invoice Line')
-    start_date = fields.DateTime('Start Date')
-    end_date = fields.DateTime('End Date')
+    init_period_date = fields.Date('Start Period Date')
+    end_period_date = fields.Date('Finish Period Date')
+    start_date = fields.Date('Start Date')
+    end_date = fields.Date('End Date')
     invoice_date = fields.Date('Invoice Date')
 
     @classmethod
@@ -667,10 +481,8 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice_line.taxes = taxes
         invoice_line.invoice_type = 'out_invoice'
         # Compute quantity based on dates
-        contract_start = self.contract_line.contract.start_date
-        invoice_date = self.contract_line.contract.rrule.after(contract_start)
-        quantity = ((self.end_date - self.start_date).total_seconds()
-            / (invoice_date - contract_start).total_seconds())
+        quantity = ((self.end_date - self.start_date).total_seconds() /
+            (self.end_period_date - self.init_period_date).total_seconds())
         rounding = invoice_line.unit.rounding if invoice_line.unit else 1
         invoice_line.quantity = Uom.round(quantity, rounding)
         return invoice_line
@@ -735,8 +547,8 @@ class ContractConsumption(ModelSQL, ModelView):
         invoices = []
         for key, grouped_lines in groupby(lines, key=cls._group_invoice_key):
             invoice = cls._get_invoice(key)
-            invoice.lines = (list(getattr(invoice, 'lines', []))
-                + list(x[1] for x in grouped_lines))
+            invoice.lines = (list(getattr(invoice, 'lines', [])) +
+                list(x[1] for x in grouped_lines))
             invoices.append(invoice)
 
         invoices = Invoice.create([x._save_values for x in invoices])

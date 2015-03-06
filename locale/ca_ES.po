@@ -18,141 +18,9 @@ msgstr ""
 "Falta el compte d'ingressos al producte \"%(product)s\" de la línia de "
 "contracte \"%(contract_line)s\"."
 
-msgctxt "error:contract.line:"
-msgid "Line \"%(line)s\" is outside its contract \"%(contract)s\" period"
-msgstr "La línia \"%(line)s\" es fora del període del seu contracte \"%(contract)s\""
-
-msgctxt "error:contract.service:"
-msgid "Invalid \"By Day\" in recurrence rule \"%s\""
-msgstr "El camp \"per dia\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract.service:"
-msgid "Invalid \"By Hour\" in recurrence rule \"%s\""
-msgstr "El camp \"per hora\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract.service:"
-msgid "Invalid \"By Minute\" in recurrence rule \"%s\""
-msgstr "El camp \"per minut\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract.service:"
-msgid "Invalid \"By Month Day\" in recurrence rule \"%s\""
-msgstr "El camp \"per dia del mes\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract.service:"
-msgid "Invalid \"By Month\" in recurrence rule \"%s\""
-msgstr "El camp \"per mes\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract.service:"
-msgid "Invalid \"By Position\" in recurrence rule \"%s\""
-msgstr "El camp \"per ubicació\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract.service:"
-msgid "Invalid \"By Second\" in recurrence rule \"%s\""
-msgstr "El camp \"per segon\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract.service:"
-msgid "Invalid \"By Week Number\" in recurrence rule \"%s\""
-msgstr ""
-"El camp \"per número de la setmana\" de la regla de recurrència \"%s\" no és"
-" correcte."
-
-msgctxt "error:contract.service:"
-msgid "Invalid \"By Year Day\" in recurrence rule \"%s\""
-msgstr ""
-"El camp \"per dia de l'any\" de la regla de recurrència \"%s\" no és "
-"correcte."
-
-msgctxt "error:contract.service:"
-msgid "Only one of \"until\" and \"count\" can be set."
-msgstr "Defineix un \"fins\" i un \"comptador\"."
-
-msgctxt "error:contract:"
-msgid "Invalid \"By Day\" in recurrence rule \"%s\""
-msgstr "El camp \"per dia\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract:"
-msgid "Invalid \"By Hour\" in recurrence rule \"%s\""
-msgstr "El camp \"per hora\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract:"
-msgid "Invalid \"By Minute\" in recurrence rule \"%s\""
-msgstr "El camp \"per minut\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract:"
-msgid "Invalid \"By Month Day\" in recurrence rule \"%s\""
-msgstr "El camp \"per dia del mes\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract:"
-msgid "Invalid \"By Month\" in recurrence rule \"%s\""
-msgstr "El camp \"per mes\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract:"
-msgid "Invalid \"By Position\" in recurrence rule \"%s\""
-msgstr "El camp \"per ubicació\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract:"
-msgid "Invalid \"By Second\" in recurrence rule \"%s\""
-msgstr "El camp \"per segon\" de la regla de recurrència \"%s\" no és correcte."
-
-msgctxt "error:contract:"
-msgid "Invalid \"By Week Number\" in recurrence rule \"%s\""
-msgstr ""
-"El camp \"per número de la setmana\" de la regla de recurrència \"%s\" no és"
-" correcte."
-
-msgctxt "error:contract:"
-msgid "Invalid \"By Year Day\" in recurrence rule \"%s\""
-msgstr ""
-"El camp \"per dia de l'any\" de la regla de recurrència \"%s\" no és "
-"correcte."
-
-msgctxt "error:contract:"
-msgid "Only one of \"until\" and \"count\" can be set."
-msgstr "Defineix un \"fins\" i un \"comptador\"."
-
-msgctxt "field:contract,byday:"
-msgid "By Day"
-msgstr "Per dia"
-
-msgctxt "field:contract,byhour:"
-msgid "By Hour"
-msgstr "Per hora"
-
-msgctxt "field:contract,byminute:"
-msgid "By Minute"
-msgstr "Per minut"
-
-msgctxt "field:contract,bymonth:"
-msgid "By Month"
-msgstr "Per mes"
-
-msgctxt "field:contract,bymonthday:"
-msgid "By Month Day"
-msgstr "Per dia del mes"
-
-msgctxt "field:contract,bysecond:"
-msgid "By Second"
-msgstr "Per segon"
-
-msgctxt "field:contract,bysetpos:"
-msgid "By Position"
-msgstr "Per ubicació"
-
-msgctxt "field:contract,byweekno:"
-msgid "By Week Number"
-msgstr "Per número de la setmana"
-
-msgctxt "field:contract,byyearday:"
-msgid "By Year Day"
-msgstr "Per dia de l'any"
-
 msgctxt "field:contract,company:"
 msgid "Company"
 msgstr "Empresa"
-
-msgctxt "field:contract,count:"
-msgid "Count"
-msgstr "Comptador"
 
 msgctxt "field:contract,create_date:"
 msgid "Create Date"
@@ -209,18 +77,6 @@ msgstr "Data inici"
 msgctxt "field:contract,state:"
 msgid "State"
 msgstr "Estat"
-
-msgctxt "field:contract,until:"
-msgid "Until Date"
-msgstr "Fins a la data"
-
-msgctxt "field:contract,until_date:"
-msgid "Is Date"
-msgstr "Es una data"
-
-msgctxt "field:contract,wkst:"
-msgid "Week Day"
-msgstr "Dia de la setmana"
 
 msgctxt "field:contract,write_date:"
 msgid "Write Date"
@@ -326,10 +182,6 @@ msgctxt "field:contract.line,description:"
 msgid "Description"
 msgstr "Descripció"
 
-msgctxt "field:contract.line,end_date:"
-msgid "End Date"
-msgstr "Data final"
-
 msgctxt "field:contract.line,id:"
 msgid "ID"
 msgstr "ID"
@@ -350,14 +202,6 @@ msgctxt "field:contract.line,service:"
 msgid "Service"
 msgstr "Serveis"
 
-msgctxt "field:contract.line,start_date:"
-msgid "Start Date"
-msgstr "Data inici"
-
-msgctxt "field:contract.line,state:"
-msgid "State"
-msgstr "Estat"
-
 msgctxt "field:contract.line,unit_price:"
 msgid "Unit Price"
 msgstr "Preu unitat"
@@ -369,46 +213,6 @@ msgstr "Data modificació"
 msgctxt "field:contract.line,write_uid:"
 msgid "Write User"
 msgstr "Usuari modificació"
-
-msgctxt "field:contract.service,byday:"
-msgid "By Day"
-msgstr "Per dia"
-
-msgctxt "field:contract.service,byhour:"
-msgid "By Hour"
-msgstr "Per hora"
-
-msgctxt "field:contract.service,byminute:"
-msgid "By Minute"
-msgstr "Per minut"
-
-msgctxt "field:contract.service,bymonth:"
-msgid "By Month"
-msgstr "Per mes"
-
-msgctxt "field:contract.service,bymonthday:"
-msgid "By Month Day"
-msgstr "Per dia del mes"
-
-msgctxt "field:contract.service,bysecond:"
-msgid "By Second"
-msgstr "Per segon"
-
-msgctxt "field:contract.service,bysetpos:"
-msgid "By Position"
-msgstr "Per ubicació"
-
-msgctxt "field:contract.service,byweekno:"
-msgid "By Week Number"
-msgstr "Per número de la setmana"
-
-msgctxt "field:contract.service,byyearday:"
-msgid "By Year Day"
-msgstr "Per dia de l'any"
-
-msgctxt "field:contract.service,count:"
-msgid "Count"
-msgstr "Comptador"
 
 msgctxt "field:contract.service,create_date:"
 msgid "Create Date"
@@ -438,18 +242,6 @@ msgctxt "field:contract.service,rec_name:"
 msgid "Name"
 msgstr "Nom"
 
-msgctxt "field:contract.service,until:"
-msgid "Until Date"
-msgstr "Fins a la data"
-
-msgctxt "field:contract.service,until_date:"
-msgid "Is Date"
-msgstr "Es una data"
-
-msgctxt "field:contract.service,wkst:"
-msgid "Week Day"
-msgstr "Dia de la setmana"
-
 msgctxt "field:contract.service,write_date:"
 msgid "Write Date"
 msgstr "Data modificació"
@@ -457,16 +249,6 @@ msgstr "Data modificació"
 msgctxt "field:contract.service,write_uid:"
 msgid "Write User"
 msgstr "Usuari modificació"
-
-msgctxt "help:contract,until_date:"
-msgid "Ignore time of field \"Until Date\", but handle as date only."
-msgstr ""
-"Ignora la hora del camp \"Fins a la data\", però utilitza com a única data."
-
-msgctxt "help:contract.service,until_date:"
-msgid "Ignore time of field \"Until Date\", but handle as date only."
-msgstr ""
-"Ignora la hora del camp \"Fins a la data\", però utilitza com a única data."
 
 msgctxt "model:contract,name:"
 msgid "Contract"
@@ -497,7 +279,7 @@ msgid "Contract"
 msgstr "Contractes"
 
 msgctxt "model:ir.action,name:act_contract_configuration_form"
-msgid "Contract Configuration"
+msgid "Contracts Configuration"
 msgstr "Configuració de contractes"
 
 msgctxt "model:ir.action,name:act_contract_consumption"
@@ -509,7 +291,7 @@ msgid "Contract Line"
 msgstr "Línia de contracte"
 
 msgctxt "model:ir.action,name:act_contract_service"
-msgid "Services"
+msgid "Contract Service"
 msgstr "Servei de contracte"
 
 msgctxt "model:ir.action,name:wizard_create_consumptions"
@@ -555,7 +337,7 @@ msgid "Contract"
 msgstr "Contracte"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_configuration"
-msgid "Contract Configuration"
+msgid "Contracts Configuration"
 msgstr "Configuració de contractes"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_consumption"
@@ -567,7 +349,7 @@ msgid "Contract"
 msgstr "Contracte"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_service"
-msgid "Services"
+msgid "Contract Service"
 msgstr "Servei de contracte"
 
 msgctxt "model:ir.ui.menu,name:menu_create_consumptions"
@@ -575,11 +357,11 @@ msgid "Create Consumptions"
 msgstr "Crea consums"
 
 msgctxt "model:res.group,name:group_contract"
-msgid "Contract User"
+msgid "Contract"
 msgstr "Contractes"
 
 msgctxt "model:res.group,name:group_contract_admin"
-msgid "Contract Administrator"
+msgid "Contract Administration"
 msgstr "Administració de contractes"
 
 msgctxt "selection:contract,freq:"
@@ -587,20 +369,8 @@ msgid "Daily"
 msgstr "Diàriament"
 
 msgctxt "selection:contract,freq:"
-msgid "Hourly"
-msgstr "Cada hora"
-
-msgctxt "selection:contract,freq:"
-msgid "Minutely"
-msgstr "Cada minut"
-
-msgctxt "selection:contract,freq:"
 msgid "Monthly"
 msgstr "Mensualment"
-
-msgctxt "selection:contract,freq:"
-msgid "Secondly"
-msgstr "Cada segon"
 
 msgctxt "selection:contract,freq:"
 msgid "Weekly"
@@ -622,69 +392,13 @@ msgctxt "selection:contract,state:"
 msgid "Validated"
 msgstr "Validat"
 
-msgctxt "selection:contract,wkst:"
-msgid ""
-msgstr " "
-
-msgctxt "selection:contract,wkst:"
-msgid "Friday"
-msgstr "Divendres"
-
-msgctxt "selection:contract,wkst:"
-msgid "Monday"
-msgstr "Dilluns"
-
-msgctxt "selection:contract,wkst:"
-msgid "Saturday"
-msgstr "Dissabte"
-
-msgctxt "selection:contract,wkst:"
-msgid "Sunday"
-msgstr "Diumenge"
-
-msgctxt "selection:contract,wkst:"
-msgid "Thursday"
-msgstr "Dijous"
-
-msgctxt "selection:contract,wkst:"
-msgid "Tuesday"
-msgstr "Dimarts"
-
-msgctxt "selection:contract,wkst:"
-msgid "Wednesday"
-msgstr "Dimecres"
-
-msgctxt "selection:contract.line,state:"
-msgid "Active"
-msgstr "Actiu"
-
-msgctxt "selection:contract.line,state:"
-msgid "Draft"
-msgstr "Esborrany"
-
-msgctxt "selection:contract.line,state:"
-msgid "Hold"
-msgstr "En espera"
-
 msgctxt "selection:contract.service,freq:"
 msgid "Daily"
 msgstr "Diàriament"
 
 msgctxt "selection:contract.service,freq:"
-msgid "Hourly"
-msgstr "Cada hora"
-
-msgctxt "selection:contract.service,freq:"
-msgid "Minutely"
-msgstr "Cada minut"
-
-msgctxt "selection:contract.service,freq:"
 msgid "Monthly"
 msgstr "Mensualment"
-
-msgctxt "selection:contract.service,freq:"
-msgid "Secondly"
-msgstr "Cada segon"
 
 msgctxt "selection:contract.service,freq:"
 msgid "Weekly"
@@ -693,38 +407,6 @@ msgstr "Setmanalment"
 msgctxt "selection:contract.service,freq:"
 msgid "Yearly"
 msgstr "Anualment"
-
-msgctxt "selection:contract.service,wkst:"
-msgid ""
-msgstr " "
-
-msgctxt "selection:contract.service,wkst:"
-msgid "Friday"
-msgstr "Divendres"
-
-msgctxt "selection:contract.service,wkst:"
-msgid "Monday"
-msgstr "Dilluns"
-
-msgctxt "selection:contract.service,wkst:"
-msgid "Saturday"
-msgstr "Dissabte"
-
-msgctxt "selection:contract.service,wkst:"
-msgid "Sunday"
-msgstr "Diumenge"
-
-msgctxt "selection:contract.service,wkst:"
-msgid "Thursday"
-msgstr "Dijous"
-
-msgctxt "selection:contract.service,wkst:"
-msgid "Tuesday"
-msgstr "Dimarts"
-
-msgctxt "selection:contract.service,wkst:"
-msgid "Wednesday"
-msgstr "Dimecres"
 
 msgctxt "view:contract.configuration:"
 msgid "Contract Configuration"

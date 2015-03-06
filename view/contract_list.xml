@@ -10,4 +10,7 @@ this repository contains the full copyright notices and license terms. -->
     <field name="interval"/>
     <field name="freq"/>
     <field name="state"/>
+    <button name="draft" string="Draft" tree_invisible="1"/>
+    <button name="validate_contract" string="Validate" tree_invisible="1"/>
+    <button name="cancel" string="Cancel" tree_invisible="1"/>
 </tree>

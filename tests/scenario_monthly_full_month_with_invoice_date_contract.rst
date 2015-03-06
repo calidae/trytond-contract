@@ -1,6 +1,14 @@
-================
-Contract Scenario
-================
+=====================================
+Monthly Contract, Full Month Scenario
+=====================================
+
+.. Define contract with monthly periodicity
+.. Start date = Start Period Date = Invoce Date.
+.. Create Consumptions.
+..      Check consumptions dates.
+.. Create Invoice.
+..      Check Invoice Lines Amounts
+..      Check Invoice Date.
 
 Imports::
     >>> import datetime
@@ -183,50 +191,58 @@ Create monthly service::
     >>> Service = Model.get('contract.service')
     >>> service = Service()
     >>> service.product = product
-    >>> service.freq = 'monthly'
+    >>> service.freq = None
     >>> service.save()
+
 
 Create a contract::
 
     >>> Contract = Model.get('contract')
     >>> contract = Contract()
     >>> contract.party = party
-    >>> contract.start_date = today + relativedelta(day=1)
+    >>> contract.start_period_date = datetime.date(2015,01,01)
+    >>> contract.start_date = datetime.date(2015,01,01)
+    >>> contract.first_invoice_date = datetime.date(2015,02,05)
     >>> contract.freq = 'monthly'
     >>> line = contract.lines.new()
-    >>> line.start_date == today + relativedelta(day=1)
-    True
     >>> line.service = service
     >>> line.unit_price
     Decimal('40')
     >>> contract.click('validate_contract')
     >>> contract.state
     u'validated'
-    >>> contract_line, = contract.lines
-    >>> contract_line.state
-    u'active'
+    >>> contract.save()
+    >>> contract.reload()
 
 Generate consumed lines::
 
     >>> create_consumptions = Wizard('contract.create_consumptions')
-    >>> create_consumptions.form.date += relativedelta(months=1)
+    >>> create_consumptions.form.date = datetime.date(2015,03,01)
     >>> create_consumptions.execute('create_consumptions')
     >>> Consumption = Model.get('contract.consumption')
-    >>> consumption, = Consumption.find([])
-    >>> consumption.contract_line == contract_line
+    >>> consumptions = Consumption.find([])
+    >>> consumption = consumptions[0]
+    >>> consumption.start_date == datetime.date(2015,01,01)
     True
-    >>> consumption.invoice_line
+    >>> consumption.end_date == datetime.date(2015,01,31)
+    True
+    >>> consumption.invoice_date == datetime.date(2015,02,05)
+    True
+    >>> consumption1 = consumptions[1]
+    >>> consumption1.start_date == datetime.date(2015,02,01)
+    True
+    >>> consumption1.end_date == datetime.date(2015,02,28)
+    True
+    >>> consumption1.invoice_date == datetime.date(2015,03,05)
+    True
 
 Generate invoice for consumed lines::
 
-    >>> consumption.invoice_date = datetime.date.today()
     >>> consumption.click('invoice')
     >>> invoice = consumption.invoice_line.invoice
     >>> invoice.type
     u'out_invoice'
     >>> invoice.party == party
-    True
-    >>> invoice.invoice_date == datetime.date.today()
     True
     >>> invoice.untaxed_amount
     Decimal('40.00')
@@ -236,5 +252,6 @@ Generate invoice for consumed lines::
     Decimal('44.00')
     >>> consumption.invoice_line.product == product
     True
-
+    >>> consumption.invoice_date == invoice.invoice_date
+    True
 

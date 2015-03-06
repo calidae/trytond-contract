@@ -26,7 +26,21 @@ def suite():
     suite = trytond.tests.test_tryton.suite()
     suite.addTests(unittest.TestLoader().loadTestsFromTestCase(
             TestContractCase))
-    suite.addTests(doctest.DocFileSuite('scenario_contract.rst',
+    suite.addTests(doctest.DocFileSuite(
+            'scenario_monthly_full_month_contract.rst',
             setUp=doctest_setup, tearDown=doctest_teardown, encoding='utf-8',
             optionflags=doctest.REPORT_ONLY_FIRST_FAILURE))
+    suite.addTests(doctest.DocFileSuite(
+            'scenario_monthly_start_in_month_contract.rst',
+            setUp=doctest_setup, tearDown=doctest_teardown, encoding='utf-8',
+            optionflags=doctest.REPORT_ONLY_FIRST_FAILURE))
+    suite.addTests(doctest.DocFileSuite(
+            'scenario_monthly_natural_days_contract.rst',
+            setUp=doctest_setup, tearDown=doctest_teardown, encoding='utf-8',
+            optionflags=doctest.REPORT_ONLY_FIRST_FAILURE))
+    suite.addTests(doctest.DocFileSuite(
+            'scenario_monthly_full_month_with_invoice_date_contract.rst',
+            setUp=doctest_setup, tearDown=doctest_teardown, encoding='utf-8',
+            optionflags=doctest.REPORT_ONLY_FIRST_FAILURE))
+
     return suite
