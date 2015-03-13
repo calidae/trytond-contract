@@ -5,4 +5,6 @@ this repository contains the full copyright notices and license terms. -->
     <field name="contract"/>
     <field name="service"/>
     <field name="unit_price"/>
+    <field name="start_date"/>
+    <field name="end_date"/>
 </tree>
