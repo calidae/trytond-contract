@@ -10,7 +10,9 @@ this repository contains the full copyright notices and license terms. -->
     <field name="name"/>
     <label name="unit_price"/>
     <field name="unit_price"/>
+    <label name="start_date"/>
     <field name="start_date"/>
+    <label name="end_date"/>
     <field name="end_date"/>
     <separator name="description" colspan="4"/>
     <field name="description" colspan="4"/>
