@@ -150,6 +150,18 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                     'invalid date "%(date)s"'),
                 })
 
+    def _get_rec_name(self, name):
+        rec_name = []
+        if self.reference:
+            rec_name.append(self.reference)
+        if self.party:
+            rec_name.append(self.party.rec_name)
+        return rec_name
+
+    def get_rec_name(self, name):
+        rec_name = self._get_rec_name(name)
+        return "/".join(rec_name)
+
     @staticmethod
     def default_company():
         return Transaction().context.get('company')
@@ -409,12 +421,15 @@ class ContractConsumption(ModelSQL, ModelView):
 
     contract_line = fields.Many2One('contract.line', 'Contract Line',
         required=True)
-    invoice_line = fields.Many2One('account.invoice.line', 'Invoice Line')
-    init_period_date = fields.Date('Start Period Date')
-    end_period_date = fields.Date('Finish Period Date')
-    start_date = fields.Date('Start Date')
-    end_date = fields.Date('End Date')
-    invoice_date = fields.Date('Invoice Date')
+    init_period_date = fields.Date('Start Period Date', required=True)
+    end_period_date = fields.Date('Finish Period Date', required=True)
+    start_date = fields.Date('Start Date', required=True)
+    end_date = fields.Date('End Date', required=True)
+    invoice_date = fields.Date('Invoice Date', required=True)
+    invoice_line = fields.One2Many('account.invoice.line', 'origin',
+        'Invoice Line', size=1)
+    contract = fields.Function(fields.Many2One('contract',
+        'Contract'), 'get_contract')
 
     @classmethod
     def __setup__(cls):
@@ -434,6 +449,9 @@ class ContractConsumption(ModelSQL, ModelView):
                     },
                 })
 
+    def get_contract(self, name=None):
+        return self.contract_line.contract.id
+
     def _get_tax_rule_pattern(self):
         '''
         Get tax rule pattern
@@ -447,7 +465,7 @@ class ContractConsumption(ModelSQL, ModelView):
         Uom = pool.get('product.uom')
         invoice_line = InvoiceLine()
         invoice_line.type = 'line'
-        invoice_line.origin = self.contract_line
+        invoice_line.origin = self
         invoice_line.company = self.contract_line.contract.company
         invoice_line.currency = self.contract_line.contract.currency
         invoice_line.product = None
@@ -544,17 +562,14 @@ class ContractConsumption(ModelSQL, ModelView):
         pool = Pool()
         Invoice = pool.get('account.invoice')
         lines = {}
-        to_write = []
         for consumption in consumptions:
+            if consumption.invoice_line:
+                continue
             line = consumption.get_invoice_line()
-            if line:
-                line.save()
-                lines[consumption.id] = line
-                to_write.extend(([consumption], {
-                            'invoice_line': line.id,
-                            }))
+            lines[consumption.id] = line
+
         if not lines:
-            return
+            return []
         lines = lines.items()
         lines = sorted(lines, key=cls._group_invoice_key)
 
@@ -567,7 +582,7 @@ class ContractConsumption(ModelSQL, ModelView):
 
         invoices = Invoice.create([x._save_values for x in invoices])
         Invoice.update_taxes(invoices)
-        cls.write(*to_write)
+        return invoices
 
 
 class CreateConsumptionsStart(ModelView):
@@ -589,7 +604,8 @@ class CreateConsumptions(Wizard):
             Button('Cancel', 'end', 'tryton-cancel'),
             Button('OK', 'create_consumptions', 'tryton-ok', True),
             ])
-    create_consumptions = StateAction('contract.act_contract_consumption')
+    create_consumptions = StateAction(
+            'contract.act_contract_consumption')
 
     def do_create_consumptions(self, action):
         pool = Pool()

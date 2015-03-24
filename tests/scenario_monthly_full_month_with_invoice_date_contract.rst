@@ -238,8 +238,8 @@ Generate consumed lines::
 
 Generate invoice for consumed lines::
 
-    >>> consumption.click('invoice')
-    >>> invoice = consumption.invoice_line.invoice
+    >>> invoices = consumption.click('invoice')
+    >>> invoice = consumption.invoice_line[0].invoice
     >>> invoice.type
     u'out_invoice'
     >>> invoice.party == party
@@ -250,7 +250,7 @@ Generate invoice for consumed lines::
     Decimal('4.00')
     >>> invoice.total_amount
     Decimal('44.00')
-    >>> consumption.invoice_line.product == product
+    >>> consumption.invoice_line[0].product == product
     True
     >>> consumption.invoice_date == invoice.invoice_date
     True

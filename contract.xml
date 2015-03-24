@@ -257,6 +257,19 @@
             <field name="name">Contract</field>
             <field name="code">contract</field>
         </record>
+
+        <record model="ir.action.wizard" id="wizard_create_invoices">
+            <field name="name">Create Invoices</field>
+            <field name="wiz_name">contract.create_invoices</field>
+        </record>
+
+        <record model="ir.ui.view" id="create_invoices_start_view_form">
+            <field name="model">contract.create_invoices.start</field>
+            <field name="type">form</field>
+            <field name="name">create_invoices_start_form</field>
+        </record>
+
+
         <!-- Menus -->
         <record model="ir.ui.icon" id="contract_icon">
             <field name="name">tryton-contract</field>
@@ -295,5 +308,10 @@
         <menuitem name="Create Consumptions" parent="menu_contract"
             sequence="40" action="wizard_create_consumptions"
             id="menu_create_consumptions"/>
+
+
+        <menuitem name="Create Invoices" parent="menu_contract"
+            sequence="40" action="wizard_create_invoices"
+            id="menu_create_invoices"/>
     </data>
 </tryton>

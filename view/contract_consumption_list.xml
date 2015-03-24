@@ -2,11 +2,11 @@
 <!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
 this repository contains the full copyright notices and license terms. -->
 <tree string="Contract Consumption">
+    <field name="contract"/>
     <field name="contract_line"/>
     <field name="start_date"/>
     <field name="end_date"/>
     <field name="invoice_date"/>
-    <field name="invoice_line"/>
     <field name="init_period_date"/>
     <field name="end_period_date"/>
     <button name="invoice" string="Invoice" tree_invisible="1"/>
