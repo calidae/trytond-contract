@@ -229,7 +229,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
     def get_invoice_date(self, last_invoice_date):
         last_invoice_date = todatetime(last_invoice_date)
-        r = rrule(self.rrule._freq, dtstart=last_invoice_date)
+        r = rrule(self.rrule._freq, interval=self.rrule._interval,
+            dtstart=last_invoice_date)
         date = r.after(last_invoice_date)
         return date.date()
 
@@ -244,13 +245,11 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         consumptions = []
 
         for line in self.lines:
-
             start_period_date = self.start_period_date
 
             last_consumption_date = line.last_consumption_date
             if last_consumption_date:
                 last_consumption_date = todatetime(line.last_consumption_date)
-                last_consumption_date += relativedelta(days=+1)
 
             start = start_period_date
             if last_consumption_date:
@@ -345,7 +344,7 @@ class ContractLine(Workflow, ModelSQL, ModelView):
     last_consumption_date = fields.Function(fields.Date(
             'Last Consumption Date'), 'get_last_consumption_date')
     last_consumption_invoice_date = fields.Function(fields.Date(
-            'Last Consumption Date'), 'get_last_consumption_date')
+            'Last Invoice Date'), 'get_last_consumption_invoice_date')
 
     @staticmethod
     def default_start_date():
@@ -560,7 +559,7 @@ class ContractConsumption(ModelSQL, ModelView):
     @ModelView.button
     def invoice(cls, consumptions):
     	cls._invoice(consumptions)
-    
+
     @classmethod
     def _invoice(cls, consumptions):
         pool = Pool()
