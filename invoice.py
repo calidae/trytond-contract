@@ -48,7 +48,7 @@ class CreateInvoices(Wizard):
         Consumptions = pool.get('contract.consumption')
         consumptions = Consumptions.search(
             [('invoice_date', '<=', self.start.date)])
-        invoices = Consumptions.invoice(consumptions)
+        invoices = Consumptions._invoice(consumptions)
 
         data = {'res_id': [c.id for c in invoices]}
         if len(invoices) == 1:

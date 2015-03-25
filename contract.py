@@ -559,6 +559,10 @@ class ContractConsumption(ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def invoice(cls, consumptions):
+    	cls._invoice(consumptions)
+    
+    @classmethod
+    def _invoice(cls, consumptions):
         pool = Pool()
         Invoice = pool.get('account.invoice')
         lines = {}
