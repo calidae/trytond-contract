@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY, WEEKLY, MONTHLY, YEARLY
 from itertools import groupby
 from sql.aggregate import Max
+from decimal import Decimal
 
 from trytond.config import config
 from trytond.model import Workflow, ModelSQL, ModelView, Model, fields
@@ -345,6 +346,8 @@ class ContractLine(Workflow, ModelSQL, ModelView):
             'Last Consumption Date'), 'get_last_consumption_date')
     last_consumption_invoice_date = fields.Function(fields.Date(
             'Last Invoice Date'), 'get_last_consumption_invoice_date')
+    consumptions = fields.One2Many('contract.consumption', 'contract_line',
+        'Consumptions', readonly=True)
 
     @staticmethod
     def default_start_date():
@@ -517,6 +520,19 @@ class ContractConsumption(ModelSQL, ModelView):
         rounding = invoice_line.unit.rounding if invoice_line.unit else 1
         invoice_line.quantity = Uom.round(quantity, rounding)
         return invoice_line
+
+    def get_amount_to_invoice(self):
+        pool = Pool()
+        Uom = pool.get('product.uom')
+        quantity = ((self.end_date - self.start_date).total_seconds() /
+            (self.end_period_date - self.init_period_date).total_seconds())
+
+        uom = self.contract_line and self.contract_line.service and \
+            self.contract_line.service.product and \
+            self.contract_line.service.product.default_uom
+        rounding = uom.rounding if uom else 1
+        qty = Uom.round(quantity, rounding)
+        return Decimal(str(qty)) * self.contract_line.unit_price
 
     @classmethod
     def _group_invoice_key(cls, line):
