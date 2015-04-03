@@ -105,8 +105,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     end_date = fields.Date('End Date')
     start_period_date = fields.Date('Start Period Date', required=True,
         states=_STATES, depends=_DEPENDS)
-    first_invoice_date = fields.Date('First Invoice Date', states=_STATES,
-        depends=_DEPENDS)
     lines = fields.One2Many('contract.line', 'contract', 'Lines',
         context={
             'start_date': Eval('start_date'),
@@ -242,11 +240,10 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         if end_date is None:
             end_date = Date.today()
 
-        end_date = todatetime(end_date)
         consumptions = []
 
         for line in self.lines:
-            start_period_date = self.start_period_date
+            start_period_date = line.start_date or self.start_period_date
 
             last_consumption_date = line.last_consumption_date
             if last_consumption_date:
@@ -256,9 +253,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             if last_consumption_date:
                 start = (last_consumption_date + relativedelta(days=+1)).date()
 
-            end_contract = None
+            end_contract = line.end_date or self.end_date or end_date
             if end_contract:
-                end_contract = todatetime(line.end_date or self.end_date)
                 self.rrule.until = end_contract
 
             last_invoice_date = line.last_consumption_invoice_date
@@ -266,13 +262,13 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             next_period = self.rrule.after(todatetime(start)) + \
                 relativedelta(days=+1)
 
-            if next_period.date() < end_date.date():
-                next_period = end_date
+            if next_period.date() < end_contract:
+                next_period = todatetime(end_contract)
 
             for date in self.rrule.between(todatetime(start), next_period):
                 date -= relativedelta(days=+1)
                 date = date.date()
-                invoice_date = last_invoice_date or self.first_invoice_date \
+                invoice_date = last_invoice_date or line.first_invoice_date \
                     or date
                 if last_invoice_date:
                     invoice_date = self.get_invoice_date(last_invoice_date)
@@ -286,8 +282,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                     start_period = start_period_date
                     start = line.start_date or self.start
 
-                if (invoice_date <= end_date.date()) or \
-                        (finish_date <= end_date.date()):
+                if ((invoice_date <= end_contract) or
+                        (finish_date <= end_contract)):
                     consumptions.append(line.get_consumption(start, date,
                         invoice_date, start_period, finish_date))
                 date += relativedelta(days=+1)
@@ -348,6 +344,7 @@ class ContractLine(Workflow, ModelSQL, ModelView):
             'Last Invoice Date'), 'get_last_consumption_invoice_date')
     consumptions = fields.One2Many('contract.consumption', 'contract_line',
         'Consumptions', readonly=True)
+    first_invoice_date = fields.Date('First Invoice Date')
 
     @staticmethod
     def default_start_date():
@@ -356,6 +353,10 @@ class ContractLine(Workflow, ModelSQL, ModelView):
     @staticmethod
     def default_end_date():
         return Transaction().context.get('end_date')
+
+    @staticmethod
+    def default_first_invoice_date():
+        return Transaction().context.get('first_invoice_date')
 
     @fields.depends('service', 'unit_price', 'description')
     def on_change_service(self):

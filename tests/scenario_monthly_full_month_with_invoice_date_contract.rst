@@ -206,6 +206,7 @@ Create a contract::
     >>> contract.freq = 'monthly'
     >>> line = contract.lines.new()
     >>> line.service = service
+    >>> line.first_invoice_date = datetime.date(2015,02,05)
     >>> line.unit_price
     Decimal('40')
     >>> contract.click('validate_contract')
