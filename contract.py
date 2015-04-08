@@ -4,7 +4,9 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY, WEEKLY, MONTHLY, YEARLY
 from itertools import groupby
-from sql.aggregate import Max
+from sql import Column, Null, Literal
+from sql.conditionals import Case
+from sql.aggregate import Max, Min, Sum
 from decimal import Decimal
 
 from trytond.config import config
@@ -12,7 +14,7 @@ from trytond.model import Workflow, ModelSQL, ModelView, Model, fields
 from trytond.pool import Pool
 from trytond.pyson import Eval, Bool
 from trytond.transaction import Transaction
-from trytond.tools import reduce_ids
+from trytond.tools import reduce_ids, grouped_slice
 from trytond.wizard import Wizard, StateView, StateAction, Button
 DIGITS = config.getint('digits', 'unit_price_digits', 4)
 
@@ -76,8 +78,11 @@ class ContractService(ModelSQL, ModelView):
             ])
 
     def get_rec_name(self, name):
-        name = super(ContractService, self).get_rec_name(name)
-        return '%s (%s)' % (self.product.rec_name, name)
+        return self.product.rec_name
+
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        return [('product.rec_name',) + tuple(clause[1:])]
 
 _STATES = {
     'readonly': Eval('state') != 'draft',
@@ -100,9 +105,10 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     party = fields.Many2One('party.party', 'Party', required=True,
         states=_STATES, depends=_DEPENDS)
     reference = fields.Char('Reference', readonly=True, select=True)
-    start_date = fields.Date('Start Date', required=True,
-        states=_STATES, depends=_DEPENDS)
-    end_date = fields.Date('End Date')
+    start_date = fields.Function(fields.Date('Start Date'),
+            'get_dates', searcher='search_dates')
+    end_date = fields.Function(fields.Date('End Date'),
+            'get_dates', searcher='search_dates')
     start_period_date = fields.Date('Start Period Date', required=True,
         states=_STATES, depends=_DEPENDS)
     lines = fields.One2Many('contract.line', 'contract', 'Lines',
@@ -160,6 +166,58 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     def get_rec_name(self, name):
         rec_name = self._get_rec_name(name)
         return "/".join(rec_name)
+
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        return ['OR',
+            ('reference',) + tuple(clause[1:]),
+            ('party.name',) + tuple(clause[1:]),
+            ]
+
+    @classmethod
+    def get_dates(cls, contracts, names):
+        pool = Pool()
+        ContractLine = pool.get('contract.line')
+        cursor = Transaction().cursor
+        line = ContractLine.__table__()
+        result = {}
+        contract_ids = [c.id for c in contracts]
+        for name in names:
+            if name not in ('start_date', 'end_date'):
+                raise Exception('Bad argument')
+            result[name] = dict((c, None) for c in contract_ids)
+        for sub_ids in grouped_slice(contract_ids):
+            where = reduce_ids(line.contract, sub_ids)
+            for name in names:
+                cursor.execute(*line.select(line.contract,
+                        cls._compute_date_column(line, name),
+                        where=where,
+                        group_by=line.contract))
+                for contract, value in cursor.fetchall():
+                    # SQlite returns unicode for dates
+                    if isinstance(value, unicode):
+                        value = datetime.date(*map(int, value.split('-')))
+                    result[name][contract] = value
+        return result
+
+    @staticmethod
+    def _compute_date_column(table, name):
+        func = Min if name == 'start_date' else Max
+        column = Column(table, name)
+        sum_ = Sum(Case((column == Null, Literal(1)), else_=Literal(0)))
+        # As fields can be null, return null if at least one of them is null
+        return Case((sum_ >= Literal(1), Null), else_=func(column))
+
+    @classmethod
+    def search_dates(cls, name, clause):
+        pool = Pool()
+        ContractLine = pool.get('contract.line')
+        line = ContractLine.__table__()
+        Operator = fields.SQL_OPERATORS[clause[1]]
+        query = line.select(line.contract, group_by=line.contract,
+                having=Operator(cls._compute_date_column(line, name),
+                clause[2]))
+        return [('id', 'in', query)]
 
     @staticmethod
     def default_company():
@@ -307,7 +365,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         return ContractConsumption.create([c._save_values for c in to_create])
 
     def check_start_date(self):
-        if not hasattr(self, 'rrule'):
+        if not hasattr(self, 'rrule') or not self.start_date:
             return
         d = self.rrule.after(todatetime(self.start_period_date)).date()
         if self.start_date >= self.start_period_date and self.start_date < d:
@@ -322,7 +380,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         super(Contract, cls).validate(contracts)
         for contract in contracts:
             contract.check_start_date()
-            pass
 
 
 class ContractLine(Workflow, ModelSQL, ModelView):
@@ -332,7 +389,6 @@ class ContractLine(Workflow, ModelSQL, ModelView):
     contract = fields.Many2One('contract', 'Contract', required=True,
         ondelete='CASCADE')
     service = fields.Many2One('contract.service', 'Service')
-    name = fields.Char('Name')
     start_date = fields.Date('Start Date', required=True)
     end_date = fields.Date('End Date')
     description = fields.Text('Description', required=True)
@@ -345,6 +401,19 @@ class ContractLine(Workflow, ModelSQL, ModelView):
     consumptions = fields.One2Many('contract.consumption', 'contract_line',
         'Consumptions', readonly=True)
     first_invoice_date = fields.Date('First Invoice Date')
+
+    def get_rec_name(self, name):
+        rec_name = self.contract.rec_name
+        if self.service:
+            rec_name = '%s (%s)' % (self.service.rec_name, rec_name)
+        return rec_name
+
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        return ['OR',
+            ('contract.rec_name',) + tuple(clause[1:]),
+            ('service.rec_name',) + tuple(clause[1:]),
+            ]
 
     @staticmethod
     def default_start_date():
@@ -432,7 +501,7 @@ class ContractConsumption(ModelSQL, ModelView):
     invoice_line = fields.One2Many('account.invoice.line', 'origin',
         'Invoice Line', size=1)
     contract = fields.Function(fields.Many2One('contract',
-        'Contract'), 'get_contract')
+        'Contract'), 'get_contract', searcher='search_contract')
 
     @classmethod
     def __setup__(cls):
@@ -454,6 +523,10 @@ class ContractConsumption(ModelSQL, ModelView):
 
     def get_contract(self, name=None):
         return self.contract_line.contract.id
+
+    @classmethod
+    def search_contract(cls, name, clause):
+        return [('contract_line.contract',) + tuple(clause[1:])]
 
     def _get_tax_rule_pattern(self):
         '''
@@ -575,7 +648,7 @@ class ContractConsumption(ModelSQL, ModelView):
     @classmethod
     @ModelView.button
     def invoice(cls, consumptions):
-    	cls._invoice(consumptions)
+        cls._invoice(consumptions)
 
     @classmethod
     def _invoice(cls, consumptions):

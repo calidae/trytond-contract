@@ -42,10 +42,6 @@ msgctxt "field:contract,end_date:"
 msgid "End Date"
 msgstr "Data final"
 
-msgctxt "field:contract,first_invoice_date:"
-msgid "First Invoice Date"
-msgstr "Data primera factura"
-
 msgctxt "field:contract,freq:"
 msgid "Frequency"
 msgstr "Freqüència"
@@ -194,6 +190,10 @@ msgctxt "field:contract.create_invoices.start,id:"
 msgid "ID"
 msgstr "Identificador"
 
+msgctxt "field:contract.line,consumptions:"
+msgid "Consumptions"
+msgstr "Consums"
+
 msgctxt "field:contract.line,contract:"
 msgid "Contract"
 msgstr "Contracte"
@@ -214,6 +214,10 @@ msgctxt "field:contract.line,end_date:"
 msgid "End Date"
 msgstr "Data finalització"
 
+msgctxt "field:contract.line,first_invoice_date:"
+msgid "First Invoice Date"
+msgstr "Data primera factura"
+
 msgctxt "field:contract.line,id:"
 msgid "ID"
 msgstr "ID"
@@ -223,12 +227,8 @@ msgid "Last Consumption Date"
 msgstr "Última data consum"
 
 msgctxt "field:contract.line,last_consumption_invoice_date:"
-msgid "Last Consumption Date"
-msgstr "Última data consum"
-
-msgctxt "field:contract.line,name:"
-msgid "Name"
-msgstr "Nom"
+msgid "Last Invoice Date"
+msgstr "Data últim consum"
 
 msgctxt "field:contract.line,rec_name:"
 msgid "Name"
