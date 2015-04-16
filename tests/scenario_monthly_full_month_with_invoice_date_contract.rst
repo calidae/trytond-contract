@@ -201,11 +201,11 @@ Create a contract::
     >>> contract = Contract()
     >>> contract.party = party
     >>> contract.start_period_date = datetime.date(2015,01,01)
-    >>> contract.start_date = datetime.date(2015,01,01)
     >>> contract.first_invoice_date = datetime.date(2015,02,05)
     >>> contract.freq = 'monthly'
     >>> line = contract.lines.new()
     >>> line.service = service
+    >>> line.start_date = datetime.date(2015,01,01)
     >>> line.first_invoice_date = datetime.date(2015,02,05)
     >>> line.unit_price
     Decimal('40')
@@ -218,7 +218,7 @@ Create a contract::
 Generate consumed lines::
 
     >>> create_consumptions = Wizard('contract.create_consumptions')
-    >>> create_consumptions.form.date = datetime.date(2015,03,01)
+    >>> create_consumptions.form.date = datetime.date(2015,02,05)
     >>> create_consumptions.execute('create_consumptions')
     >>> Consumption = Model.get('contract.consumption')
     >>> consumptions = Consumption.find([])
@@ -228,13 +228,6 @@ Generate consumed lines::
     >>> consumption.end_date == datetime.date(2015,01,31)
     True
     >>> consumption.invoice_date == datetime.date(2015,02,05)
-    True
-    >>> consumption1 = consumptions[1]
-    >>> consumption1.start_date == datetime.date(2015,02,01)
-    True
-    >>> consumption1.end_date == datetime.date(2015,02,28)
-    True
-    >>> consumption1.invoice_date == datetime.date(2015,03,05)
     True
 
 Generate invoice for consumed lines::
