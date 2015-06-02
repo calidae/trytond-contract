@@ -539,6 +539,23 @@ class ContractConsumption(ModelSQL, ModelView):
         '''
         return {}
 
+    def _get_start_end_date(self):
+        pool = Pool()
+        Lang = pool.get('ir.lang')
+        if self.contract.party.lang:
+            lang = self.contract.party.lang
+        else:
+            language = Transaction().language
+            languages = Lang.search([('code', '=', language)])
+            if not languages:
+                languages = Lang.search([('code', '=', 'en_US')])
+            lang = languages[0]
+        start = Lang.strftime(self.start_date,
+            lang.code, lang.date)
+        end = Lang.strftime(self.end_date, lang.code,
+            lang.date)
+        return start, end
+
     def get_invoice_line(self):
         pool = Pool()
         InvoiceLine = pool.get('account.invoice.line')
@@ -552,10 +569,11 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice_line.product = None
         if self.contract_line.service:
             invoice_line.product = self.contract_line.service.product
-        invoice_line.description = '%(name)s (%(start)s - %(end)s)' % {
+        start_date, end_date = self._get_start_end_date()
+        invoice_line.description = '[%(start)s - %(end)s] %(name)s' % {
+            'start': start_date,
+            'end': end_date,
             'name': self.contract_line.description,
-            'start': self.start_date,
-            'end': self.end_date,
             }
         invoice_line.unit_price = self.contract_line.unit_price
         invoice_line.party = self.contract_line.contract.party
