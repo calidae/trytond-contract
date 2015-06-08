@@ -274,6 +274,10 @@ msgctxt "field:contract.service,interval:"
 msgid "Interval"
 msgstr "Intervalo"
 
+msgctxt "field:contract.service,name:"
+msgid "Name"
+msgstr "Nombre"
+
 msgctxt "field:contract.service,product:"
 msgid "Product"
 msgstr "Producto"
@@ -395,6 +399,10 @@ msgstr "Consumos de contratos"
 msgctxt "model:ir.ui.menu,name:menu_contract_form"
 msgid "Contract"
 msgstr "Contratos"
+
+msgctxt "model:ir.ui.menu,name:menu_contract_line_form"
+msgid "Contract Line"
+msgstr "Líneas"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_service"
 msgid "Contract Service"

@@ -72,17 +72,11 @@ class ContractService(ModelSQL, ModelView):
     'Contract Service'
     __name__ = 'contract.service'
 
+    name = fields.Char('Name', required=True)
     product = fields.Many2One('product.product', 'Product', required=True,
         domain=[
             ('type', '=', 'service'),
             ])
-
-    def get_rec_name(self, name):
-        return self.product.rec_name
-
-    @classmethod
-    def search_rec_name(cls, name, clause):
-        return [('product.rec_name',) + tuple(clause[1:])]
 
 _STATES = {
     'readonly': Eval('state') != 'draft',
@@ -434,9 +428,7 @@ class ContractLine(Workflow, ModelSQL, ModelView):
 
     @fields.depends('service', 'unit_price', 'description')
     def on_change_service(self):
-        changes = {
-            'unit_price': None,
-            }
+        changes = {}
         if self.service:
             changes['name'] = self.service.rec_name
             if not self.unit_price:

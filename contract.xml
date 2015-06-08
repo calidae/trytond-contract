@@ -301,6 +301,9 @@
 
         <menuitem action="act_contract" id="menu_contract_form"
             parent="menu_contract" sequence="20" name="Contract"/>
+
+        <menuitem action="act_contract_line" id="menu_contract_line_form"
+            parent="menu_contract_form" sequence="10"/>
         <menuitem action="act_contract_consumption"
             id="menu_contract_consumption" parent="menu_contract"
             sequence="30" name="Contract Consumption"/>
