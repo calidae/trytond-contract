@@ -438,7 +438,7 @@ msgstr "Anualment"
 
 msgctxt "selection:contract,state:"
 msgid "Cancel"
-msgstr "Cancel·la"
+msgstr "Cancel·lat"
 
 msgctxt "selection:contract,state:"
 msgid "Draft"

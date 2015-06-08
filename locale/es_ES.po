@@ -366,7 +366,7 @@ msgstr "Borrador"
 
 msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_validated"
 msgid "Validated"
-msgstr "Valido"
+msgstr "Válido"
 
 msgctxt "model:ir.sequence,name:sequence_contract"
 msgid "Contract"
@@ -438,7 +438,7 @@ msgstr "Anualmente"
 
 msgctxt "selection:contract,state:"
 msgid "Cancel"
-msgstr "Cancelar"
+msgstr "Cancelado"
 
 msgctxt "selection:contract,state:"
 msgid "Draft"
@@ -446,7 +446,7 @@ msgstr "Borrador"
 
 msgctxt "selection:contract,state:"
 msgid "Validated"
-msgstr "Valido"
+msgstr "Válido"
 
 msgctxt "selection:contract.service,freq:"
 msgid "Daily"
@@ -539,4 +539,4 @@ msgstr "Crear"
 
 msgctxt "wizard_button:contract.create_invoices,start,end:"
 msgid "Cancel"
-msgstr "Cancel·lar"
+msgstr "Cancelar"
