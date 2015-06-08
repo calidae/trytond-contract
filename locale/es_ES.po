@@ -294,6 +294,10 @@ msgctxt "field:contract.service,write_uid:"
 msgid "Write User"
 msgstr "Usuario modificación"
 
+msgctxt "field:party.party,contract_grouping_method:"
+msgid "Contract Grouping Method"
+msgstr "Método agrupación contratos"
+
 msgctxt "model:contract,name:"
 msgid "Contract"
 msgstr "Contrato"
@@ -476,6 +480,14 @@ msgctxt "selection:contract.service,freq:"
 msgid "Yearly"
 msgstr "Anualmente"
 
+msgctxt "selection:party.party,contract_grouping_method:"
+msgid "Group contracts"
+msgstr "Agrupar contratos"
+
+msgctxt "selection:party.party,contract_grouping_method:"
+msgid "None"
+msgstr "Ninguno"
+
 msgctxt "view:contract.configuration:"
 msgid "Contract Configuration"
 msgstr "Configuración de contratos"
@@ -531,6 +543,10 @@ msgstr "Recurrencia factura"
 msgctxt "view:contract:"
 msgid "Validate"
 msgstr "Validar"
+
+msgctxt "view:party.party:"
+msgid "Contract"
+msgstr "Contratos"
 
 msgctxt ""
 "wizard_button:contract.create_consumptions,start,create_consumptions:"

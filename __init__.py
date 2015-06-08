@@ -4,10 +4,12 @@ from trytond.pool import Pool
 from .contract import *
 from .configuration import *
 from .invoice import *
+from .party import *
 
 
 def register():
     Pool.register(
+        Party,
         ContractService,
         Contract,
         ContractLine,

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<data>
+    <xpath expr="/form/notebook" position="inside">
+        <page string="Contract" id="contracts">
+            <label name="contract_grouping_method"/>
+            <field name="contract_grouping_method"/>
+        </page>
+    </xpath>
+</data>

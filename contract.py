@@ -632,13 +632,16 @@ class ContractConsumption(ModelSQL, ModelView):
         '''
         consumption_id, invoice_line = line
         consumption = cls(consumption_id)
-        return (
+        grouping = [
             ('party', invoice_line.party),
             ('company', invoice_line.company),
             ('currency', invoice_line.currency),
             ('type', invoice_line.invoice_type),
             ('invoice_date', consumption.invoice_date),
-            )
+            ]
+        if invoice_line.party.contract_grouping_method is None:
+            grouping.append(('contract', consumption.contract_line.contract))
+        return grouping
 
     @classmethod
     def _get_invoice(cls, keys):
