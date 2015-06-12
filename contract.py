@@ -661,6 +661,9 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice.journal = journal
         invoice.payment_term = invoice.party.customer_payment_term
         invoice.account = invoice.party.account_receivable
+        # Compatibility with account_payment_type module
+        if hasattr(Invoice, 'payment_type'):
+            invoice.payment_type = invoice.party.customer_payment_type
         return invoice
 
     @classmethod
