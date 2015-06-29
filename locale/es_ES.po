@@ -346,6 +346,10 @@ msgctxt "model:ir.action,name:act_contract_service"
 msgid "Contract Service"
 msgstr "Servicio de contrato"
 
+msgctxt "model:ir.action,name:act_open_contract"
+msgid "Contracts"
+msgstr "Contratos"
+
 msgctxt "model:ir.action,name:wizard_create_consumptions"
 msgid "Create Consumptions"
 msgstr "Crear consumos"
