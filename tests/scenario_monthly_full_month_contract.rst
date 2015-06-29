@@ -190,6 +190,7 @@ Create monthly service::
 
     >>> Service = Model.get('contract.service')
     >>> service = Service()
+    >>> service.name = 'Service'
     >>> service.product = product
     >>> service.freq = None
     >>> service.save()
@@ -204,6 +205,7 @@ Create a contract::
     >>> contract.start_date = datetime.date(2015,01,01)
     >>> contract.freq = 'monthly'
     >>> line = contract.lines.new()
+    >>> line.first_invoice_date = datetime.date(2015,01,31)
     >>> line.service = service
     >>> line.unit_price
     Decimal('40')

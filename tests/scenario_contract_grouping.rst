@@ -1,14 +1,6 @@
-=====================================
-Monthly Contract, Full Month Scenario
-=====================================
-
-.. Define contract with monthly periodicity
-.. Start date = Start Period Date = Invoce Date.
-.. Create Consumptions.
-..      Check consumptions dates.
-.. Create Invoice.
-..      Check Invoice Lines Amounts
-..      Check Invoice Date.
+=================
+Contract Grouping
+=================
 
 Imports::
     >>> import datetime
@@ -25,11 +17,11 @@ Create database::
     >>> config = config.set_trytond()
     >>> config.pool.test = True
 
-Install account_invoice::
+Install contract module::
 
     >>> Module = Model.get('ir.module.module')
     >>> contract_module, = Module.find([('name', '=', 'contract')])
-    >>> Module.install([contract_module.id], config.context)
+    >>> contract_module.click('install')
     >>> Wizard('ir.module.module.install_upgrade').execute('upgrade')
 
 Create company::
@@ -150,7 +142,10 @@ Create party::
 
     >>> Party = Model.get('party.party')
     >>> party = Party(name='Party')
+    >>> party.contract_grouping_method = 'contract'
     >>> party.save()
+    >>> non_grouping_party = Party(name='Party')
+    >>> non_grouping_party.save()
 
 Create product::
 
@@ -185,6 +180,8 @@ Create payment term::
     >>> payment_term.save()
     >>> party.customer_payment_term = payment_term
     >>> party.save()
+    >>> non_grouping_party.customer_payment_term = payment_term
+    >>> non_grouping_party.save()
 
 Create monthly service::
 
@@ -192,62 +189,104 @@ Create monthly service::
     >>> service = Service()
     >>> service.name = 'Service'
     >>> service.product = product
-    >>> service.freq = None
     >>> service.save()
 
-
-Create a contract::
+Create two contract for grouped party::
 
     >>> Contract = Model.get('contract')
     >>> contract = Contract()
     >>> contract.party = party
-    >>> contract.start_period_date = datetime.date(2015,01,05)
-    >>> contract.start_date = datetime.date(2015,01,05)
+    >>> contract.start_period_date = datetime.date(today.year, 01, 01)
+    >>> contract.start_date = datetime.date(today.year, 01, 01)
     >>> contract.freq = 'monthly'
     >>> line = contract.lines.new()
+    >>> line.first_invoice_date = datetime.date(today.year, 01, 31)
     >>> line.service = service
     >>> line.unit_price
     Decimal('40')
     >>> contract.click('validate_contract')
     >>> contract.state
     u'validated'
-    >>> contract.save()
-    >>> contract.reload()
+    >>> contract = Contract()
+    >>> contract.party = party
+    >>> contract.start_period_date = datetime.date(today.year, 01, 01)
+    >>> contract.start_date = datetime.date(today.year, 01, 01)
+    >>> contract.freq = 'monthly'
+    >>> line = contract.lines.new()
+    >>> line.first_invoice_date = datetime.date(today.year, 01, 31)
+    >>> line.service = service
+    >>> line.unit_price
+    Decimal('40')
+    >>> contract.click('validate_contract')
+    >>> contract.state
+    u'validated'
+
+
+Create two contract for non grouped party::
+
+    >>> contract = Contract()
+    >>> contract.party = non_grouping_party
+    >>> contract.start_period_date = datetime.date(today.year, 01, 01)
+    >>> contract.start_date = datetime.date(today.year, 01, 01)
+    >>> contract.freq = 'monthly'
+    >>> line = contract.lines.new()
+    >>> line.first_invoice_date = datetime.date(today.year, 01, 31)
+    >>> line.service = service
+    >>> line.unit_price
+    Decimal('40')
+    >>> contract.click('validate_contract')
+    >>> contract.state
+    u'validated'
+    >>> contract = Contract()
+    >>> contract.party = non_grouping_party
+    >>> contract.start_period_date = datetime.date(today.year, 01, 01)
+    >>> contract.start_date = datetime.date(today.year, 01, 01)
+    >>> contract.freq = 'monthly'
+    >>> line = contract.lines.new()
+    >>> line.first_invoice_date = datetime.date(today.year, 01, 31)
+    >>> line.service = service
+    >>> line.unit_price
+    Decimal('40')
+    >>> contract.click('validate_contract')
+    >>> contract.state
+    u'validated'
 
 Generate consumed lines::
 
     >>> create_consumptions = Wizard('contract.create_consumptions')
-    >>> create_consumptions.form.date = datetime.date(2015,02,06)
+    >>> create_consumptions.form.date = datetime.date(today.year, 02, 01)
     >>> create_consumptions.execute('create_consumptions')
-    >>> Consumption = Model.get('contract.consumption')
-    >>> consumption, = Consumption.find([])
-    >>> consumption.start_date == datetime.date(2015,01,05)
-    True
-    >>> consumption.end_date == datetime.date(2015,02,04)
-    True
-    >>> consumption.invoice_date == datetime.date(2015,02,04)
-    True
-    >>> consumption.init_period_date == datetime.date(2015,01,05)
-    True
-    >>> consumption.end_period_date == datetime.date(2015,02,04)
-    True
 
 Generate invoice for consumed lines::
 
-    >>> invoices = consumption.click('invoice')
-    >>> invoice = consumption.invoice_line[0].invoice
-    >>> invoice.type
-    u'out_invoice'
-    >>> invoice.party == party
-    True
+    >>> create_invoice = Wizard('contract.create_invoices')
+    >>> create_invoice.form.date = datetime.date(today.year, 02, 01)
+    >>> create_invoice.execute('create_invoices')
+
+Only one invoice is generated for grouping party::
+
+    >>> Invoice = Model.get('account.invoice')
+    >>> invoice, = Invoice.find([('party', '=', party.id)])
     >>> invoice.untaxed_amount
-    Decimal('40.00')
+    Decimal('80.00')
     >>> invoice.tax_amount
-    Decimal('4.00')
+    Decimal('8.00')
     >>> invoice.total_amount
+    Decimal('88.00')
+    >>> len(invoice.lines)
+    2
+
+Two invoices are generated for non grouping party::
+
+    >>> Invoice = Model.get('account.invoice')
+    >>> first_invoice, second_invoice = Invoice.find([
+    ...     ('party', '=', non_grouping_party.id)])
+    >>> first_invoice.untaxed_amount
+    Decimal('40.00')
+    >>> first_invoice.total_amount
     Decimal('44.00')
-    >>> consumption.invoice_line[0].product == product
-    True
-    >>> consumption.invoice_date == invoice.invoice_date
-    True
+    >>> second_invoice.untaxed_amount
+    Decimal('40.00')
+    >>> second_invoice.total_amount
+    Decimal('44.00')
 

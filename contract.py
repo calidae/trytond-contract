@@ -4,14 +4,17 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY, WEEKLY, MONTHLY, YEARLY
 from itertools import groupby
-from sql.aggregate import Max
+from sql import Column, Null, Literal
+from sql.conditionals import Case
+from sql.aggregate import Max, Min, Sum
+from decimal import Decimal
 
 from trytond.config import config
 from trytond.model import Workflow, ModelSQL, ModelView, Model, fields
 from trytond.pool import Pool
 from trytond.pyson import Eval, Bool
 from trytond.transaction import Transaction
-from trytond.tools import reduce_ids
+from trytond.tools import reduce_ids, grouped_slice
 from trytond.wizard import Wizard, StateView, StateAction, Button
 DIGITS = config.getint('digits', 'unit_price_digits', 4)
 
@@ -69,14 +72,11 @@ class ContractService(ModelSQL, ModelView):
     'Contract Service'
     __name__ = 'contract.service'
 
+    name = fields.Char('Name', required=True)
     product = fields.Many2One('product.product', 'Product', required=True,
         domain=[
             ('type', '=', 'service'),
             ])
-
-    def get_rec_name(self, name):
-        name = super(ContractService, self).get_rec_name(name)
-        return '%s (%s)' % (self.product.rec_name, name)
 
 _STATES = {
     'readonly': Eval('state') != 'draft',
@@ -99,13 +99,12 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     party = fields.Many2One('party.party', 'Party', required=True,
         states=_STATES, depends=_DEPENDS)
     reference = fields.Char('Reference', readonly=True, select=True)
-    start_date = fields.Date('Start Date', required=True,
-        states=_STATES, depends=_DEPENDS)
-    end_date = fields.Date('End Date')
+    start_date = fields.Function(fields.Date('Start Date'),
+            'get_dates', searcher='search_dates')
+    end_date = fields.Function(fields.Date('End Date'),
+            'get_dates', searcher='search_dates')
     start_period_date = fields.Date('Start Period Date', required=True,
         states=_STATES, depends=_DEPENDS)
-    first_invoice_date = fields.Date('First Invoice Date', states=_STATES,
-        depends=_DEPENDS)
     lines = fields.One2Many('contract.line', 'contract', 'Lines',
         context={
             'start_date': Eval('start_date'),
@@ -161,6 +160,58 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     def get_rec_name(self, name):
         rec_name = self._get_rec_name(name)
         return "/".join(rec_name)
+
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        return ['OR',
+            ('reference',) + tuple(clause[1:]),
+            ('party.name',) + tuple(clause[1:]),
+            ]
+
+    @classmethod
+    def get_dates(cls, contracts, names):
+        pool = Pool()
+        ContractLine = pool.get('contract.line')
+        cursor = Transaction().cursor
+        line = ContractLine.__table__()
+        result = {}
+        contract_ids = [c.id for c in contracts]
+        for name in names:
+            if name not in ('start_date', 'end_date'):
+                raise Exception('Bad argument')
+            result[name] = dict((c, None) for c in contract_ids)
+        for sub_ids in grouped_slice(contract_ids):
+            where = reduce_ids(line.contract, sub_ids)
+            for name in names:
+                cursor.execute(*line.select(line.contract,
+                        cls._compute_date_column(line, name),
+                        where=where,
+                        group_by=line.contract))
+                for contract, value in cursor.fetchall():
+                    # SQlite returns unicode for dates
+                    if isinstance(value, unicode):
+                        value = datetime.date(*map(int, value.split('-')))
+                    result[name][contract] = value
+        return result
+
+    @staticmethod
+    def _compute_date_column(table, name):
+        func = Min if name == 'start_date' else Max
+        column = Column(table, name)
+        sum_ = Sum(Case((column == Null, Literal(1)), else_=Literal(0)))
+        # As fields can be null, return null if at least one of them is null
+        return Case((sum_ >= Literal(1), Null), else_=func(column))
+
+    @classmethod
+    def search_dates(cls, name, clause):
+        pool = Pool()
+        ContractLine = pool.get('contract.line')
+        line = ContractLine.__table__()
+        Operator = fields.SQL_OPERATORS[clause[1]]
+        query = line.select(line.contract, group_by=line.contract,
+                having=Operator(cls._compute_date_column(line, name),
+                clause[2]))
+        return [('id', 'in', query)]
 
     @staticmethod
     def default_company():
@@ -241,11 +292,10 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         if end_date is None:
             end_date = Date.today()
 
-        end_date = todatetime(end_date)
         consumptions = []
 
         for line in self.lines:
-            start_period_date = self.start_period_date
+            start_period_date = line.start_date or self.start_period_date
 
             last_consumption_date = line.last_consumption_date
             if last_consumption_date:
@@ -255,26 +305,30 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             if last_consumption_date:
                 start = (last_consumption_date + relativedelta(days=+1)).date()
 
-            end_contract = None
+            end_contract = line.end_date or self.end_date
             if end_contract:
-                end_contract = todatetime(line.end_date or self.end_date)
                 self.rrule.until = end_contract
+
 
             last_invoice_date = line.last_consumption_invoice_date
 
             next_period = self.rrule.after(todatetime(start)) + \
                 relativedelta(days=+1)
 
-            if next_period.date() < end_date.date():
-                next_period = end_date
+            if end_contract and next_period.date() < end_contract:
+                next_period = todatetime(end_contract)
+
 
             for date in self.rrule.between(todatetime(start), next_period):
                 date -= relativedelta(days=+1)
                 date = date.date()
-                invoice_date = last_invoice_date or self.first_invoice_date \
+                invoice_date = last_invoice_date or line.first_invoice_date \
                     or date
                 if last_invoice_date:
                     invoice_date = self.get_invoice_date(last_invoice_date)
+
+                if invoice_date > end_date:
+                    break
 
                 finish_date = date
                 if end_contract and end_contract <= date:
@@ -285,8 +339,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                     start_period = start_period_date
                     start = line.start_date or self.start
 
-                if (invoice_date <= end_date.date()) or \
-                        (finish_date <= end_date.date()):
+                if (not end_contract or (invoice_date <= end_contract) or
+                        (finish_date <= end_contract) or (invoice_date < end_date)):
                     consumptions.append(line.get_consumption(start, date,
                         invoice_date, start_period, finish_date))
                 date += relativedelta(days=+1)
@@ -310,7 +364,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         return ContractConsumption.create([c._save_values for c in to_create])
 
     def check_start_date(self):
-        if not hasattr(self, 'rrule'):
+        if not hasattr(self, 'rrule') or not self.start_date:
             return
         d = self.rrule.after(todatetime(self.start_period_date)).date()
         if self.start_date >= self.start_period_date and self.start_date < d:
@@ -325,7 +379,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         super(Contract, cls).validate(contracts)
         for contract in contracts:
             contract.check_start_date()
-            pass
 
 
 class ContractLine(Workflow, ModelSQL, ModelView):
@@ -335,7 +388,6 @@ class ContractLine(Workflow, ModelSQL, ModelView):
     contract = fields.Many2One('contract', 'Contract', required=True,
         ondelete='CASCADE')
     service = fields.Many2One('contract.service', 'Service')
-    name = fields.Char('Name')
     start_date = fields.Date('Start Date', required=True)
     end_date = fields.Date('End Date')
     description = fields.Text('Description', required=True)
@@ -345,6 +397,22 @@ class ContractLine(Workflow, ModelSQL, ModelView):
             'Last Consumption Date'), 'get_last_consumption_date')
     last_consumption_invoice_date = fields.Function(fields.Date(
             'Last Invoice Date'), 'get_last_consumption_invoice_date')
+    consumptions = fields.One2Many('contract.consumption', 'contract_line',
+        'Consumptions', readonly=True)
+    first_invoice_date = fields.Date('First Invoice Date')
+
+    def get_rec_name(self, name):
+        rec_name = self.contract.rec_name
+        if self.service:
+            rec_name = '%s (%s)' % (self.service.rec_name, rec_name)
+        return rec_name
+
+    @classmethod
+    def search_rec_name(cls, name, clause):
+        return ['OR',
+            ('contract.rec_name',) + tuple(clause[1:]),
+            ('service.rec_name',) + tuple(clause[1:]),
+            ]
 
     @staticmethod
     def default_start_date():
@@ -354,11 +422,13 @@ class ContractLine(Workflow, ModelSQL, ModelView):
     def default_end_date():
         return Transaction().context.get('end_date')
 
+    @staticmethod
+    def default_first_invoice_date():
+        return Transaction().context.get('first_invoice_date')
+
     @fields.depends('service', 'unit_price', 'description')
     def on_change_service(self):
-        changes = {
-            'unit_price': None,
-            }
+        changes = {}
         if self.service:
             changes['name'] = self.service.rec_name
             if not self.unit_price:
@@ -428,7 +498,7 @@ class ContractConsumption(ModelSQL, ModelView):
     invoice_line = fields.One2Many('account.invoice.line', 'origin',
         'Invoice Line', size=1)
     contract = fields.Function(fields.Many2One('contract',
-        'Contract'), 'get_contract')
+        'Contract'), 'get_contract', searcher='search_contract')
 
     @classmethod
     def __setup__(cls):
@@ -451,11 +521,32 @@ class ContractConsumption(ModelSQL, ModelView):
     def get_contract(self, name=None):
         return self.contract_line.contract.id
 
+    @classmethod
+    def search_contract(cls, name, clause):
+        return [('contract_line.contract',) + tuple(clause[1:])]
+
     def _get_tax_rule_pattern(self):
         '''
         Get tax rule pattern
         '''
         return {}
+
+    def _get_start_end_date(self):
+        pool = Pool()
+        Lang = pool.get('ir.lang')
+        if self.contract.party.lang:
+            lang = self.contract.party.lang
+        else:
+            language = Transaction().language
+            languages = Lang.search([('code', '=', language)])
+            if not languages:
+                languages = Lang.search([('code', '=', 'en_US')])
+            lang = languages[0]
+        start = Lang.strftime(self.start_date,
+            lang.code, lang.date)
+        end = Lang.strftime(self.end_date, lang.code,
+            lang.date)
+        return start, end
 
     def get_invoice_line(self):
         pool = Pool()
@@ -470,10 +561,11 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice_line.product = None
         if self.contract_line.service:
             invoice_line.product = self.contract_line.service.product
-        invoice_line.description = '%(name)s (%(start)s - %(end)s)' % {
+        start_date, end_date = self._get_start_end_date()
+        invoice_line.description = '[%(start)s - %(end)s] %(name)s' % {
+            'start': start_date,
+            'end': end_date,
             'name': self.contract_line.description,
-            'start': self.start_date,
-            'end': self.end_date,
             }
         invoice_line.unit_price = self.contract_line.unit_price
         invoice_line.party = self.contract_line.contract.party
@@ -518,6 +610,19 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice_line.quantity = Uom.round(quantity, rounding)
         return invoice_line
 
+    def get_amount_to_invoice(self):
+        pool = Pool()
+        Uom = pool.get('product.uom')
+        quantity = ((self.end_date - self.start_date).total_seconds() /
+            (self.end_period_date - self.init_period_date).total_seconds())
+
+        uom = self.contract_line and self.contract_line.service and \
+            self.contract_line.service.product and \
+            self.contract_line.service.product.default_uom
+        rounding = uom.rounding if uom else 1
+        qty = Uom.round(quantity, rounding)
+        return Decimal(str(qty)) * self.contract_line.unit_price
+
     @classmethod
     def _group_invoice_key(cls, line):
         '''
@@ -527,13 +632,16 @@ class ContractConsumption(ModelSQL, ModelView):
         '''
         consumption_id, invoice_line = line
         consumption = cls(consumption_id)
-        return (
+        grouping = [
             ('party', invoice_line.party),
             ('company', invoice_line.company),
             ('currency', invoice_line.currency),
             ('type', invoice_line.invoice_type),
             ('invoice_date', consumption.invoice_date),
-            )
+            ]
+        if invoice_line.party.contract_grouping_method is None:
+            grouping.append(('contract', consumption.contract_line.contract))
+        return grouping
 
     @classmethod
     def _get_invoice(cls, keys):
@@ -553,12 +661,15 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice.journal = journal
         invoice.payment_term = invoice.party.customer_payment_term
         invoice.account = invoice.party.account_receivable
+        # Compatibility with account_payment_type module
+        if hasattr(Invoice, 'payment_type'):
+            invoice.payment_type = invoice.party.customer_payment_type
         return invoice
 
     @classmethod
     @ModelView.button
     def invoice(cls, consumptions):
-    	cls._invoice(consumptions)
+        cls._invoice(consumptions)
 
     @classmethod
     def _invoice(cls, consumptions):
