@@ -144,10 +144,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                     'icon': 'tryton-cancel',
                     },
                 })
-        cls._error_messages.update({
-                'start_date_not_valid': ('Contract %(contract)s with '
-                    'invalid date "%(date)s"'),
-                })
 
     def _get_rec_name(self, name):
         rec_name = []
@@ -362,23 +358,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             to_create += contract.get_consumptions(date)
 
         return ContractConsumption.create([c._save_values for c in to_create])
-
-    def check_start_date(self):
-        if not hasattr(self, 'rrule') or not self.start_date:
-            return
-        d = self.rrule.after(todatetime(self.start_period_date)).date()
-        if self.start_date >= self.start_period_date and self.start_date < d:
-            return True
-        self.raise_user_error('start_date_not_valid', {
-                    'contract': self.rec_name,
-                    'date': self.start_date,
-                    })
-
-    @classmethod
-    def validate(cls, contracts):
-        super(Contract, cls).validate(contracts)
-        for contract in contracts:
-            contract.check_start_date()
 
 
 class ContractLine(Workflow, ModelSQL, ModelView):

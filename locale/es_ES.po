@@ -18,10 +18,6 @@ msgstr ""
 "Falta la cuenta de ingresos par el producto \"%(product)s\" de la linea de "
 "contracto \"%(contract_line)s\"."
 
-msgctxt "error:contract:"
-msgid "Contract %(contract)s with invalid date \"%(date)s\""
-msgstr "El contracto %(contract)s tiene fecha de comienzo inválida \"%(date)s\""
-
 msgctxt "field:contract,company:"
 msgid "Company"
 msgstr "Empresa"

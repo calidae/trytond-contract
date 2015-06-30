@@ -18,10 +18,6 @@ msgstr ""
 "Falta el compte d'ingressos al producte \"%(product)s\" de la línia de "
 "contracte \"%(contract_line)s\"."
 
-msgctxt "error:contract:"
-msgid "Contract %(contract)s with invalid date \"%(date)s\""
-msgstr "El contracte \"%(contract)s\" té dates invàlides \"%(date)s\""
-
 msgctxt "field:contract,company:"
 msgid "Company"
 msgstr "Empresa"
