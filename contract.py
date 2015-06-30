@@ -399,7 +399,7 @@ class ContractLine(Workflow, ModelSQL, ModelView):
             'Last Invoice Date'), 'get_last_consumption_invoice_date')
     consumptions = fields.One2Many('contract.consumption', 'contract_line',
         'Consumptions', readonly=True)
-    first_invoice_date = fields.Date('First Invoice Date')
+    first_invoice_date = fields.Date('First Invoice Date', required=True)
 
     def get_rec_name(self, name):
         rec_name = self.contract.rec_name
@@ -435,6 +435,13 @@ class ContractLine(Workflow, ModelSQL, ModelView):
                 changes['unit_price'] = self.service.product.list_price
             if not self.description:
                 changes['description'] = self.service.product.rec_name
+        return changes
+
+    @fields.depends('start_date', 'first_invoice_date')
+    def on_change_start_date(self):
+        changes = {}
+        if self.start_date and not self.first_invoice_date:
+            changes['first_invoice_date'] = self.start_date
         return changes
 
     @classmethod
