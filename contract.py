@@ -12,7 +12,7 @@ from decimal import Decimal
 from trytond.config import config
 from trytond.model import Workflow, ModelSQL, ModelView, Model, fields
 from trytond.pool import Pool
-from trytond.pyson import Eval, Bool
+from trytond.pyson import Eval, Bool, If
 from trytond.transaction import Transaction
 from trytond.tools import reduce_ids, grouped_slice
 from trytond.wizard import Wizard, StateView, StateAction, Button
@@ -388,8 +388,20 @@ class ContractLine(Workflow, ModelSQL, ModelView):
     contract = fields.Many2One('contract', 'Contract', required=True,
         ondelete='CASCADE')
     service = fields.Many2One('contract.service', 'Service')
-    start_date = fields.Date('Start Date', required=True)
-    end_date = fields.Date('End Date')
+    start_date = fields.Date('Start Date', required=True,
+        domain=[
+            If(Bool(Eval('end_date')),
+                ('start_date', '<=', Eval('end_date', None)),
+                ()),
+            ],
+        depends=['end_date'])
+    end_date = fields.Date('End Date',
+        domain=[
+            If(Bool(Eval('end_date')),
+                ('end_date', '>=', Eval('start_date', None)),
+                ()),
+            ],
+        depends=['start_date'])
     description = fields.Text('Description', required=True)
     unit_price = fields.Numeric('Unit Price', digits=(16, DIGITS),
         required=True)
@@ -497,10 +509,26 @@ class ContractConsumption(ModelSQL, ModelView):
 
     contract_line = fields.Many2One('contract.line', 'Contract Line',
         required=True)
-    init_period_date = fields.Date('Start Period Date', required=True)
-    end_period_date = fields.Date('Finish Period Date', required=True)
-    start_date = fields.Date('Start Date', required=True)
-    end_date = fields.Date('End Date', required=True)
+    init_period_date = fields.Date('Start Period Date', required=True,
+        domain=[
+            ('init_period_date', '<=', Eval('end_period_date', None)),
+            ],
+        depends=['end_period_date'])
+    end_period_date = fields.Date('Finish Period Date', required=True,
+        domain=[
+            ('end_period_date', '>=', Eval('init_period_date', None)),
+            ],
+        depends=['init_period_date'])
+    start_date = fields.Date('Start Date', required=True,
+        domain=[
+            ('start_date', '<=', Eval('end_date', None)),
+            ],
+        depends=['end_date'])
+    end_date = fields.Date('End Date', required=True,
+        domain=[
+            ('end_date', '>=', Eval('start_date', None)),
+            ],
+        depends=['start_date'])
     invoice_date = fields.Date('Invoice Date', required=True)
     invoice_line = fields.One2Many('account.invoice.line', 'origin',
         'Invoice Line', size=1)
