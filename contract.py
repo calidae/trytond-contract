@@ -309,7 +309,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             if end_contract:
                 self.rrule.until = end_contract
 
-
             last_invoice_date = line.last_consumption_invoice_date
 
             next_period = self.rrule.after(todatetime(start)) + \
@@ -317,7 +316,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
             if end_contract and next_period.date() < end_contract:
                 next_period = todatetime(end_contract)
-
 
             for date in self.rrule.between(todatetime(start), next_period):
                 date -= relativedelta(days=+1)
@@ -339,8 +337,10 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                     start_period = start_period_date
                     start = line.start_date or self.start
 
-                if (not end_contract or (invoice_date <= end_contract) or
-                        (finish_date <= end_contract) or (invoice_date < end_date)):
+                if ((not end_contract or (invoice_date <= end_contract) or
+                            (finish_date <= end_contract) or
+                            (invoice_date < end_date))
+                        and not start > date):
                     consumptions.append(line.get_consumption(start, date,
                         invoice_date, start_period, finish_date))
                 date += relativedelta(days=+1)
@@ -638,9 +638,12 @@ class ContractConsumption(ModelSQL, ModelView):
                         })
         invoice_line.taxes = taxes
         invoice_line.invoice_type = 'out_invoice'
-        # Compute quantity based on dates
-        quantity = ((self.end_date - self.start_date).total_seconds() /
-            (self.end_period_date - self.init_period_date).total_seconds())
+        if self.end_period_date == self.init_period_date:
+            quantity = 0.0
+        else:
+            # Compute quantity based on dates
+            quantity = ((self.end_date - self.start_date).total_seconds() /
+                (self.end_period_date - self.init_period_date).total_seconds())
         rounding = invoice_line.unit.rounding if invoice_line.unit else 1
         invoice_line.quantity = Uom.round(quantity, rounding)
         return invoice_line
