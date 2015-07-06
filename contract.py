@@ -391,6 +391,17 @@ class ContractLine(Workflow, ModelSQL, ModelView):
     consumptions = fields.One2Many('contract.consumption', 'contract_line',
         'Consumptions', readonly=True)
     first_invoice_date = fields.Date('First Invoice Date', required=True)
+    sequence = fields.Integer('Sequence')
+
+    @classmethod
+    def __setup__(cls):
+        super(ContractLine, cls).__setup__()
+        cls._order = [('contract', 'ASC'), ('sequence', 'ASC')]
+
+    @staticmethod
+    def order_sequence(tables):
+        table, _ = tables[None]
+        return [table.sequence == None, table.sequence]
 
     def get_rec_name(self, name):
         rec_name = self.contract.rec_name
@@ -572,6 +583,7 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice_line.origin = self
         invoice_line.company = self.contract_line.contract.company
         invoice_line.currency = self.contract_line.contract.currency
+        invoice_line.sequence = self.contract_line.sequence
         invoice_line.product = None
         if self.contract_line.service:
             invoice_line.product = self.contract_line.service.product

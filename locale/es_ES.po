@@ -230,6 +230,10 @@ msgctxt "field:contract.line,rec_name:"
 msgid "Name"
 msgstr "Nombre"
 
+msgctxt "field:contract.line,sequence:"
+msgid "Sequence"
+msgstr "Secuencia"
+
 msgctxt "field:contract.line,service:"
 msgid "Service"
 msgstr "Servicios"
