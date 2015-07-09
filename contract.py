@@ -535,6 +535,8 @@ class ContractConsumption(ModelSQL, ModelView):
                 'missing_account_revenue_property': ('Contract Line '
                     '"%(contract_line)s" misses an "account revenue" default '
                     'property.'),
+                'delete_invoiced_consumption': ('Consumption "%s" can not be'
+                    ' deleted because it is already invoiced.'),
                 })
         cls._buttons.update({
                 'invoice': {
@@ -726,6 +728,19 @@ class ContractConsumption(ModelSQL, ModelView):
         invoices = Invoice.create([x._save_values for x in invoices])
         Invoice.update_taxes(invoices)
         return invoices
+
+    @classmethod
+    def delete(cls, consumptions):
+        pool = Pool()
+        InvoiceLine = pool.get('account.invoice.line')
+        lines = InvoiceLine.search([
+                ('origin', 'in', [str(c) for c in consumptions])
+                ], limit=1)
+        if lines:
+            line, = lines
+            cls.raise_user_error('delete_invoiced_consumption',
+                line.origin.rec_name)
+        super(ContractConsumption, cls).delete(consumptions)
 
 
 class CreateConsumptionsStart(ModelView):

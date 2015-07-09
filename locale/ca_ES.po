@@ -3,6 +3,10 @@ msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
 msgctxt "error:contract.consumption:"
+msgid "Consumption \"%s\" can not be deleted because it is already invoiced."
+msgstr "No es pot eliminar el consum \"%s\" perquè ja esta facturat."
+
+msgctxt "error:contract.consumption:"
 msgid ""
 "Contract Line \"%(contract_line)s\" misses an \"account revenue\" default "
 "property."
