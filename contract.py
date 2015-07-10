@@ -106,11 +106,10 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     start_period_date = fields.Date('Start Period Date', required=True,
         states=_STATES, depends=_DEPENDS)
     lines = fields.One2Many('contract.line', 'contract', 'Lines',
-        context={
-            'start_date': Eval('start_date'),
-            'end_date': Eval('end_date'),
+        states={
+            'readonly': Eval('state') == 'cancel',
             },
-        depends=['start_date', 'end_date'])
+        depends=['state'])
     state = fields.Selection([
             ('draft', 'Draft'),
             ('validated', 'Validated'),
@@ -415,18 +414,6 @@ class ContractLine(Workflow, ModelSQL, ModelView):
             ('contract.rec_name',) + tuple(clause[1:]),
             ('service.rec_name',) + tuple(clause[1:]),
             ]
-
-    @staticmethod
-    def default_start_date():
-        return Transaction().context.get('start_date')
-
-    @staticmethod
-    def default_end_date():
-        return Transaction().context.get('end_date')
-
-    @staticmethod
-    def default_first_invoice_date():
-        return Transaction().context.get('first_invoice_date')
 
     @fields.depends('service', 'unit_price', 'description')
     def on_change_service(self):

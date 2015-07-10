@@ -201,11 +201,11 @@ Create a contract::
     >>> Contract = Model.get('contract')
     >>> contract = Contract()
     >>> contract.party = party
-    >>> contract.start_period_date = datetime.date(2015,01,01)
-    >>> contract.start_date = datetime.date(2015,01,01)
+    >>> contract.start_period_date = datetime.date(2015, 01, 01)
     >>> contract.freq = 'monthly'
     >>> line = contract.lines.new()
-    >>> line.first_invoice_date = datetime.date(2015,01,31)
+    >>> line.start_date = datetime.date(2015, 01, 01)
+    >>> line.first_invoice_date = datetime.date(2015, 01, 31)
     >>> line.service = service
     >>> line.unit_price
     Decimal('40')

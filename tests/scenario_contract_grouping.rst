@@ -197,9 +197,9 @@ Create two contract for grouped party::
     >>> contract = Contract()
     >>> contract.party = party
     >>> contract.start_period_date = datetime.date(today.year, 01, 01)
-    >>> contract.start_date = datetime.date(today.year, 01, 01)
     >>> contract.freq = 'monthly'
     >>> line = contract.lines.new()
+    >>> line.start_date = datetime.date(today.year, 01, 01)
     >>> line.first_invoice_date = datetime.date(today.year, 01, 31)
     >>> line.service = service
     >>> line.unit_price
@@ -213,6 +213,7 @@ Create two contract for grouped party::
     >>> contract.start_date = datetime.date(today.year, 01, 01)
     >>> contract.freq = 'monthly'
     >>> line = contract.lines.new()
+    >>> line.start_date = datetime.date(today.year, 01, 01)
     >>> line.first_invoice_date = datetime.date(today.year, 01, 31)
     >>> line.service = service
     >>> line.unit_price
@@ -227,9 +228,9 @@ Create two contract for non grouped party::
     >>> contract = Contract()
     >>> contract.party = non_grouping_party
     >>> contract.start_period_date = datetime.date(today.year, 01, 01)
-    >>> contract.start_date = datetime.date(today.year, 01, 01)
     >>> contract.freq = 'monthly'
     >>> line = contract.lines.new()
+    >>> line.start_date = datetime.date(today.year, 01, 01)
     >>> line.first_invoice_date = datetime.date(today.year, 01, 31)
     >>> line.service = service
     >>> line.unit_price
@@ -243,6 +244,7 @@ Create two contract for non grouped party::
     >>> contract.start_date = datetime.date(today.year, 01, 01)
     >>> contract.freq = 'monthly'
     >>> line = contract.lines.new()
+    >>> line.start_date = datetime.date(today.year, 01, 01)
     >>> line.first_invoice_date = datetime.date(today.year, 01, 31)
     >>> line.service = service
     >>> line.unit_price
@@ -289,4 +291,3 @@ Two invoices are generated for non grouping party::
     Decimal('40.00')
     >>> second_invoice.total_amount
     Decimal('44.00')
-
