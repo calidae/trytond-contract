@@ -60,6 +60,8 @@ o también:
 
 .. view:: contract.contract_view_form
 
+   Vista en formulario del contrato
+
 .. inheritref:: contract/contract:paragraph:lineas
 
 Una vez rellenados los campos de la cabecera, tendremos que indicar las |lines|
