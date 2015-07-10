@@ -152,10 +152,17 @@ Create party::
     >>> party = Party(name='Party')
     >>> party.save()
 
-Create product::
+
+Configure unit to accept decimals::
 
     >>> ProductUom = Model.get('product.uom')
     >>> unit, = ProductUom.find([('name', '=', 'Unit')])
+    >>> unit.rounding =  0.01
+    >>> unit.digits = 2
+    >>> unit.save()
+
+Create product::
+
     >>> ProductTemplate = Model.get('product.template')
     >>> Product = Model.get('product.product')
     >>> product = Product()
@@ -201,24 +208,23 @@ Create a contract::
     >>> Contract = Model.get('contract')
     >>> contract = Contract()
     >>> contract.party = party
-    >>> contract.start_period_date = datetime.date(2015,01,01)
+    >>> contract.start_period_date = datetime.date(2015, 01, 01)
     >>> contract.freq = 'monthly'
     >>> contract.interval = 1
-    >>> contract.first_invoice_date = datetime.date(2015,02,10)
     >>> line = contract.lines.new()
     >>> line.start_date = datetime.date(2015, 01, 10)
+    >>> line.first_invoice_date = datetime.date(2015, 02, 10)
     >>> line.service = service
     >>> line.unit_price
     Decimal('40')
-    >>> line.end_date = datetime.date(2015,01,31)
-    >>> line.first_invoice_date = contract.first_invoice_date
+    >>> line.end_date = datetime.date(2015, 01, 31)
     >>> line2 = contract.lines.new()
     >>> line2.service = service
     >>> line2.unit_price = Decimal('100')
     >>> line2.unit_price
     Decimal('100')
-    >>> line2.start_date = datetime.date(2015,02,01)
-    >>> line2.first_invoice_date = datetime.date(2015,03,01)
+    >>> line2.start_date = datetime.date(2015, 02, 01)
+    >>> line2.first_invoice_date = datetime.date(2015, 03, 01)
     >>> contract.click('validate_contract')
     >>> contract.state
     u'validated'
@@ -228,34 +234,34 @@ Create a contract::
 Generate consumed lines::
 
     >>> create_consumptions = Wizard('contract.create_consumptions')
-    >>> create_consumptions.form.date = datetime.date(2015,03,01)
+    >>> create_consumptions.form.date = datetime.date(2015, 03, 01)
     >>> create_consumptions.execute('create_consumptions')
     >>> Consumption = Model.get('contract.consumption')
     >>> consumption, consumption2 = Consumption.find([])
-    >>> consumption.start_date == datetime.date(2015,01,10)
+    >>> consumption.start_date == datetime.date(2015, 01, 10)
     True
-    >>> consumption.end_date == datetime.date(2015,01,31)
+    >>> consumption.end_date == datetime.date(2015, 01, 31)
     True
-    >>> consumption.invoice_date == datetime.date(2015,02,10)
+    >>> consumption.invoice_date == datetime.date(2015, 02, 10)
     True
-    >>> consumption.init_period_date == datetime.date(2015,01,10)
+    >>> consumption.init_period_date == datetime.date(2015, 01, 01)
     True
-    >>> consumption.end_period_date == datetime.date(2015,01,31)
-    True
-
-    >>> consumption2.start_date == datetime.date(2015,02,01)
-    True
-    >>> consumption2.end_date == datetime.date(2015,02,28)
-    True
-    >>> consumption2.invoice_date == datetime.date(2015,03,01)
-    True
-    >>> consumption2.init_period_date == datetime.date(2015,02,1)
-    True
-    >>> consumption2.end_period_date == datetime.date(2015,02,28)
+    >>> consumption.end_period_date == datetime.date(2015, 01, 31)
     True
 
+    >>> consumption2.start_date == datetime.date(2015, 02, 01)
+    True
+    >>> consumption2.end_date == datetime.date(2015, 02, 28)
+    True
+    >>> consumption2.invoice_date == datetime.date(2015, 03, 01)
+    True
+    >>> consumption2.init_period_date == datetime.date(2015, 02, 1)
+    True
+    >>> consumption2.end_period_date == datetime.date(2015, 02, 28)
+    True
 
-Generate invoice for consumed lines::
+
+Invoice first consumed line::
 
     >>> invoices = consumption.click('invoice')
     >>> invoice = consumption.invoice_line[0].invoice
@@ -264,13 +270,38 @@ Generate invoice for consumed lines::
     >>> invoice.party == party
     True
     >>> invoice.untaxed_amount
-    Decimal('40.00')
+    Decimal('28.00')
     >>> invoice.tax_amount
-    Decimal('4.00')
+    Decimal('2.80')
     >>> invoice.total_amount
-    Decimal('44.00')
+    Decimal('30.80')
     >>> consumption.invoice_line[0].product == product
     True
     >>> consumption.invoice_date == invoice.invoice_date
     True
+    >>> invoice_line, = invoice.lines
+    >>> invoice_line.quantity
+    0.7
+
+Invoice second consumed line::
+
+    >>> invoices = consumption2.click('invoice')
+    >>> invoice = consumption2.invoice_line[0].invoice
+    >>> invoice.type
+    u'out_invoice'
+    >>> invoice.party == party
+    True
+    >>> invoice.untaxed_amount
+    Decimal('100.00')
+    >>> invoice.tax_amount
+    Decimal('10.00')
+    >>> invoice.total_amount
+    Decimal('110.00')
+    >>> consumption2.invoice_line[0].product == product
+    True
+    >>> consumption2.invoice_date == invoice.invoice_date
+    True
+    >>> invoice_line, = invoice.lines
+    >>> invoice_line.quantity
+    1.0
 
