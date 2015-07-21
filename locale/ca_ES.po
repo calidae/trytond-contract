@@ -330,6 +330,14 @@ msgctxt "model:contract.service,name:"
 msgid "Contract Service"
 msgstr "Servei de contracte"
 
+msgctxt "model:ir.action,name:act_consumption_contract_line"
+msgid "Consumptions"
+msgstr "Consums"
+
+msgctxt "model:ir.action,name:act_consumption_contracts"
+msgid "Consumptions"
+msgstr "Consums"
+
 msgctxt "model:ir.action,name:act_contract"
 msgid "Contract"
 msgstr "Contractes"
@@ -349,6 +357,10 @@ msgstr "Línia de contracte"
 msgctxt "model:ir.action,name:act_contract_service"
 msgid "Contract Service"
 msgstr "Servei de contracte"
+
+msgctxt "model:ir.action,name:act_invoices"
+msgid "Invoices"
+msgstr "Factures"
 
 msgctxt "model:ir.action,name:act_open_contract"
 msgid "Contracts"
