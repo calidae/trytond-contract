@@ -515,8 +515,14 @@ class ContractConsumption(ModelSQL, ModelView):
             ],
         depends=['start_date'])
     invoice_date = fields.Date('Invoice Date', required=True)
-    invoice_line = fields.One2Many('account.invoice.line', 'origin',
-        'Invoice Line', size=1)
+    invoice_lines = fields.One2Many('account.invoice.line', 'origin',
+        'Invoice Lines', readonly=True)
+    credit_lines = fields.Function(fields.One2Many('account.invoice.line',
+            None, 'Credit Lines',
+            states={
+                'invisible': ~Bool(Eval('credit_lines')),
+                }),
+        'get_credit_lines')
     contract = fields.Function(fields.Many2One('contract',
         'Contract'), 'get_contract', searcher='search_contract')
 
@@ -535,10 +541,16 @@ class ContractConsumption(ModelSQL, ModelView):
                 })
         cls._buttons.update({
                 'invoice': {
-                    'invisible': Bool(Eval('invoice_line')),
                     'icon': 'tryton-go-next',
                     },
                 })
+
+    def get_credit_lines(self, name):
+        pool = Pool()
+        InvoiceLine = pool.get('account.invoice.line')
+        return [x.id for x in InvoiceLine.search([
+                    ('origin.id', 'in', [l.id for l in self.invoice_lines],
+                        'account.invoice.line')])]
 
     def get_contract(self, name=None):
         return self.contract_line.contract.id
@@ -703,8 +715,6 @@ class ContractConsumption(ModelSQL, ModelView):
         Invoice = pool.get('account.invoice')
         lines = {}
         for consumption in consumptions:
-            if consumption.invoice_line:
-                continue
             line = consumption.get_invoice_line()
             lines[consumption.id] = line
 

@@ -16,6 +16,7 @@ this repository contains the full copyright notices and license terms. -->
     <field name="init_period_date"/>
     <label name="end_period_date"/>
     <field name="end_period_date"/>
-    <field name="invoice_line" colspan="4"/>
+    <field name="invoice_lines" colspan="4"/>
+    <field name="credit_lines" colspan="4"/>
     <button name="invoice" string="Invoice" icon="tryton-go-next" colspan="4"/>
 </form>

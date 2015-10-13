@@ -113,7 +113,7 @@
                 id="act_contract_consumption_domain_to_invoiced">
             <field name="name">To Invoice</field>
             <field name="sequence" eval="10"/>
-            <field name="domain">[('invoice_line', '=', None)]</field>
+            <field name="domain">[('invoice_lines', '=', None)]</field>
             <field name="act_window" ref="act_contract_consumption"/>
         </record>
         <record model="ir.action.act_window.domain"
