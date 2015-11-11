@@ -264,7 +264,7 @@ Generate consumed lines::
 Invoice first consumed line::
 
     >>> invoices = consumption.click('invoice')
-    >>> invoice = consumption.invoice_line[0].invoice
+    >>> invoice = consumption.invoice_lines[0].invoice
     >>> invoice.type
     u'out_invoice'
     >>> invoice.party == party
@@ -275,7 +275,7 @@ Invoice first consumed line::
     Decimal('2.80')
     >>> invoice.total_amount
     Decimal('30.80')
-    >>> consumption.invoice_line[0].product == product
+    >>> consumption.invoice_lines[0].product == product
     True
     >>> consumption.invoice_date == invoice.invoice_date
     True
@@ -286,7 +286,7 @@ Invoice first consumed line::
 Invoice second consumed line::
 
     >>> invoices = consumption2.click('invoice')
-    >>> invoice = consumption2.invoice_line[0].invoice
+    >>> invoice = consumption2.invoice_lines[0].invoice
     >>> invoice.type
     u'out_invoice'
     >>> invoice.party == party
@@ -297,7 +297,7 @@ Invoice second consumed line::
     Decimal('10.00')
     >>> invoice.total_amount
     Decimal('110.00')
-    >>> consumption2.invoice_line[0].product == product
+    >>> consumption2.invoice_lines[0].product == product
     True
     >>> consumption2.invoice_date == invoice.invoice_date
     True
