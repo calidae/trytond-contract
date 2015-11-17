@@ -202,10 +202,11 @@ Create a contract::
     >>> contract = Contract()
     >>> contract.party = party
     >>> contract.start_period_date = datetime.date(2015,01,05)
-    >>> contract.start_date = datetime.date(2015,01,05)
     >>> contract.freq = 'monthly'
     >>> line = contract.lines.new()
     >>> line.service = service
+    >>> line.start_date = datetime.date(2015,01,05)
+    >>> line.first_invoice_date = datetime.date(2015,02,04)
     >>> line.unit_price
     Decimal('40')
     >>> contract.click('validate_contract')
@@ -235,7 +236,7 @@ Generate consumed lines::
 Generate invoice for consumed lines::
 
     >>> invoices = consumption.click('invoice')
-    >>> invoice = consumption.invoice_line[0].invoice
+    >>> invoice = consumption.invoice_lines[0].invoice
     >>> invoice.type
     u'out_invoice'
     >>> invoice.party == party
@@ -246,7 +247,7 @@ Generate invoice for consumed lines::
     Decimal('4.00')
     >>> invoice.total_amount
     Decimal('44.00')
-    >>> consumption.invoice_line[0].product == product
+    >>> consumption.invoice_lines[0].product == product
     True
     >>> consumption.invoice_date == invoice.invoice_date
     True

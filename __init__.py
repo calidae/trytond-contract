@@ -18,8 +18,10 @@ def register():
         CreateInvoicesStart,
         Configuration,
         InvoiceLine,
+        CreditInvoiceStart,
         module='contract', type_='model')
     Pool.register(
         CreateConsumptions,
         CreateInvoices,
+        CreditInvoice,
         module='contract', type_='wizard')

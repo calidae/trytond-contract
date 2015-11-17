@@ -113,7 +113,7 @@
                 id="act_contract_consumption_domain_to_invoiced">
             <field name="name">To Invoice</field>
             <field name="sequence" eval="10"/>
-            <field name="domain">[('invoice_line', '=', None)]</field>
+            <field name="domain">[('invoice_lines', '=', None)]</field>
             <field name="act_window" ref="act_contract_consumption"/>
         </record>
         <record model="ir.action.act_window.domain"
@@ -122,7 +122,6 @@
             <field name="sequence" eval="9999"/>
             <field name="act_window" ref="act_contract_consumption"/>
         </record>
-        <!-- TODO: Add relate from consumption to invoices
         <record model="ir.action.act_window" id="act_invoices">
             <field name="name">Invoices</field>
             <field name="res_model">account.invoice</field>
@@ -133,7 +132,27 @@
             <field name="model">contract.consumption,-1</field>
             <field name="action" ref="act_invoices"/>
         </record>
-        -->
+        <record model="ir.action.act_window" id="act_consumption_contracts">
+            <field name="name">Consumptions</field>
+            <field name="res_model">contract.consumption</field>
+            <field name="domain">[('contract', 'in', Eval('active_ids'))]</field>
+        </record>
+        <record model="ir.action.keyword" id="act_consumption_contracts_keyword1">
+            <field name="keyword">form_relate</field>
+            <field name="model">contract,-1</field>
+            <field name="action" ref="act_consumption_contracts"/>
+        </record>
+        <record model="ir.action.act_window" id="act_consumption_contract_line">
+            <field name="name">Consumptions</field>
+            <field name="res_model">contract.consumption</field>
+            <field name="domain">[('contract_line', 'in', Eval('active_ids'))]</field>
+        </record>
+        <record model="ir.action.keyword"
+                id="act_consumption_contract_line_keyword1">
+            <field name="keyword">form_relate</field>
+            <field name="model">contract.line,-1</field>
+            <field name="action" ref="act_consumption_contract_line"/>
+        </record>
         <record model="ir.model.access" id="access_contract_consumption">
             <field name="model" search="[('model', '=', 'contract.consumption')]"/>
             <field name="perm_read" eval="True"/>

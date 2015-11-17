@@ -12,7 +12,7 @@ from decimal import Decimal
 from trytond.config import config
 from trytond.model import Workflow, ModelSQL, ModelView, Model, fields
 from trytond.pool import Pool
-from trytond.pyson import Eval, Bool
+from trytond.pyson import Eval, Bool, If
 from trytond.transaction import Transaction
 from trytond.tools import reduce_ids, grouped_slice
 from trytond.wizard import Wizard, StateView, StateAction, Button
@@ -106,11 +106,10 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     start_period_date = fields.Date('Start Period Date', required=True,
         states=_STATES, depends=_DEPENDS)
     lines = fields.One2Many('contract.line', 'contract', 'Lines',
-        context={
-            'start_date': Eval('start_date'),
-            'end_date': Eval('end_date'),
+        states={
+            'readonly': Eval('state') == 'cancel',
             },
-        depends=['start_date', 'end_date'])
+        depends=['state'])
     state = fields.Selection([
             ('draft', 'Draft'),
             ('validated', 'Validated'),
@@ -143,10 +142,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                     'invisible': Eval('state') == 'cancel',
                     'icon': 'tryton-cancel',
                     },
-                })
-        cls._error_messages.update({
-                'start_date_not_valid': ('Contract %(contract)s with '
-                    'invalid date "%(date)s"'),
                 })
 
     def _get_rec_name(self, name):
@@ -285,6 +280,14 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         date = r.after(last_invoice_date)
         return date.date()
 
+    def get_start_period_date(self, start_date):
+        r = rrule(self.rrule._freq, interval=self.rrule._interval,
+            dtstart=self.start_period_date)
+        date = r.before(todatetime(start_date), inc=True)
+        if date:
+            return date.date()
+        return self.start_period_date
+
     def get_consumptions(self, end_date=None):
         pool = Pool()
         Date = pool.get('ir.date')
@@ -295,7 +298,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         consumptions = []
 
         for line in self.lines:
-            start_period_date = line.start_date or self.start_period_date
+            start_period_date = self.get_start_period_date(line.start_date)
 
             last_consumption_date = line.last_consumption_date
             if last_consumption_date:
@@ -309,7 +312,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             if end_contract:
                 self.rrule.until = end_contract
 
-
             last_invoice_date = line.last_consumption_invoice_date
 
             next_period = self.rrule.after(todatetime(start)) + \
@@ -317,7 +319,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
             if end_contract and next_period.date() < end_contract:
                 next_period = todatetime(end_contract)
-
 
             for date in self.rrule.between(todatetime(start), next_period):
                 date -= relativedelta(days=+1)
@@ -339,8 +340,10 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                     start_period = start_period_date
                     start = line.start_date or self.start
 
-                if (not end_contract or (invoice_date <= end_contract) or
-                        (finish_date <= end_contract) or (invoice_date < end_date)):
+                if ((not end_contract or (invoice_date <= end_contract) or
+                            (finish_date <= end_contract) or
+                            (invoice_date < end_date))
+                        and not start > date):
                     consumptions.append(line.get_consumption(start, date,
                         invoice_date, start_period, finish_date))
                 date += relativedelta(days=+1)
@@ -363,23 +366,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
         return ContractConsumption.create([c._save_values for c in to_create])
 
-    def check_start_date(self):
-        if not hasattr(self, 'rrule') or not self.start_date:
-            return
-        d = self.rrule.after(todatetime(self.start_period_date)).date()
-        if self.start_date >= self.start_period_date and self.start_date < d:
-            return True
-        self.raise_user_error('start_date_not_valid', {
-                    'contract': self.rec_name,
-                    'date': self.start_date,
-                    })
-
-    @classmethod
-    def validate(cls, contracts):
-        super(Contract, cls).validate(contracts)
-        for contract in contracts:
-            contract.check_start_date()
-
 
 class ContractLine(Workflow, ModelSQL, ModelView):
     'Contract Line'
@@ -388,8 +374,20 @@ class ContractLine(Workflow, ModelSQL, ModelView):
     contract = fields.Many2One('contract', 'Contract', required=True,
         ondelete='CASCADE')
     service = fields.Many2One('contract.service', 'Service')
-    start_date = fields.Date('Start Date', required=True)
-    end_date = fields.Date('End Date')
+    start_date = fields.Date('Start Date', required=True,
+        domain=[
+            If(Bool(Eval('end_date')),
+                ('start_date', '<=', Eval('end_date', None)),
+                ()),
+            ],
+        depends=['end_date'])
+    end_date = fields.Date('End Date',
+        domain=[
+            If(Bool(Eval('end_date')),
+                ('end_date', '>=', Eval('start_date', None)),
+                ()),
+            ],
+        depends=['start_date'])
     description = fields.Text('Description', required=True)
     unit_price = fields.Numeric('Unit Price', digits=(16, DIGITS),
         required=True)
@@ -399,7 +397,18 @@ class ContractLine(Workflow, ModelSQL, ModelView):
             'Last Invoice Date'), 'get_last_consumption_invoice_date')
     consumptions = fields.One2Many('contract.consumption', 'contract_line',
         'Consumptions', readonly=True)
-    first_invoice_date = fields.Date('First Invoice Date')
+    first_invoice_date = fields.Date('First Invoice Date', required=True)
+    sequence = fields.Integer('Sequence')
+
+    @classmethod
+    def __setup__(cls):
+        super(ContractLine, cls).__setup__()
+        cls._order = [('contract', 'ASC'), ('sequence', 'ASC')]
+
+    @staticmethod
+    def order_sequence(tables):
+        table, _ = tables[None]
+        return [table.sequence == None, table.sequence]
 
     def get_rec_name(self, name):
         rec_name = self.contract.rec_name
@@ -414,18 +423,6 @@ class ContractLine(Workflow, ModelSQL, ModelView):
             ('service.rec_name',) + tuple(clause[1:]),
             ]
 
-    @staticmethod
-    def default_start_date():
-        return Transaction().context.get('start_date')
-
-    @staticmethod
-    def default_end_date():
-        return Transaction().context.get('end_date')
-
-    @staticmethod
-    def default_first_invoice_date():
-        return Transaction().context.get('first_invoice_date')
-
     @fields.depends('service', 'unit_price', 'description')
     def on_change_service(self):
         changes = {}
@@ -435,6 +432,13 @@ class ContractLine(Workflow, ModelSQL, ModelView):
                 changes['unit_price'] = self.service.product.list_price
             if not self.description:
                 changes['description'] = self.service.product.rec_name
+        return changes
+
+    @fields.depends('start_date', 'first_invoice_date')
+    def on_change_start_date(self):
+        changes = {}
+        if self.start_date and not self.first_invoice_date:
+            changes['first_invoice_date'] = self.start_date
         return changes
 
     @classmethod
@@ -490,13 +494,35 @@ class ContractConsumption(ModelSQL, ModelView):
 
     contract_line = fields.Many2One('contract.line', 'Contract Line',
         required=True)
-    init_period_date = fields.Date('Start Period Date', required=True)
-    end_period_date = fields.Date('Finish Period Date', required=True)
-    start_date = fields.Date('Start Date', required=True)
-    end_date = fields.Date('End Date', required=True)
+    init_period_date = fields.Date('Start Period Date', required=True,
+        domain=[
+            ('init_period_date', '<=', Eval('end_period_date', None)),
+            ],
+        depends=['end_period_date'])
+    end_period_date = fields.Date('Finish Period Date', required=True,
+        domain=[
+            ('end_period_date', '>=', Eval('init_period_date', None)),
+            ],
+        depends=['init_period_date'])
+    start_date = fields.Date('Start Date', required=True,
+        domain=[
+            ('start_date', '<=', Eval('end_date', None)),
+            ],
+        depends=['end_date'])
+    end_date = fields.Date('End Date', required=True,
+        domain=[
+            ('end_date', '>=', Eval('start_date', None)),
+            ],
+        depends=['start_date'])
     invoice_date = fields.Date('Invoice Date', required=True)
-    invoice_line = fields.One2Many('account.invoice.line', 'origin',
-        'Invoice Line', size=1)
+    invoice_lines = fields.One2Many('account.invoice.line', 'origin',
+        'Invoice Lines', readonly=True)
+    credit_lines = fields.Function(fields.One2Many('account.invoice.line',
+            None, 'Credit Lines',
+            states={
+                'invisible': ~Bool(Eval('credit_lines')),
+                }),
+        'get_credit_lines')
     contract = fields.Function(fields.Many2One('contract',
         'Contract'), 'get_contract', searcher='search_contract')
 
@@ -510,13 +536,21 @@ class ContractConsumption(ModelSQL, ModelView):
                 'missing_account_revenue_property': ('Contract Line '
                     '"%(contract_line)s" misses an "account revenue" default '
                     'property.'),
+                'delete_invoiced_consumption': ('Consumption "%s" can not be'
+                    ' deleted because it is already invoiced.'),
                 })
         cls._buttons.update({
                 'invoice': {
-                    'invisible': Bool(Eval('invoice_line')),
                     'icon': 'tryton-go-next',
                     },
                 })
+
+    def get_credit_lines(self, name):
+        pool = Pool()
+        InvoiceLine = pool.get('account.invoice.line')
+        return [x.id for x in InvoiceLine.search([
+                    ('origin.id', 'in', [l.id for l in self.invoice_lines],
+                        'account.invoice.line')])]
 
     def get_contract(self, name=None):
         return self.contract_line.contract.id
@@ -558,6 +592,7 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice_line.origin = self
         invoice_line.company = self.contract_line.contract.company
         invoice_line.currency = self.contract_line.contract.currency
+        invoice_line.sequence = self.contract_line.sequence
         invoice_line.product = None
         if self.contract_line.service:
             invoice_line.product = self.contract_line.service.product
@@ -603,9 +638,12 @@ class ContractConsumption(ModelSQL, ModelView):
                         })
         invoice_line.taxes = taxes
         invoice_line.invoice_type = 'out_invoice'
-        # Compute quantity based on dates
-        quantity = ((self.end_date - self.start_date).total_seconds() /
-            (self.end_period_date - self.init_period_date).total_seconds())
+        if self.end_period_date == self.init_period_date:
+            quantity = 0.0
+        else:
+            # Compute quantity based on dates
+            quantity = ((self.end_date - self.start_date).total_seconds() /
+                (self.end_period_date - self.init_period_date).total_seconds())
         rounding = invoice_line.unit.rounding if invoice_line.unit else 1
         invoice_line.quantity = Uom.round(quantity, rounding)
         return invoice_line
@@ -677,8 +715,6 @@ class ContractConsumption(ModelSQL, ModelView):
         Invoice = pool.get('account.invoice')
         lines = {}
         for consumption in consumptions:
-            if consumption.invoice_line:
-                continue
             line = consumption.get_invoice_line()
             lines[consumption.id] = line
 
@@ -697,6 +733,19 @@ class ContractConsumption(ModelSQL, ModelView):
         invoices = Invoice.create([x._save_values for x in invoices])
         Invoice.update_taxes(invoices)
         return invoices
+
+    @classmethod
+    def delete(cls, consumptions):
+        pool = Pool()
+        InvoiceLine = pool.get('account.invoice.line')
+        lines = InvoiceLine.search([
+                ('origin', 'in', [str(c) for c in consumptions])
+                ], limit=1)
+        if lines:
+            line, = lines
+            cls.raise_user_error('delete_invoiced_consumption',
+                line.origin.rec_name)
+        super(ContractConsumption, cls).delete(consumptions)
 
 
 class CreateConsumptionsStart(ModelView):

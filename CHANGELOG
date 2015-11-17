@@ -1,3 +1,4 @@
+* Add sequence on contract lines
 * Make contracts start date and end date functional fields based on lines
 * Improve rec_names of all fields
 * Initial release

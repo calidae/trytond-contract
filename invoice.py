@@ -1,12 +1,13 @@
-# This file is part of contract_invoice module for Tryton.
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
-from trytond.pool import PoolMeta
 from trytond.model import ModelView, fields
-from trytond.pool import Pool
+from trytond.pool import Pool, PoolMeta
+from trytond.pyson import Bool, Eval
+from trytond.transaction import Transaction
 from trytond.wizard import Wizard, StateView, StateAction, Button
 
-__all__ = ['InvoiceLine', 'CreateInvoicesStart', 'CreateInvoices']
+__all__ = ['InvoiceLine', 'CreateInvoicesStart', 'CreateInvoices',
+    'CreditInvoiceStart', 'CreditInvoice']
 __metaclass__ = PoolMeta
 
 
@@ -53,4 +54,51 @@ class CreateInvoices(Wizard):
         data = {'res_id': [c.id for c in invoices]}
         if len(invoices) == 1:
             action['views'].reverse()
+        return action, data
+
+
+class CreditInvoiceStart:
+    __name__ = 'account.invoice.credit.start'
+    from_contract = fields.Boolean('From Contract', readonly=True)
+    reinvoice_contract = fields.Boolean('Reinvoice Contract',
+        states={
+            'invisible': ~Bool(Eval('from_contract')),
+            },
+        depends=['from_contract'],
+        help=('If true, the consumption that generated this line will be '
+            'reinvoiced.'))
+
+
+class CreditInvoice:
+    __name__ = 'account.invoice.credit'
+
+    def default_start(self, fields):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        Consumption = pool.get('contract.consumption')
+
+        default = super(CreditInvoice, self).default_start(fields)
+        default.update({
+            'from_contract': False,
+            'reinvoice_contract': False,
+            })
+        for invoice in Invoice.browse(Transaction().context['active_ids']):
+            for line in invoice.lines:
+                if isinstance(line.origin, Consumption):
+                    default['from_contract'] = True
+                    break
+        return default
+
+    def do_credit(self, action):
+        pool = Pool()
+        Invoice = pool.get('account.invoice')
+        Consumption = pool.get('contract.consumption')
+
+        action, data = super(CreditInvoice, self).do_credit(action)
+        consumptions = set([])
+        for invoice in Invoice.browse(Transaction().context['active_ids']):
+            for line in invoice.lines:
+                if isinstance(line.origin, Consumption):
+                    consumptions.add(line.origin)
+        Consumption.invoice(list(consumptions))
         return action, data
