@@ -54,14 +54,14 @@
                 id="act_contract_domain_draft">
             <field name="name">Draft</field>
             <field name="sequence" eval="10"/>
-            <field name="domain">[('state', '=', 'draft')]</field>
+            <field name="domain" eval="[('state', '=', 'draft')]" pyson="1"/>
             <field name="act_window" ref="act_contract"/>
         </record>
         <record model="ir.action.act_window.domain"
                 id="act_contract_domain_validated">
             <field name="name">Validated</field>
             <field name="sequence" eval="20"/>
-            <field name="domain">[('state', '=', 'validated')]</field>
+            <field name="domain" eval="[('state', '=', 'validated')]" pyson="1"/>
             <field name="act_window" ref="act_contract"/>
         </record>
         <record model="ir.action.act_window.domain"
@@ -113,7 +113,8 @@
                 id="act_contract_consumption_domain_to_invoiced">
             <field name="name">To Invoice</field>
             <field name="sequence" eval="10"/>
-            <field name="domain">[('invoice_lines', '=', None)]</field>
+            <field name="domain" eval="[('invoice_lines', '=', None)]"
+                pyson="1"/>
             <field name="act_window" ref="act_contract_consumption"/>
         </record>
         <record model="ir.action.act_window.domain"
@@ -125,7 +126,8 @@
         <record model="ir.action.act_window" id="act_invoices">
             <field name="name">Invoices</field>
             <field name="res_model">account.invoice</field>
-            <field name="domain">[('lines.origin.id', 'in', Eval('active_ids'), Eval('active_model'))]</field>
+            <field name="domain" eval="[('lines.origin.id', 'in', Eval('active_ids'), Eval('active_model'))]"
+                pyson="1"/>
         </record>
         <record model="ir.action.keyword" id="act_invoices_keyword1">
             <field name="keyword">form_relate</field>
@@ -135,7 +137,8 @@
         <record model="ir.action.act_window" id="act_consumption_contracts">
             <field name="name">Consumptions</field>
             <field name="res_model">contract.consumption</field>
-            <field name="domain">[('contract', 'in', Eval('active_ids'))]</field>
+            <field name="domain" eval="[('contract', 'in', Eval('active_ids'))]"
+                pyson="1"/>
         </record>
         <record model="ir.action.keyword" id="act_consumption_contracts_keyword1">
             <field name="keyword">form_relate</field>
@@ -145,7 +148,8 @@
         <record model="ir.action.act_window" id="act_consumption_contract_line">
             <field name="name">Consumptions</field>
             <field name="res_model">contract.consumption</field>
-            <field name="domain">[('contract_line', 'in', Eval('active_ids'))]</field>
+            <field name="domain" eval="[('contract_line', 'in', Eval('active_ids'))]"
+                pyson="1"/>
         </record>
         <record model="ir.action.keyword"
                 id="act_consumption_contract_line_keyword1">

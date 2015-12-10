@@ -9,14 +9,13 @@ from sql.conditionals import Case
 from sql.aggregate import Max, Min, Sum
 from decimal import Decimal
 
-from trytond.config import config
 from trytond.model import Workflow, ModelSQL, ModelView, Model, fields
 from trytond.pool import Pool
 from trytond.pyson import Eval, Bool, If
 from trytond.transaction import Transaction
 from trytond.tools import reduce_ids, grouped_slice
 from trytond.wizard import Wizard, StateView, StateAction, Button
-DIGITS = config.getint('digits', 'unit_price_digits', 4)
+from trytond.modules.product import price_digits
 
 __all__ = ['ContractService', 'Contract', 'ContractLine', 'RRuleMixin',
     'ContractConsumption', 'CreateConsumptionsStart', 'CreateConsumptions']
@@ -367,7 +366,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         return ContractConsumption.create([c._save_values for c in to_create])
 
 
-class ContractLine(Workflow, ModelSQL, ModelView):
+class ContractLine(ModelSQL, ModelView):
     'Contract Line'
     __name__ = 'contract.line'
 
@@ -389,7 +388,7 @@ class ContractLine(Workflow, ModelSQL, ModelView):
             ],
         depends=['start_date'])
     description = fields.Text('Description', required=True)
-    unit_price = fields.Numeric('Unit Price', digits=(16, DIGITS),
+    unit_price = fields.Numeric('Unit Price', digits=price_digits,
         required=True)
     last_consumption_date = fields.Function(fields.Date(
             'Last Consumption Date'), 'get_last_consumption_date')
@@ -425,21 +424,17 @@ class ContractLine(Workflow, ModelSQL, ModelView):
 
     @fields.depends('service', 'unit_price', 'description')
     def on_change_service(self):
-        changes = {}
         if self.service:
-            changes['name'] = self.service.rec_name
+            self.name = self.service.rec_name
             if not self.unit_price:
-                changes['unit_price'] = self.service.product.list_price
+                self.unit_price = self.service.product.list_price
             if not self.description:
-                changes['description'] = self.service.product.rec_name
-        return changes
+                self.description = self.service.product.rec_name
 
     @fields.depends('start_date', 'first_invoice_date')
     def on_change_start_date(self):
-        changes = {}
         if self.start_date and not self.first_invoice_date:
-            changes['first_invoice_date'] = self.start_date
-        return changes
+            self.first_invoice_date = self.start_date
 
     @classmethod
     def get_last_consumption_date(cls, lines, name):

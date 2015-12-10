@@ -68,6 +68,15 @@ class CreditInvoiceStart:
         help=('If true, the consumption that generated this line will be '
             'reinvoiced.'))
 
+    @classmethod
+    def view_attributes(cls):
+        states = {'invisible': ~Bool(Eval('from_contract'))}
+        return [
+            ('/form//image[@name="tryton-dialog-warning"]', 'states', states),
+            ('/form//label[@id="credit_contract"]', 'states', states),
+            ]
+
+
 
 class CreditInvoice:
     __name__ = 'account.invoice.credit'
