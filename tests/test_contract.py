@@ -3,23 +3,13 @@
 import unittest
 import doctest
 import trytond.tests.test_tryton
-from trytond.tests.test_tryton import test_view, test_depends
+from trytond.tests.test_tryton import ModuleTestCase
 from trytond.tests.test_tryton import doctest_setup, doctest_teardown
 
 
-class TestContractCase(unittest.TestCase):
+class TestContractCase(ModuleTestCase):
     'Test Contract module'
-
-    def setUp(self):
-        trytond.tests.test_tryton.install_module('contract')
-
-    def test0005views(self):
-        'Test views'
-        test_view('contract')
-
-    def test0006depends(self):
-        'Test depends'
-        test_depends()
+    module = 'contract'
 
 
 def suite():

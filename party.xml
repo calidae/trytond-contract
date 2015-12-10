@@ -11,7 +11,8 @@
         <record model="ir.action.act_window" id="act_open_contract">
             <field name="name">Contracts</field>
             <field name="res_model">contract</field>
-            <field name="domain">[('party', 'in', Eval('active_ids'))]</field>
+            <field name="domain" eval="[('party', 'in', Eval('active_ids'))]"
+                pyson="1"/>
         </record>
         <record model="ir.action.keyword"
                 id="act_open_contract_keyword1">

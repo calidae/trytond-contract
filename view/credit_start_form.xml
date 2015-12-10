@@ -5,10 +5,10 @@
     <xpath expr="/form" position="inside">
         <group col="2" name="from_contract" string="" colspan="2">
             <image name="tryton-dialog-warning" xexpand="0"
-                xfill="0" states="{'invisible': ~Bool(Eval('from_contract'))}"/>
+                xfill="0" states=""/>
             <label string="Those/this invoice(s) have been generated from contracts, are you sure you want to credit them?"
                 id="credit_contract" colspan="2" yalign="0.0" xalign="0.0"
-                xexpand="1" states="{'invisible': ~Bool(Eval('from_contract'))}"/>
+                xexpand="1"/>
             <label name="reinvoice_contract"/>
             <field name="reinvoice_contract"/>
         </group>
