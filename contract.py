@@ -296,6 +296,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             end_date = Date.today()
 
         consumptions = []
+        if not self.freq:
+            return consumptions
 
         for line in self.lines:
             start_period_date = self.get_start_period_date(line.start_date)
