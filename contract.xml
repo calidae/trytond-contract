@@ -335,5 +335,29 @@
         <menuitem name="Create Invoices" parent="menu_contract"
             sequence="40" action="wizard_create_invoices"
             id="menu_create_invoices"/>
+        <record model="ir.rule.group" id="rule_group_contract">
+            <field name="model" search="[('model', '=', 'contract')]"/>
+            <field name="global_p" eval="True"/>
+        </record>
+        <record model="ir.rule" id="rule_contract1">
+            <field name="domain">[('company', '=', user.company.id if user.company else None)]</field>
+            <field name="rule_group" ref="rule_group_contract"/>
+        </record>
+        <record model="ir.rule.group" id="rule_group_contract_line">
+            <field name="model" search="[('model', '=', 'contract.line')]"/>
+            <field name="global_p" eval="True"/>
+        </record>
+        <record model="ir.rule" id="rule_contract_line1">
+            <field name="domain">[('contract.company', '=', user.company.id if user.company else None)]</field>
+            <field name="rule_group" ref="rule_group_contract_line"/>
+        </record>
+        <record model="ir.rule.group" id="rule_group_contract_consumption">
+            <field name="model" search="[('model', '=', 'contract.consumption')]"/>
+            <field name="global_p" eval="True"/>
+        </record>
+        <record model="ir.rule" id="rule_contract_consumption1">
+            <field name="domain">[('contract.company', '=', user.company.id if user.company else None)]</field>
+            <field name="rule_group" ref="rule_group_contract_consumption"/>
+        </record>
     </data>
 </tryton>
