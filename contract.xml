@@ -356,7 +356,7 @@
             <field name="global_p" eval="True"/>
         </record>
         <record model="ir.rule" id="rule_contract_consumption1">
-            <field name="domain">[('contract.company', '=', user.company.id if user.company else None)]</field>
+            <field name="domain">[('contract_line.contract.company', '=', user.company.id if user.company else None)]</field>
             <field name="rule_group" ref="rule_group_contract_consumption"/>
         </record>
     </data>
