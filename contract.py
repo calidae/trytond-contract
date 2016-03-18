@@ -113,6 +113,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             ('draft', 'Draft'),
             ('validated', 'Validated'),
             ('cancel', 'Cancel'),
+            ('finished', 'Finished'),
             ], 'State', required=True, readonly=True)
 
     @classmethod
@@ -124,7 +125,10 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             field.depends = _DEPENDS
         cls._transitions |= set((
                 ('draft', 'validated'),
+                ('draft', 'finished'),
                 ('validated', 'cancel'),
+                ('validated', 'finished'),
+
                 ('draft', 'cancel'),
                 ('cancel', 'draft'),
                 ))
@@ -137,6 +141,10 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                     'invisible': Eval('state') != 'draft',
                     'icon': 'tryton-go-next',
                     },
+                'finish_contract': {
+                    'invisible': Eval('state') != 'draft',
+                    'icon': 'tryton-go-next',
+                },
                 'cancel': {
                     'invisible': Eval('state') == 'cancel',
                     'icon': 'tryton-cancel',
@@ -265,6 +273,12 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     @ModelView.button
     @Workflow.transition('cancel')
     def cancel(cls, contracts):
+        pass
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('finished')
+    def finish_contract(cls, contracts):
         pass
 
     def rrule_values(self):
