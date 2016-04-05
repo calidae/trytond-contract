@@ -122,19 +122,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         required=True, readonly=True)
 
     @classmethod
-    def __register__(cls, module_name):
-        TableHandler = backend.get('TableHandler')
-        cursor = Transaction().cursor
-        handler = TableHandler(cursor, cls, module_name)
-        handler.column_rename('reference', 'number')
-        super(Contract, cls).__register__(module_name)
-        table = cls.__table__()
-        cursor.execute(*table.update(columns=[table.state],
-            values=['cancelled'], where=table.state == 'cancel'))
-        cursor.execute(*table.update(columns=[table.state],
-            values=['confirmed'], where=table.state == 'validated'))
-
-    @classmethod
     def __setup__(cls):
         super(Contract, cls).__setup__()
         for field_name in ('freq', 'interval'):
@@ -173,11 +160,46 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         cls._error_messages.update({
                 'line_start_date_required': ('Start Date is required in line '
                     '"%(line)s" of contract "%(contract)s".'),
-                'cannot_finish': ('Contract "%(contract)s" can not be finished '
-                    'because line "%(line)s" has no end date.'),
+                'cannot_finish': ('Contract "%(contract)s" can not be '
+                    'finished because line "%(line)s" has no end date.'),
                 'cannot_draft': ('Contract "%s" can not be moved to '
                     'draft because it has consumptions.'),
                 })
+
+    @classmethod
+    def __register__(cls, module_name):
+        Line = Pool().get('contract.line')
+        TableHandler = backend.get('TableHandler')
+
+        cursor = Transaction().cursor
+        handler = TableHandler(cursor, cls, module_name)
+        first_invoice_date_exist = handler.column_exist('first_invoice_date')
+
+        handler.column_rename('reference', 'number')
+
+        super(Contract, cls).__register__(module_name)
+
+        table = cls.__table__()
+        line = Line.__table__()
+        line_handler = TableHandler(cursor, Line, module_name)
+
+        # Changed state field values
+        cursor.execute(*table.update(columns=[table.state],
+            values=['cancelled'], where=table.state == 'cancel'))
+        cursor.execute(*table.update(columns=[table.state],
+            values=['confirmed'], where=table.state == 'validated'))
+
+        # Move first_invoice_date field from line into contract
+        if (not first_invoice_date_exist
+                and line_handler.column_exist('first_invoice_date')):
+            query = table.update(
+                [table.first_invoice_date],
+                line.select(
+                    Min(line.first_invoice_date),
+                    where=table.id == line.contract,
+                    group_by=line.contract))
+            cursor.execute(*query)
+            line_handler.drop_column('first_invoice_date')
 
     def _get_rec_name(self, name):
         rec_name = []
@@ -377,7 +399,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                 next_period = todatetime(line.end_date)
 
             rrule = self.rrule
-            for date in rrule.between(todatetime(start), next_period, inc=True):
+            for date in rrule.between(todatetime(start), next_period,
+                    inc=True):
                 start_period = date.date()
                 if start_period > limit_date:
                     break
@@ -685,7 +708,7 @@ class ContractConsumption(ModelSQL, ModelView):
         unit_price = self.contract_line.unit_price * rate
         digits = invoice_line.__class__.unit_price.digits
         unit_price = unit_price.quantize(Decimal(str(10 ** -digits[1])))
-        invoice_line.unit_price  = unit_price
+        invoice_line.unit_price = unit_price
         invoice_line.party = self.contract_line.contract.party
         taxes = []
         if invoice_line.product:
