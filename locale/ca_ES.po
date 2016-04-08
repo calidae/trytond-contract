@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -21,6 +21,20 @@ msgid ""
 msgstr ""
 "Falta el compte d'ingressos al producte \"%(product)s\" de la línia de "
 "contracte \"%(contract_line)s\"."
+
+msgctxt "error:contract:"
+msgid ""
+"Contract \"%(contract)s\" can not be finished because line \"%(line)s\" has "
+"no end date."
+msgstr ""
+"El contracte \"%(contract)s\" no es pot finalitzar perquè la línia "
+"\"%(line)s\" no té data final."
+
+msgctxt "error:contract:"
+msgid "Start Date is required in line \"%(line)s\" of contract \"%(contract)s\"."
+msgstr ""
+"La data d'inici és obligatòria en la línia \"%(line)s\" del contracte "
+"\"%(contract)s\"."
 
 msgctxt "field:account.invoice.credit.start,from_contract:"
 msgid "From Contract"
@@ -49,6 +63,10 @@ msgstr "Moneda"
 msgctxt "field:contract,end_date:"
 msgid "End Date"
 msgstr "Data final"
+
+msgctxt "field:contract,first_invoice_date:"
+msgid "First Invoice Date"
+msgstr "Data primera factura"
 
 msgctxt "field:contract,freq:"
 msgid "Frequency"
@@ -210,6 +228,10 @@ msgctxt "field:contract.line,contract:"
 msgid "Contract"
 msgstr "Contracte"
 
+msgctxt "field:contract.line,contract_state:"
+msgid "Contract State"
+msgstr "Estat del contracte"
+
 msgctxt "field:contract.line,create_date:"
 msgid "Create Date"
 msgstr "Data creació"
@@ -225,10 +247,6 @@ msgstr "Descripció"
 msgctxt "field:contract.line,end_date:"
 msgid "End Date"
 msgstr "Data finalització"
-
-msgctxt "field:contract,first_invoice_date:"
-msgid "First Invoice Date"
-msgstr "Data primera factura"
 
 msgctxt "field:contract.line,id:"
 msgid "ID"
@@ -252,7 +270,7 @@ msgstr "Seqüència"
 
 msgctxt "field:contract.line,service:"
 msgid "Service"
-msgstr "Serveis"
+msgstr "Servei"
 
 msgctxt "field:contract.line,start_date:"
 msgid "Start Date"
@@ -278,17 +296,9 @@ msgctxt "field:contract.service,create_uid:"
 msgid "Create User"
 msgstr "Usuari creació"
 
-msgctxt "field:contract.service,freq:"
-msgid "Frequency"
-msgstr "Freqüència"
-
 msgctxt "field:contract.service,id:"
 msgid "ID"
 msgstr "ID"
-
-msgctxt "field:contract.service,interval:"
-msgid "Interval"
-msgstr "Interval"
 
 msgctxt "field:contract.service,name:"
 msgid "Name"
@@ -357,7 +367,7 @@ msgid "Consumptions"
 msgstr "Consums"
 
 msgctxt "model:ir.action,name:act_contract"
-msgid "Contracts"
+msgid "Contract"
 msgstr "Contractes"
 
 msgctxt "model:ir.action,name:act_contract_configuration_form"
@@ -365,11 +375,11 @@ msgid "Contracts Configuration"
 msgstr "Configuració de contractes"
 
 msgctxt "model:ir.action,name:act_contract_consumption"
-msgid "Contract Consumptions"
+msgid "Contract Consumption"
 msgstr "Consums de contractes"
 
 msgctxt "model:ir.action,name:act_contract_line"
-msgid "Contract Lines"
+msgid "Contract Line"
 msgstr "Línies de contractes"
 
 msgctxt "model:ir.action,name:act_contract_service"
@@ -406,13 +416,17 @@ msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_all"
 msgid "All"
 msgstr "Tots"
 
+msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_confirmed"
+msgid "Confirmed"
+msgstr "Confirmat"
+
 msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_draft"
 msgid "Draft"
 msgstr "Esborrany"
 
-msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_validated"
-msgid "Validated"
-msgstr "Validat"
+msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_finished"
+msgid "Finished"
+msgstr "Finalitzats"
 
 msgctxt "model:ir.sequence,name:sequence_contract"
 msgid "Contract"
@@ -427,7 +441,7 @@ msgid "Configuration"
 msgstr "Configuració"
 
 msgctxt "model:ir.ui.menu,name:menu_contract"
-msgid "Contracts"
+msgid "Contract"
 msgstr "Contractes"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_configuration"
@@ -435,19 +449,19 @@ msgid "Contracts Configuration"
 msgstr "Configuració de contractes"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_consumption"
-msgid "Contract Consumptions"
+msgid "Contract Consumption"
 msgstr "Consums de contractes"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_form"
-msgid "Contracts"
+msgid "Contract"
 msgstr "Contractes"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_line_form"
-msgid "Contract Lines"
+msgid "Contract Line"
 msgstr "Línies"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_service"
-msgid "Contract Services"
+msgid "Contract Service"
 msgstr "Serveis de contracte"
 
 msgctxt "model:ir.ui.menu,name:menu_create_consumptions"
@@ -459,12 +473,16 @@ msgid "Create Invoices"
 msgstr "Crea factures"
 
 msgctxt "model:res.group,name:group_contract"
-msgid "Contracts"
+msgid "Contract"
 msgstr "Contractes"
 
 msgctxt "model:res.group,name:group_contract_admin"
-msgid "Contracts Administration"
+msgid "Contract Administration"
 msgstr "Administració de contractes"
+
+msgctxt "selection:contract,freq:"
+msgid ""
+msgstr " "
 
 msgctxt "selection:contract,freq:"
 msgid "Daily"
@@ -475,10 +493,6 @@ msgid "Monthly"
 msgstr "Mensualment"
 
 msgctxt "selection:contract,freq:"
-msgid "None"
-msgstr "Cap"
-
-msgctxt "selection:contract,freq:"
 msgid "Weekly"
 msgstr "Setmanalment"
 
@@ -487,32 +501,36 @@ msgid "Yearly"
 msgstr "Anualment"
 
 msgctxt "selection:contract,state:"
-msgid "Cancel"
+msgid "Cancelled"
 msgstr "Cancel·lat"
+
+msgctxt "selection:contract,state:"
+msgid "Confirmed"
+msgstr "Confirmat"
 
 msgctxt "selection:contract,state:"
 msgid "Draft"
 msgstr "Esborrany"
 
 msgctxt "selection:contract,state:"
-msgid "Validated"
-msgstr "Validat"
+msgid "Finished"
+msgstr "Finalitzat"
 
-msgctxt "selection:contract.service,freq:"
-msgid "Daily"
-msgstr "Diàriament"
+msgctxt "selection:contract.line,contract_state:"
+msgid "Cancelled"
+msgstr "Cancel·lat"
 
-msgctxt "selection:contract.service,freq:"
-msgid "Monthly"
-msgstr "Mensualment"
+msgctxt "selection:contract.line,contract_state:"
+msgid "Confirmed"
+msgstr "Confirmat"
 
-msgctxt "selection:contract.service,freq:"
-msgid "Weekly"
-msgstr "Setmanalment"
+msgctxt "selection:contract.line,contract_state:"
+msgid "Draft"
+msgstr "Esborrany"
 
-msgctxt "selection:contract.service,freq:"
-msgid "Yearly"
-msgstr "Anualment"
+msgctxt "selection:contract.line,contract_state:"
+msgid "Finished"
+msgstr "Finalitzat"
 
 msgctxt "selection:party.party,contract_grouping_method:"
 msgid "Group contracts"
@@ -571,6 +589,18 @@ msgid "Cancel"
 msgstr "Cancel·la"
 
 msgctxt "view:contract:"
+msgid ""
+"Cancelled contracts no longer create consumptions. Are you sure you want to "
+"cancel this contract?"
+msgstr ""
+"Els contractes cancel·lats ja no generen consums. Esteu segurs que voleu "
+"cancel·lar aquest contracte?"
+
+msgctxt "view:contract:"
+msgid "Confirm"
+msgstr "Confirmar"
+
+msgctxt "view:contract:"
 msgid "Contract"
 msgstr "Contracte"
 
@@ -579,12 +609,12 @@ msgid "Draft"
 msgstr "Esborrany"
 
 msgctxt "view:contract:"
-msgid "Invoice recurrence"
-msgstr "Recurrència factura"
+msgid "Finish"
+msgstr "Finalitza"
 
 msgctxt "view:contract:"
-msgid "Validate"
-msgstr "Valida"
+msgid "Invoice recurrence"
+msgstr "Recurrència factura"
 
 msgctxt "view:party.party:"
 msgid "Contract"
