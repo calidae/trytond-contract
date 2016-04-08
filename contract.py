@@ -403,15 +403,13 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     @classmethod
     def consume(cls, contracts, date=None):
         'Consume the contracts until date'
-        pool = Pool()
-        ContractConsumption = pool.get('contract.consumption')
+        ContractConsumption = Pool().get('contract.consumption')
 
         date += relativedelta(days=+1)  # to support included.
         to_create = []
         for contract in contracts:
             to_create += contract.get_consumptions(date)
-
-        return ContractConsumption.create([c._save_values for c in to_create])
+        return ContractConsumption.save(to_create)
 
 
 class ContractLine(ModelSQL, ModelView):
