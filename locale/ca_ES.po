@@ -226,7 +226,7 @@ msgctxt "field:contract.line,end_date:"
 msgid "End Date"
 msgstr "Data finalització"
 
-msgctxt "field:contract.line,first_invoice_date:"
+msgctxt "field:contract,first_invoice_date:"
 msgid "First Invoice Date"
 msgstr "Data primera factura"
 
