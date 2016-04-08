@@ -25,13 +25,17 @@
     <label name="interval"/>
     <field name="interval"/>
     <newline/>
-    <field name="lines" colspan="4"/>
-    <label name="state"/>
-    <field name="state"/>
-    <group id="buttons" colspan="2">
-        <button name="draft" string="Draft"/>
-        <button name="validate_contract" string="Validate"/>
-        <button name="finish_contract" string="Finish"/>
-        <button name="cancel" string="Cancel"/>
-    </group>
+    <notebook>
+        <page string="Contract" id="contract">
+            <field name="lines" colspan="4"/>
+            <label name="state"/>
+            <field name="state"/>
+            <group id="buttons" colspan="2">
+                <button name="cancel" string="Cancel" confirm="Cancelled contracts no longer create consumptions. Are you sure you want to cancel this contract?"/>
+                <button name="draft" string="Draft"/>
+                <button name="confirm" string="Confirm"/>
+                <button name="finish" string="Finish"/>
+            </group>
+        </page>
+    </notebook>
 </form>

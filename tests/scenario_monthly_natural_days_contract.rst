@@ -112,7 +112,6 @@ Create monthly service::
     >>> service = Service()
     >>> service.name = 'Service'
     >>> service.product = product
-    >>> service.freq = None
     >>> service.save()
 
 
@@ -123,15 +122,16 @@ Create a contract::
     >>> contract.party = party
     >>> contract.start_period_date = datetime.date(2015,01,05)
     >>> contract.freq = 'monthly'
+    >>> contract.interval = 1
     >>> contract.first_invoice_date = datetime.date(2015,02,04)
     >>> line = contract.lines.new()
     >>> line.service = service
     >>> line.start_date = datetime.date(2015,01,05)
     >>> line.unit_price
     Decimal('40')
-    >>> contract.click('validate_contract')
+    >>> contract.click('confirm')
     >>> contract.state
-    u'validated'
+    u'confirmed'
     >>> contract.save()
     >>> contract.reload()
 

@@ -17,26 +17,24 @@ from trytond.tools import reduce_ids, grouped_slice
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.modules.product import price_digits
 
-__all__ = ['ContractService', 'Contract', 'ContractLine', 'RRuleMixin',
+__all__ = ['ContractService', 'Contract', 'ContractLine',
     'ContractConsumption', 'CreateConsumptionsStart', 'CreateConsumptions']
 
 
 class RRuleMixin(Model):
-    _rec_name = 'freq'
     freq = fields.Selection([
-        (None, 'None'),
+        (None, ''),
         ('daily', 'Daily'),
         ('weekly', 'Weekly'),
         ('monthly', 'Monthly'),
         ('yearly', 'Yearly'),
-        ], 'Frequency')
-    interval = fields.Integer('Interval')
-
-    def _rule2update(self):
-        res = {}
-        for field in ('freq', 'interval'):
-            res[field] = getattr(self, field)
-        return res
+        ], 'Frequency', sort=False)
+    interval = fields.Integer('Interval', states={
+            'required': Bool(Eval('freq')),
+            }, domain=[
+            If(Bool(Eval('freq')),
+                [('interval', '>', 0)], [])
+            ], depends=['freq'])
 
     def rrule_values(self):
         values = {}
@@ -82,6 +80,13 @@ _STATES = {
     }
 _DEPENDS = ['state']
 
+CONTRACT_STATES = [
+    ('draft', 'Draft'),
+    ('confirmed', 'Confirmed'),
+    ('cancelled', 'Cancelled'),
+    ('finished', 'Finished'),
+    ]
+
 
 def todatetime(date):
     return datetime.datetime.combine(date, datetime.datetime.min.time())
@@ -105,18 +110,24 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     start_period_date = fields.Date('Start Period Date', required=True,
         states=_STATES, depends=_DEPENDS)
     first_invoice_date = fields.Date('First Invoice Date', required=True)
-
     lines = fields.One2Many('contract.line', 'contract', 'Lines',
         states={
-            'readonly': Eval('state') == 'cancel',
+            'readonly': ~Eval('state').in_(['draft', 'confirmed']),
+            'required': Eval('state') == 'confirmed',
             },
         depends=['state'])
-    state = fields.Selection([
-            ('draft', 'Draft'),
-            ('validated', 'Validated'),
-            ('cancel', 'Cancel'),
-            ('finished', 'Finished'),
-            ], 'State', required=True, readonly=True)
+    state = fields.Selection(CONTRACT_STATES, 'State',
+        required=True, readonly=True)
+
+    @classmethod
+    def __register__(cls, module_name):
+        super(Contract, cls).__register__(module_name)
+        cursor = Transaction().cursor
+        table = cls.__table__()
+        cursor.execute(*table.update(columns=[table.state],
+            values=['cancelled'], where=table.state == 'cancel'))
+        cursor.execute(*table.update(columns=[table.state],
+            values=['confirmed'], where=table.state == 'validated'))
 
     @classmethod
     def __setup__(cls):
@@ -124,33 +135,41 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         for field_name in ('freq', 'interval'):
             field = getattr(cls, field_name)
             field.states = _STATES
-            field.depends = _DEPENDS
+            field.states['required'] = True
+            field.depends += _DEPENDS
         cls._transitions |= set((
-                ('draft', 'validated'),
-                ('draft', 'finished'),
-                ('validated', 'cancel'),
-                ('validated', 'finished'),
-
-                ('draft', 'cancel'),
-                ('cancel', 'draft'),
+                ('draft', 'confirmed'),
+                ('draft', 'cancelled'),
+                ('confirmed', 'draft'),
+                ('confirmed', 'cancelled'),
+                ('confirmed', 'finished'),
+                ('cancelled', 'draft'),
+                ('finished', 'draft'),
                 ))
         cls._buttons.update({
                 'draft': {
-                    'invisible': Eval('state') != 'cancel',
+                    'invisible': ~Eval('state').in_(['cancelled', 'finished',
+                            'confirmed']),
                     'icon': 'tryton-clear',
                     },
-                'validate_contract': {
+                'confirm': {
                     'invisible': Eval('state') != 'draft',
                     'icon': 'tryton-go-next',
                     },
-                'finish_contract': {
-                    'invisible': Eval('state') != 'draft',
+                'finish': {
+                    'invisible': Eval('state') != 'confirmed',
                     'icon': 'tryton-go-next',
                 },
                 'cancel': {
-                    'invisible': Eval('state') == 'cancel',
+                    'invisible': ~Eval('state').in_(['draft', 'confirmed']),
                     'icon': 'tryton-cancel',
                     },
+                })
+        cls._error_messages.update({
+                'line_start_date_required': ('Start Date is required in line '
+                    '"%(line)s" of contract "%(contract)s".'),
+                'cannot_finish': ('Contract "%(contract)s" can not be finished '
+                    'because line "%(line)s" has no end date.'),
                 })
 
     def _get_rec_name(self, name):
@@ -267,21 +286,34 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
     @classmethod
     @ModelView.button
-    @Workflow.transition('validated')
-    def validate_contract(cls, contracts):
+    @Workflow.transition('confirmed')
+    def confirm(cls, contracts):
         cls.set_reference(contracts)
+        for contract in contracts:
+            for line in contract.lines:
+                if not line.start_date:
+                    cls.raise_user_error('line_start_date_required', {
+                            'line': line.rec_name,
+                            'contract': line.contract.rec_name,
+                            })
 
     @classmethod
     @ModelView.button
-    @Workflow.transition('cancel')
+    @Workflow.transition('cancelled')
     def cancel(cls, contracts):
         pass
 
     @classmethod
     @ModelView.button
     @Workflow.transition('finished')
-    def finish_contract(cls, contracts):
-        pass
+    def finish(cls, contracts):
+        for contract in contracts:
+            for line in contract.lines:
+                if not line.end_date:
+                    cls.raise_user_error('cannot_finish', {
+                            'line': line.rec_name,
+                            'contract': line.contract.rec_name,
+                            })
 
     def rrule_values(self):
         values = super(Contract, self).rrule_values()
@@ -388,21 +420,29 @@ class ContractLine(ModelSQL, ModelView):
 
     contract = fields.Many2One('contract', 'Contract', required=True,
         ondelete='CASCADE')
-    service = fields.Many2One('contract.service', 'Service')
+    contract_state = fields.Function(fields.Selection(CONTRACT_STATES,
+            'Contract State'), 'get_contract_state')
+    service = fields.Many2One('contract.service', 'Service', required=True)
     start_date = fields.Date('Start Date', required=True,
+        states={
+            'required': ~Eval('contract_state').in_(['draft', 'cancelled']),
+            },
         domain=[
             If(Bool(Eval('end_date')),
                 ('start_date', '<=', Eval('end_date', None)),
                 ()),
             ],
-        depends=['end_date'])
+        depends=['end_date', 'contract_state'])
     end_date = fields.Date('End Date',
+        states={
+            'required': Eval('contract_state') == 'finished',
+            },
         domain=[
             If(Bool(Eval('end_date')),
                 ('end_date', '>=', Eval('start_date', None)),
                 ()),
             ],
-        depends=['start_date'])
+        depends=['start_date', 'contract_state'])
     description = fields.Text('Description', required=True)
     unit_price = fields.Numeric('Unit Price', digits=price_digits,
         required=True)
@@ -436,6 +476,9 @@ class ContractLine(ModelSQL, ModelView):
             ('contract.rec_name',) + tuple(clause[1:]),
             ('service.rec_name',) + tuple(clause[1:]),
             ]
+
+    def get_contract_state(self, name):
+        return self.contract.state
 
     @fields.depends('service', 'unit_price', 'description')
     def on_change_service(self):
@@ -788,7 +831,7 @@ class CreateConsumptions(Wizard):
         pool = Pool()
         Contract = pool.get('contract')
         contracts = Contract.search([
-                ('state', '=', 'validated'),
+                ('state', 'in', ['confirmed', 'finished']),
                 ])
         consumptions = Contract.consume(contracts, self.start.date)
         data = {'res_id': [c.id for c in consumptions]}

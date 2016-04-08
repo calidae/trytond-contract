@@ -118,29 +118,31 @@ Create two contract for grouped party::
     >>> contract.party = party
     >>> contract.start_period_date = datetime.date(today.year, 01, 01)
     >>> contract.freq = 'monthly'
+    >>> contract.interval = 1
     >>> contract.first_invoice_date = datetime.date(today.year, 01, 31)
     >>> line = contract.lines.new()
     >>> line.start_date = datetime.date(today.year, 01, 01)
     >>> line.service = service
     >>> line.unit_price
     Decimal('40')
-    >>> contract.click('validate_contract')
+    >>> contract.click('confirm')
     >>> contract.state
-    u'validated'
+    u'confirmed'
     >>> contract = Contract()
     >>> contract.party = party
     >>> contract.start_period_date = datetime.date(today.year, 01, 01)
     >>> contract.start_date = datetime.date(today.year, 01, 01)
     >>> contract.freq = 'monthly'
+    >>> contract.interval = 1
     >>> contract.first_invoice_date = datetime.date(today.year, 01, 31)
     >>> line = contract.lines.new()
     >>> line.start_date = datetime.date(today.year, 01, 01)
     >>> line.service = service
     >>> line.unit_price
     Decimal('40')
-    >>> contract.click('validate_contract')
+    >>> contract.click('confirm')
     >>> contract.state
-    u'validated'
+    u'confirmed'
 
 
 Create two contract for non grouped party::
@@ -149,29 +151,31 @@ Create two contract for non grouped party::
     >>> contract.party = non_grouping_party
     >>> contract.start_period_date = datetime.date(today.year, 01, 01)
     >>> contract.freq = 'monthly'
+    >>> contract.interval = 1
     >>> contract.first_invoice_date = datetime.date(today.year, 01, 31)
     >>> line = contract.lines.new()
     >>> line.start_date = datetime.date(today.year, 01, 01)
     >>> line.service = service
     >>> line.unit_price
     Decimal('40')
-    >>> contract.click('validate_contract')
+    >>> contract.click('confirm')
     >>> contract.state
-    u'validated'
+    u'confirmed'
     >>> contract = Contract()
     >>> contract.party = non_grouping_party
     >>> contract.start_period_date = datetime.date(today.year, 01, 01)
     >>> contract.start_date = datetime.date(today.year, 01, 01)
     >>> contract.freq = 'monthly'
+    >>> contract.interval = 1
     >>> contract.first_invoice_date = datetime.date(today.year, 01, 31)
     >>> line = contract.lines.new()
     >>> line.start_date = datetime.date(today.year, 01, 01)
     >>> line.service = service
     >>> line.unit_price
     Decimal('40')
-    >>> contract.click('validate_contract')
+    >>> contract.click('confirm')
     >>> contract.state
-    u'validated'
+    u'confirmed'
 
 Generate consumed lines::
 
