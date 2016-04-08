@@ -418,7 +418,7 @@ msgstr "Todos"
 
 msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_confirmed"
 msgid "Confirmed"
-msgstr "Confirmado"
+msgstr "Confirmados"
 
 msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_draft"
 msgid "Draft"
