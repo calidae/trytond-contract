@@ -109,7 +109,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             'get_dates', searcher='search_dates')
     start_period_date = fields.Date('Start Period Date', required=True,
         states=_STATES, depends=_DEPENDS)
-    first_invoice_date = fields.Date('First Invoice Date', required=True)
+    first_invoice_date = fields.Date('First Invoice Date', required=True,
+        states=_STATES, depends=_DEPENDS)
     lines = fields.One2Many('contract.line', 'contract', 'Lines',
         states={
             'readonly': ~Eval('state').in_(['draft', 'confirmed']),
