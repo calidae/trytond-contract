@@ -27,7 +27,7 @@
     <newline/>
     <notebook>
         <page string="Contract" id="contract">
-            <field name="lines" colspan="4"/>
+            <field name="lines" colspan="4" mode="tree,form" view_ids="contract.contract_line_view_list_sequence"/>
             <label name="state"/>
             <field name="state"/>
             <group id="buttons" colspan="2">

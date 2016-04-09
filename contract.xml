@@ -173,6 +173,12 @@
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="True"/>
         </record>
+        <record model="ir.ui.view" id="contract_line_view_list_sequence">
+            <field name="model">contract.line</field>
+            <field name="type">tree</field>
+            <field name="priority">20</field>
+            <field name="name">contract_line_list_sequence</field>
+        </record>
         <record model="ir.ui.view" id="contract_line_view_form">
             <field name="model">contract.line</field>
             <field name="type">form</field>
@@ -321,6 +327,26 @@
                 eval="[('company', '=', Eval('user', {}).get('company', None))]"
                 pyson="1"/>
             <field name="rule_group" ref="rule_group_contract"/>
+        </record>
+        <record model="ir.rule.group" id="rule_group_contract_line">
+            <field name="model" search="[('model', '=', 'contract.line')]"/>
+            <field name="global_p" eval="True"/>
+        </record>
+        <record model="ir.rule" id="rule_contract_line1">
+            <field name="domain"
+                eval="[('contract.company', '=', Eval('user', {}).get('company', None))]"
+                pyson="1"/>
+            <field name="rule_group" ref="rule_group_contract_line"/>
+        </record>
+        <record model="ir.rule.group" id="rule_group_contract_consumption">
+            <field name="model" search="[('model', '=', 'contract.consumption')]"/>
+            <field name="global_p" eval="True"/>
+        </record>
+        <record model="ir.rule" id="rule_contract_consumption1">
+            <field name="domain"
+                eval="[('contract_line.contract.company', '=', Eval('user', {}).get('company', None))]"
+                pyson="1"/>
+            <field name="rule_group" ref="rule_group_contract_consumption"/>
         </record>
 
         <menuitem name="Configuration" parent="menu_contract"
