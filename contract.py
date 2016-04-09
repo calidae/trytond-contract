@@ -362,8 +362,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
             last_invoice_date = line.last_consumption_invoice_date
 
-            next_period = self.rrule.after(todatetime(start)) + \
-                relativedelta(days=+1)
+            next_period = (self.rrule.after(todatetime(start)) +
+                relativedelta(days=+1))
 
             if end_contract and next_period.date() < end_contract:
                 next_period = todatetime(end_contract)
@@ -371,8 +371,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             for date in self.rrule.between(todatetime(start), next_period):
                 date -= relativedelta(days=+1)
                 date = date.date()
-                invoice_date = last_invoice_date or line.contract.first_invoice_date \
-                    or date
+                invoice_date = (last_invoice_date or
+                    line.contract.first_invoice_date or date)
                 if last_invoice_date:
                     invoice_date = self.get_invoice_date(last_invoice_date)
 
