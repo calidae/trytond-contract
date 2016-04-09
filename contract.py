@@ -420,7 +420,8 @@ class ContractLine(ModelSQL, ModelView):
     contract = fields.Many2One('contract', 'Contract', required=True,
         ondelete='CASCADE')
     contract_state = fields.Function(fields.Selection(CONTRACT_STATES,
-            'Contract State'), 'get_contract_state')
+            'Contract State'), 'get_contract_state',
+        searcher='search_contract_state')
     service = fields.Many2One('contract.service', 'Service', required=True)
     start_date = fields.Date('Start Date', required=True,
         states={
@@ -478,6 +479,12 @@ class ContractLine(ModelSQL, ModelView):
 
     def get_contract_state(self, name):
         return self.contract.state
+
+    @classmethod
+    def search_contract_state(cls, name, clause):
+        return [
+            ('contract.state',) + tuple(clause[1:]),
+            ]
 
     @fields.depends('service', 'unit_price', 'description')
     def on_change_service(self):
