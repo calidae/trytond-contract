@@ -410,7 +410,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         to_create = []
         for contract in contracts:
             to_create += contract.get_consumptions(date)
-        return ContractConsumption.save(to_create)
+        return ContractConsumption.create([x._save_values for x in to_create])
 
 
 class ContractLine(ModelSQL, ModelView):
