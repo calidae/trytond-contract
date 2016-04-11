@@ -9,6 +9,7 @@ from sql.conditionals import Case
 from sql.aggregate import Max, Min, Sum
 from decimal import Decimal
 
+from trytond import backend
 from trytond.model import Workflow, ModelSQL, ModelView, Model, fields
 from trytond.pool import Pool
 from trytond.pyson import Eval, Bool, If
@@ -102,7 +103,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         states=_STATES, depends=_DEPENDS)
     party = fields.Many2One('party.party', 'Party', required=True,
         states=_STATES, depends=_DEPENDS)
-    reference = fields.Char('Reference', readonly=True, select=True)
+    number = fields.Char('Number', readonly=True, select=True)
     start_date = fields.Function(fields.Date('Start Date'),
             'get_dates', searcher='search_dates')
     end_date = fields.Function(fields.Date('End Date'),
@@ -122,8 +123,11 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
     @classmethod
     def __register__(cls, module_name):
-        super(Contract, cls).__register__(module_name)
+        TableHandler = backend.get('TableHandler')
         cursor = Transaction().cursor
+        handler = TableHandler(cursor, cls, module_name)
+        handler.column_rename('reference', 'number')
+        super(Contract, cls).__register__(module_name)
         table = cls.__table__()
         cursor.execute(*table.update(columns=[table.state],
             values=['cancelled'], where=table.state == 'cancel'))
@@ -175,8 +179,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
     def _get_rec_name(self, name):
         rec_name = []
-        if self.reference:
-            rec_name.append(self.reference)
+        if self.number:
+            rec_name.append(self.number)
         if self.party:
             rec_name.append(self.party.rec_name)
         return rec_name
@@ -188,7 +192,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     @classmethod
     def search_rec_name(cls, name, clause):
         return ['OR',
-            ('reference',) + tuple(clause[1:]),
+            ('number',) + tuple(clause[1:]),
             ('party.name',) + tuple(clause[1:]),
             ]
 
@@ -253,8 +257,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         return 'draft'
 
     @classmethod
-    def set_reference(cls, contracts):
-        'Fill the reference field with the contract sequence'
+    def set_number(cls, contracts):
+        'Fill the number field with the contract sequence'
         pool = Pool()
         Sequence = pool.get('ir.sequence')
         Config = pool.get('contract.configuration')
@@ -262,11 +266,11 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         config = Config(1)
         to_write = []
         for contract in contracts:
-            if contract.reference:
+            if contract.number:
                 continue
-            reference = Sequence.get_id(config.contract_sequence.id)
+            number = Sequence.get_id(config.contract_sequence.id)
             to_write.extend(([contract], {
-                        'reference': reference,
+                        'number': number,
                         }))
         if to_write:
             cls.write(*to_write)
@@ -275,7 +279,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     def copy(cls, contracts, default=None):
         if default is None:
             default = {}
-        default.setdefault('reference', None)
+        default.setdefault('number', None)
         default.setdefault('end_date', None)
         return super(Contract, cls).copy(contracts, default=default)
 
@@ -289,7 +293,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     @ModelView.button
     @Workflow.transition('confirmed')
     def confirm(cls, contracts):
-        cls.set_reference(contracts)
+        cls.set_number(contracts)
         for contract in contracts:
             for line in contract.lines:
                 if not line.start_date:
