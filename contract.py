@@ -340,12 +340,12 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             return date.date()
         return self.start_period_date
 
-    def get_consumptions(self, end_date=None):
+    def get_consumptions(self, limit_date=None):
         pool = Pool()
         Date = pool.get('ir.date')
 
-        if end_date is None:
-            end_date = Date.today()
+        if limit_date is None:
+            limit_date = Date.today()
 
         consumptions = []
 
@@ -360,49 +360,37 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             if last_consumption_date:
                 start = (last_consumption_date + relativedelta(days=+1)).date()
 
-            end_contract = line.end_date or self.end_date
-            if end_contract:
-                self.rrule.until = end_contract
-
             last_invoice_date = line.last_consumption_invoice_date
 
-            next_period = (self.rrule.after(todatetime(start)) +
+            next_period = (self.rrule.after(todatetime(limit_date)) +
                 relativedelta(days=+1))
 
-            if end_contract and next_period.date() < end_contract:
-                next_period = todatetime(end_contract)
+            if line.end_date and next_period.date() < line.end_date:
+                next_period = todatetime(line.end_date)
 
-            for date in self.rrule.between(todatetime(start), next_period):
-                date -= relativedelta(days=+1)
-                date = date.date()
-                invoice_date = (last_invoice_date or
-                    line.contract.first_invoice_date or date)
+            rrule = self.rrule
+            for date in rrule.between(todatetime(start), next_period, inc=True):
                 if last_invoice_date:
                     invoice_date = self.get_invoice_date(last_invoice_date)
+                else:
+                    invoice_date = line.contract.first_invoice_date
 
-                if invoice_date > end_date:
+                if invoice_date > limit_date:
                     break
 
-                finish_date = date
-                if end_contract and end_contract <= date:
-                    date = end_contract
+                start_period = date.date()
+                end_period = rrule.after(date).date() - relativedelta(days=1)
 
-                start_period = start
-                if last_consumption_date is None:
-                    start_period = start_period_date
-                    start = line.start_date or self.start
+                start = start_period
+                if line.start_date > start:
+                    start = line.start_date
+                end = end_period
+                if line.end_date and line.end_date <= end:
+                    end = line.end_date
 
-                if ((not end_contract or (invoice_date <= end_contract) or
-                            (finish_date <= end_contract) or
-                            (invoice_date < end_date))
-                        and not start > date):
-                    consumptions.append(line.get_consumption(start, date,
-                        invoice_date, start_period, finish_date))
-                date += relativedelta(days=+1)
-                start_period = date
-                start = date
+                consumptions.append(line.get_consumption(start, end,
+                        invoice_date, start_period, end_period))
                 last_invoice_date = invoice_date
-                last_consumption_date = date
         return consumptions
 
     @classmethod
