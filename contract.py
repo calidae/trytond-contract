@@ -175,6 +175,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                     '"%(line)s" of contract "%(contract)s".'),
                 'cannot_finish': ('Contract "%(contract)s" can not be finished '
                     'because line "%(line)s" has no end date.'),
+                'cannot_draft': ('Contract "%s" can not be moved to '
+                    'draft because it has consumptions.'),
                 })
 
     def _get_rec_name(self, name):
@@ -287,7 +289,13 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     @ModelView.button
     @Workflow.transition('draft')
     def draft(cls, contracts):
-        pass
+        Consumption = Pool().get('contract.consumption')
+        consumptions = Consumption.search([
+                ('contract', 'in', [x.id for x in contracts]),
+                ])
+        if consumptions:
+            cls.raise_user_error('cannot_draft',
+                consumptions[0].contract.rec_name)
 
     @classmethod
     @ModelView.button
