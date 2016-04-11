@@ -762,6 +762,7 @@ class ContractConsumption(ModelSQL, ModelView):
         values = dict(keys)
         values['invoice_address'] = values['party'].address_get('invoice')
         invoice = Invoice(**values)
+        invoice.on_change_party()
         invoice.journal = journal
         invoice.payment_term = invoice.party.customer_payment_term
         invoice.account = invoice.party.account_receivable
