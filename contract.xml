@@ -367,7 +367,7 @@
             parent="menu_contract_form" sequence="10"/>
         <menuitem action="act_contract_consumption"
             id="menu_contract_consumption" parent="menu_contract"
-            sequence="30" name="Contract Consumptions"/>
+            sequence="30" name="Consumptions"/>
 
         <menuitem name="Create Consumptions" parent="menu_contract"
             sequence="40" action="wizard_create_consumptions"
