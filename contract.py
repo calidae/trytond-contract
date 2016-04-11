@@ -422,9 +422,13 @@ class ContractLine(ModelSQL, ModelView):
     contract_state = fields.Function(fields.Selection(CONTRACT_STATES,
             'Contract State'), 'get_contract_state',
         searcher='search_contract_state')
-    service = fields.Many2One('contract.service', 'Service', required=True)
+    service = fields.Many2One('contract.service', 'Service', required=True,
+        states={
+            'readonly': Eval('contract_state') == 'confirmed',
+            })
     start_date = fields.Date('Start Date', required=True,
         states={
+            'readonly': Eval('contract_state') == 'confirmed',
             'required': ~Eval('contract_state').in_(['draft', 'cancelled']),
             },
         domain=[
@@ -458,6 +462,10 @@ class ContractLine(ModelSQL, ModelView):
     def __setup__(cls):
         super(ContractLine, cls).__setup__()
         cls._order = [('contract', 'ASC'), ('sequence', 'ASC')]
+        cls._error_messages.update({
+                'cannot_delete': ('Contract Line "%(line)s" cannot be removed '
+                    'because contract "%(contract)s" is not in draft state.')
+                })
 
     @staticmethod
     def order_sequence(tables):
@@ -540,6 +548,16 @@ class ContractLine(ModelSQL, ModelView):
         consumption.end_period_date = finish_period
         consumption.invoice_date = invoice_date
         return consumption
+
+    @classmethod
+    def delete(cls, lines):
+        for line in lines:
+            if line.contract_state != 'draft':
+                cls.raise_user_error('cannot_delete', {
+                        'line': line.rec_name,
+                        'contract': line.contract.rec_name,
+                        })
+        super(ContractLine, cls).delete(lines)
 
 
 class ContractConsumption(ModelSQL, ModelView):
