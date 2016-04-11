@@ -658,7 +658,6 @@ class ContractConsumption(ModelSQL, ModelView):
         pool = Pool()
         InvoiceLine = pool.get('account.invoice.line')
         Property = pool.get('ir.property')
-        Uom = pool.get('product.uom')
         if (self.invoice_lines and
                 not Transaction().context.get('force_reinvoice', False)):
             return
@@ -677,7 +676,17 @@ class ContractConsumption(ModelSQL, ModelView):
             'end': end_date,
             'name': self.contract_line.description,
             }
-        invoice_line.unit_price = self.contract_line.unit_price
+        invoice_line.quantity = 1
+        if self.end_period_date == self.init_period_date:
+            rate = 0.0
+        else:
+            # Compute quantity based on dates
+            rate = Decimal((self.end_date - self.start_date).total_seconds() /
+                (self.end_period_date - self.init_period_date).total_seconds())
+        unit_price = self.contract_line.unit_price * rate
+        digits = invoice_line.__class__.unit_price.digits
+        unit_price = unit_price.quantize(Decimal(str(10 ** -digits[1])))
+        invoice_line.unit_price  = unit_price
         invoice_line.party = self.contract_line.contract.party
         taxes = []
         if invoice_line.product:
@@ -713,14 +722,6 @@ class ContractConsumption(ModelSQL, ModelView):
                         })
         invoice_line.taxes = taxes
         invoice_line.invoice_type = 'out_invoice'
-        if self.end_period_date == self.init_period_date:
-            quantity = 0.0
-        else:
-            # Compute quantity based on dates
-            quantity = ((self.end_date - self.start_date).total_seconds() /
-                (self.end_period_date - self.init_period_date).total_seconds())
-        rounding = invoice_line.unit.rounding if invoice_line.unit else 1
-        invoice_line.quantity = Uom.round(quantity, rounding)
         return invoice_line
 
     def get_amount_to_invoice(self):
