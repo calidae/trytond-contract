@@ -449,8 +449,8 @@ msgid "Contracts Configuration"
 msgstr "Configuración de contratos"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_consumption"
-msgid "Contract Consumption"
-msgstr "Consumos de contratos"
+msgid "Consumptions"
+msgstr "Consumos"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_form"
 msgid "Contract"
