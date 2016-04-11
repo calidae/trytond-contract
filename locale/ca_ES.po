@@ -254,11 +254,11 @@ msgstr "ID"
 
 msgctxt "field:contract.line,last_consumption_date:"
 msgid "Last Consumption Date"
-msgstr "Última data consum"
+msgstr "Data últim consum"
 
 msgctxt "field:contract.line,last_consumption_invoice_date:"
 msgid "Last Invoice Date"
-msgstr "Data últim consum"
+msgstr "Data última factura"
 
 msgctxt "field:contract.line,rec_name:"
 msgid "Name"

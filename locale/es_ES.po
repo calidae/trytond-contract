@@ -258,7 +258,7 @@ msgstr "Fecha último consumo"
 
 msgctxt "field:contract.line,last_consumption_invoice_date:"
 msgid "Last Invoice Date"
-msgstr "Fecha último factura"
+msgstr "Fecha última factura"
 
 msgctxt "field:contract.line,rec_name:"
 msgid "Name"
