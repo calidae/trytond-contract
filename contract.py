@@ -495,11 +495,6 @@ class ContractLine(ModelSQL, ModelView):
             if not self.description:
                 self.description = self.service.product.rec_name
 
-    # @fields.depends('start_date', 'first_invoice_date')
-    # def on_change_start_date(self):
-    #     if self.start_date and not self.first_invoice_date:
-    #         self.first_invoice_date = self.start_date
-
     @classmethod
     def get_last_consumption_date(cls, lines, name):
         pool = Pool()
