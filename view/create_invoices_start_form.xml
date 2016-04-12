@@ -4,7 +4,7 @@
 <form string="Create Invoices" col="2">
     <image name="tryton-dialog-information" xexpand="0" xfill="0"/>
     <group col="3" id="label_date">
-        <label string="Create Contract Invoices up to" id="create"
+        <label string="Create invoices up to" id="create"
             yalign="0.0" xalign="0.0"/>
         <label name="date"/>
         <field name="date"/>
