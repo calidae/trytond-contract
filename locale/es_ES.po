@@ -565,12 +565,12 @@ msgid "Create Consumptions"
 msgstr "Crear consumos"
 
 msgctxt "view:contract.create_consumptions.start:"
-msgid "Create Contract Consumptions up to"
-msgstr "Crear consumos de contrato hasta la"
+msgid "Create consumptions up to"
+msgstr "Crear consumos hasta la"
 
 msgctxt "view:contract.create_invoices.start:"
-msgid "Create Contract Invoices up to"
-msgstr "Crear contratos hasta "
+msgid "Create invoices up to"
+msgstr "Crear facturas hasta "
 
 msgctxt "view:contract.create_invoices.start:"
 msgid "Create Invoices"
