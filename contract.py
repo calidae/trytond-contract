@@ -3,11 +3,11 @@
 import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY, WEEKLY, MONTHLY, YEARLY
+from decimal import Decimal
 from itertools import groupby
 from sql import Column, Null, Literal
 from sql.conditionals import Case
 from sql.aggregate import Max, Min, Sum
-from decimal import Decimal
 
 from trytond import backend
 from trytond.model import Workflow, ModelSQL, ModelView, Model, fields
@@ -124,11 +124,11 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     @classmethod
     def __register__(cls, module_name):
         TableHandler = backend.get('TableHandler')
-        cursor = Transaction().cursor
-        handler = TableHandler(cursor, cls, module_name)
+        handler = TableHandler(cls, module_name)
         handler.column_rename('reference', 'number')
         super(Contract, cls).__register__(module_name)
         table = cls.__table__()
+        cursor = Transaction().connection.cursor()
         cursor.execute(*table.update(columns=[table.state],
             values=['cancelled'], where=table.state == 'cancel'))
         cursor.execute(*table.update(columns=[table.state],
@@ -202,7 +202,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     def get_dates(cls, contracts, names):
         pool = Pool()
         ContractLine = pool.get('contract.line')
-        cursor = Transaction().cursor
+        cursor = Transaction().connection.cursor()
         line = ContractLine.__table__()
         result = {}
         contract_ids = [c.id for c in contracts]
@@ -507,7 +507,7 @@ class ContractLine(ModelSQL, ModelView):
         pool = Pool()
         Consumption = pool.get('contract.consumption')
         table = Consumption.__table__()
-        cursor = Transaction().cursor
+        cursor = Transaction().connection.cursor()
 
         line_ids = [l.id for l in lines]
         values = dict.fromkeys(line_ids, None)
@@ -523,7 +523,7 @@ class ContractLine(ModelSQL, ModelView):
         pool = Pool()
         Consumption = pool.get('contract.consumption')
         table = Consumption.__table__()
-        cursor = Transaction().cursor
+        cursor = Transaction().connection.cursor()
 
         line_ids = [l.id for l in lines]
         values = dict.fromkeys(line_ids, None)
