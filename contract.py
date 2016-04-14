@@ -24,18 +24,19 @@ __all__ = ['ContractService', 'Contract', 'ContractLine',
 
 class RRuleMixin(Model):
     freq = fields.Selection([
-        (None, ''),
-        ('daily', 'Daily'),
-        ('weekly', 'Weekly'),
-        ('monthly', 'Monthly'),
-        ('yearly', 'Yearly'),
-        ], 'Frequency', sort=False)
-    interval = fields.Integer('Interval', states={
-            'required': Bool(Eval('freq')),
-            }, domain=[
+            (None, ''),
+            ('daily', 'Daily'),
+            ('weekly', 'Weekly'),
+            ('monthly', 'Monthly'),
+            ('yearly', 'Yearly'),
+            ], 'Frequency', sort=False)
+    interval = fields.Integer('Interval', domain=[
             If(Bool(Eval('freq')),
                 [('interval', '>', 0)], [])
-            ], depends=['freq'])
+            ],
+        states={
+            'required': Bool(Eval('freq')),
+            }, depends=['freq'])
 
     def rrule_values(self):
         values = {}
@@ -105,9 +106,9 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         states=_STATES, depends=_DEPENDS)
     number = fields.Char('Number', readonly=True, select=True)
     start_date = fields.Function(fields.Date('Start Date'),
-            'get_dates', searcher='search_dates')
+        'get_dates', searcher='search_dates')
     end_date = fields.Function(fields.Date('End Date'),
-            'get_dates', searcher='search_dates')
+        'get_dates', searcher='search_dates')
     start_period_date = fields.Date('Start Period Date', required=True,
         states=_STATES, depends=_DEPENDS)
     first_invoice_date = fields.Date('First Invoice Date', required=True,
@@ -198,6 +199,17 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             ('party.name',) + tuple(clause[1:]),
             ]
 
+    @staticmethod
+    def default_company():
+        return Transaction().context.get('company')
+
+    @staticmethod
+    def default_currency():
+        Company = Pool().get('company.company')
+        if Transaction().context.get('company'):
+            company = Company(Transaction().context['company'])
+            return company.currency.id
+
     @classmethod
     def get_dates(cls, contracts, names):
         pool = Pool()
@@ -242,17 +254,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                 having=Operator(cls._compute_date_column(line, name),
                 clause[2]))
         return [('id', 'in', query)]
-
-    @staticmethod
-    def default_company():
-        return Transaction().context.get('company')
-
-    @staticmethod
-    def default_currency():
-        Company = Pool().get('company.company')
-        if Transaction().context.get('company'):
-            company = Company(Transaction().context['company'])
-            return company.currency.id
 
     @staticmethod
     def default_state():
@@ -720,7 +721,7 @@ class ContractConsumption(ModelSQL, ModelView):
                         'contract_line': self.contract_line.rec_name,
                         })
         invoice_line.taxes = taxes
-        invoice_line.invoice_type = 'out_invoice'
+        invoice_line.invoice_type = 'out'
         return invoice_line
 
     def get_amount_to_invoice(self):

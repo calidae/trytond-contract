@@ -41,8 +41,7 @@ class CreateInvoices(Wizard):
             Button('Cancel', 'end', 'tryton-cancel'),
             Button('OK', 'create_invoices', 'tryton-ok', True),
             ])
-    create_invoices = StateAction(
-            'account_invoice.act_invoice_out_invoice_form')
+    create_invoices = StateAction('account_invoice.act_invoice_form')
 
     def do_create_invoices(self, action):
         pool = Pool()
