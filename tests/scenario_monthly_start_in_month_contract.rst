@@ -20,8 +20,8 @@ Imports::
     ...     get_company
     >>> from trytond.modules.account.tests.tools import create_fiscalyear, \
     ...     create_chart, get_accounts, create_tax, set_tax_code
-    >>> from.trytond.modules.account_invoice.tests.tools import \
-    ...     set_fiscalyear_invoice_sequences
+    >>> from trytond.modules.account_invoice.tests.tools import \
+    ...     set_fiscalyear_invoice_sequences, create_payment_term
     >>> today = datetime.datetime.combine(datetime.date.today(),
     ...     datetime.datetime.min.time())
     >>> tomorrow = datetime.date.today() + relativedelta(days=1)
@@ -102,12 +102,7 @@ Create product::
 
 Create payment term::
 
-    >>> PaymentTerm = Model.get('account.invoice.payment_term')
-    >>> payment_term = PaymentTerm(name='Term')
-    >>> line = payment_term.lines.new(type='percent', percentage=Decimal(50))
-    >>> delta = line.relativedeltas.new(days=20)
-    >>> line = payment_term.lines.new(type='remainder')
-    >>> delta = line.relativedeltas.new(days=40)
+    >>> payment_term = create_payment_term()
     >>> payment_term.save()
     >>> party.customer_payment_term = payment_term
     >>> party.save()
@@ -182,7 +177,7 @@ Invoice first consumed line::
     >>> invoices = consumption.click('invoice')
     >>> invoice = consumption.invoice_lines[0].invoice
     >>> invoice.type
-    u'out_invoice'
+    u'out'
     >>> invoice.party == party
     True
     >>> invoice.untaxed_amount
@@ -197,14 +192,14 @@ Invoice first consumed line::
     True
     >>> invoice_line, = invoice.lines
     >>> invoice_line.quantity
-    0.7
+    1.0
 
 Invoice second consumed line::
 
     >>> invoices = consumption2.click('invoice')
     >>> invoice = consumption2.invoice_lines[0].invoice
     >>> invoice.type
-    u'out_invoice'
+    u'out'
     >>> invoice.party == party
     True
     >>> invoice.untaxed_amount
