@@ -402,7 +402,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             for date in rrule.between(todatetime(start), next_period,
                     inc=True):
                 start_period = date.date()
-                if start_period > limit_date:
+                if (start_period > limit_date or (line.end_date and
+                        start_period > line.end_date)):
                     break
                 end_period = rrule.after(date).date() - relativedelta(days=1)
 
