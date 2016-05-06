@@ -397,13 +397,14 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
             if line.end_date and next_period.date() < line.end_date:
                 next_period = todatetime(line.end_date)
+            elif line.end_date and next_period.date() >= line.end_date:
+                continue
 
             rrule = self.rrule
             for date in rrule.between(todatetime(start), next_period,
                     inc=True):
                 start_period = date.date()
-                if (start_period > limit_date or (line.end_date and
-                        start_period > line.end_date)):
+                if start_period > limit_date:
                     break
                 end_period = rrule.after(date).date() - relativedelta(days=1)
 
