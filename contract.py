@@ -430,7 +430,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         'Consume the contracts until date'
         ContractConsumption = Pool().get('contract.consumption')
 
-        date += relativedelta(days=+1)  # to support included.
         to_create = []
         for contract in contracts:
             to_create += contract.get_consumptions(date)
