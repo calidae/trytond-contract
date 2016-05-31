@@ -1,4 +1,4 @@
-#
+# 
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -16,11 +16,27 @@ msgstr ""
 
 msgctxt "error:contract.consumption:"
 msgid ""
+"No payment term could be found for contract invoice of customer "
+"\"%(customer)s\"."
+msgstr ""
+"No se ha encontrado ningún plazo de pago para la factura de contrato del "
+"cliente \"%(customer)s\"."
+
+msgctxt "error:contract.consumption:"
+msgid ""
 "Product \"%(product)s\" of contract line %(contract_line)s misses a revenue "
 "account."
 msgstr ""
 "Falta la cuenta de ingresos par el producto \"%(product)s\" de la linea de "
 "contracto \"%(contract_line)s\"."
+
+msgctxt "error:contract.line:"
+msgid ""
+"Contract Line \"%(line)s\" cannot be removed because contract "
+"\"%(contract)s\" is not in draft state."
+msgstr ""
+"La línea de contrato \"%(line)s\" no se puede eliminar porqué el contrato "
+"\"%(contract)s\" no está en estado borrador."
 
 msgctxt "error:contract:"
 msgid ""
@@ -29,6 +45,10 @@ msgid ""
 msgstr ""
 "El contrato \"%(contract)s\" no se puede finalizar porque la línea "
 "\"%(line)s\" no tiene fecha final."
+
+msgctxt "error:contract:"
+msgid "Contract \"%s\" can not be moved to draft because it has consumptions."
+msgstr "El contrato \"%s\" no se puede pasar a borrador porqué tiene consumos."
 
 msgctxt "error:contract:"
 msgid "Start Date is required in line \"%(line)s\" of contract \"%(contract)s\"."
@@ -83,6 +103,10 @@ msgstr "Intervalo"
 msgctxt "field:contract,lines:"
 msgid "Lines"
 msgstr "Líneas"
+
+msgctxt "field:contract,number:"
+msgid "Number"
+msgstr "Número"
 
 msgctxt "field:contract,party:"
 msgid "Party"
@@ -367,7 +391,7 @@ msgid "Consumptions"
 msgstr "Consumos"
 
 msgctxt "model:ir.action,name:act_contract"
-msgid "Contract"
+msgid "Contracts"
 msgstr "Contratos"
 
 msgctxt "model:ir.action,name:act_contract_configuration_form"
@@ -375,15 +399,15 @@ msgid "Contracts Configuration"
 msgstr "Configuración de contratos"
 
 msgctxt "model:ir.action,name:act_contract_consumption"
-msgid "Contract Consumption"
+msgid "Contract Consumptions"
 msgstr "Consumos de contratos"
 
 msgctxt "model:ir.action,name:act_contract_line"
-msgid "Contract Line"
+msgid "Contract Lines"
 msgstr "Líneas de contrato"
 
 msgctxt "model:ir.action,name:act_contract_service"
-msgid "Contract Service"
+msgid "Contract Services"
 msgstr "Servicios de contrato"
 
 msgctxt "model:ir.action,name:act_invoices"
@@ -401,6 +425,10 @@ msgstr "Crear consumos"
 msgctxt "model:ir.action,name:wizard_create_invoices"
 msgid "Create Invoices"
 msgstr "Crear facturas"
+
+msgctxt "model:ir.action.act_window.domain,name:"
+msgid "Finished"
+msgstr "Finalizados"
 
 msgctxt ""
 "model:ir.action.act_window.domain,name:act_contract_consumption_domain_all"
@@ -424,10 +452,6 @@ msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_draft"
 msgid "Draft"
 msgstr "Borrador"
 
-msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_finished"
-msgid "Finished"
-msgstr "Finalizados"
-
 msgctxt "model:ir.sequence,name:sequence_contract"
 msgid "Contract"
 msgstr "Contrato"
@@ -441,7 +465,7 @@ msgid "Configuration"
 msgstr "Configuración"
 
 msgctxt "model:ir.ui.menu,name:menu_contract"
-msgid "Contract"
+msgid "Contracts"
 msgstr "Contratos"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_configuration"
@@ -453,15 +477,15 @@ msgid "Consumptions"
 msgstr "Consumos"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_form"
-msgid "Contract"
+msgid "Contracts"
 msgstr "Contratos"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_line_form"
-msgid "Contract Line"
+msgid "Contract Lines"
 msgstr "Líneas"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_service"
-msgid "Contract Service"
+msgid "Contract Services"
 msgstr "Servicios de contrato"
 
 msgctxt "model:ir.ui.menu,name:menu_create_consumptions"
@@ -473,11 +497,11 @@ msgid "Create Invoices"
 msgstr "Crear facturas"
 
 msgctxt "model:res.group,name:group_contract"
-msgid "Contract"
+msgid "Contracts"
 msgstr "Contratos"
 
 msgctxt "model:res.group,name:group_contract_admin"
-msgid "Contract Administration"
+msgid "Contracts Administration"
 msgstr "Administración de contratos"
 
 msgctxt "selection:contract,freq:"
@@ -569,12 +593,12 @@ msgid "Create consumptions up to"
 msgstr "Crear consumos hasta la"
 
 msgctxt "view:contract.create_invoices.start:"
-msgid "Create invoices up to"
-msgstr "Crear facturas hasta "
-
-msgctxt "view:contract.create_invoices.start:"
 msgid "Create Invoices"
 msgstr "Crear facturas"
+
+msgctxt "view:contract.create_invoices.start:"
+msgid "Create invoices up to"
+msgstr "Crear facturas hasta "
 
 msgctxt "view:contract.line:"
 msgid "Contract Line"

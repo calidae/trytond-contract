@@ -1,4 +1,4 @@
-#
+# 
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -16,11 +16,27 @@ msgstr ""
 
 msgctxt "error:contract.consumption:"
 msgid ""
+"No payment term could be found for contract invoice of customer "
+"\"%(customer)s\"."
+msgstr ""
+"No s'ha trobat cap termini de pagament per la factura de contracte del "
+"client \"%(customer)s\"."
+
+msgctxt "error:contract.consumption:"
+msgid ""
 "Product \"%(product)s\" of contract line %(contract_line)s misses a revenue "
 "account."
 msgstr ""
 "Falta el compte d'ingressos al producte \"%(product)s\" de la línia de "
 "contracte \"%(contract_line)s\"."
+
+msgctxt "error:contract.line:"
+msgid ""
+"Contract Line \"%(line)s\" cannot be removed because contract "
+"\"%(contract)s\" is not in draft state."
+msgstr ""
+"La línia de contracte \"%(line)s\" no es pot eliminar perquè el contracte "
+"\"%(contract)s\" no està en estat esborrany."
 
 msgctxt "error:contract:"
 msgid ""
@@ -29,6 +45,10 @@ msgid ""
 msgstr ""
 "El contracte \"%(contract)s\" no es pot finalitzar perquè la línia "
 "\"%(line)s\" no té data final."
+
+msgctxt "error:contract:"
+msgid "Contract \"%s\" can not be moved to draft because it has consumptions."
+msgstr "El contracte \"%s\" no es pot passar a esborrany perquè té consums."
 
 msgctxt "error:contract:"
 msgid "Start Date is required in line \"%(line)s\" of contract \"%(contract)s\"."
@@ -83,6 +103,10 @@ msgstr "Interval"
 msgctxt "field:contract,lines:"
 msgid "Lines"
 msgstr "Línies"
+
+msgctxt "field:contract,number:"
+msgid "Number"
+msgstr "Número"
 
 msgctxt "field:contract,party:"
 msgid "Party"
@@ -367,7 +391,7 @@ msgid "Consumptions"
 msgstr "Consums"
 
 msgctxt "model:ir.action,name:act_contract"
-msgid "Contract"
+msgid "Contracts"
 msgstr "Contractes"
 
 msgctxt "model:ir.action,name:act_contract_configuration_form"
@@ -375,15 +399,15 @@ msgid "Contracts Configuration"
 msgstr "Configuració de contractes"
 
 msgctxt "model:ir.action,name:act_contract_consumption"
-msgid "Contract Consumption"
+msgid "Contract Consumptions"
 msgstr "Consums de contractes"
 
 msgctxt "model:ir.action,name:act_contract_line"
-msgid "Contract Line"
+msgid "Contract Lines"
 msgstr "Línies de contractes"
 
 msgctxt "model:ir.action,name:act_contract_service"
-msgid "Contract Service"
+msgid "Contract Services"
 msgstr "Serveis de contractes"
 
 msgctxt "model:ir.action,name:act_invoices"
@@ -401,6 +425,10 @@ msgstr "Crea consums"
 msgctxt "model:ir.action,name:wizard_create_invoices"
 msgid "Create Invoices"
 msgstr "Crea factures"
+
+msgctxt "model:ir.action.act_window.domain,name:"
+msgid "Finished"
+msgstr "Finalitzats"
 
 msgctxt ""
 "model:ir.action.act_window.domain,name:act_contract_consumption_domain_all"
@@ -424,10 +452,6 @@ msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_draft"
 msgid "Draft"
 msgstr "Esborrany"
 
-msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_finished"
-msgid "Finished"
-msgstr "Finalitzats"
-
 msgctxt "model:ir.sequence,name:sequence_contract"
 msgid "Contract"
 msgstr "Contracte"
@@ -441,7 +465,7 @@ msgid "Configuration"
 msgstr "Configuració"
 
 msgctxt "model:ir.ui.menu,name:menu_contract"
-msgid "Contract"
+msgid "Contracts"
 msgstr "Contractes"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_configuration"
@@ -453,15 +477,15 @@ msgid "Consumptions"
 msgstr "Consums"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_form"
-msgid "Contract"
+msgid "Contracts"
 msgstr "Contractes"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_line_form"
-msgid "Contract Line"
+msgid "Contract Lines"
 msgstr "Línies"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_service"
-msgid "Contract Service"
+msgid "Contract Services"
 msgstr "Serveis de contracte"
 
 msgctxt "model:ir.ui.menu,name:menu_create_consumptions"
@@ -473,11 +497,11 @@ msgid "Create Invoices"
 msgstr "Crea factures"
 
 msgctxt "model:res.group,name:group_contract"
-msgid "Contract"
+msgid "Contracts"
 msgstr "Contractes"
 
 msgctxt "model:res.group,name:group_contract_admin"
-msgid "Contract Administration"
+msgid "Contracts Administration"
 msgstr "Administració de contractes"
 
 msgctxt "selection:contract,freq:"

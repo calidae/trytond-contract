@@ -632,6 +632,8 @@ class ContractConsumption(ModelSQL, ModelView):
                     'property.'),
                 'delete_invoiced_consumption': ('Consumption "%s" can not be'
                     ' deleted because it is already invoiced.'),
+                'no_payment_term_found': ('No payment term could be found for '
+                    'contract invoice of customer "%(customer)s".'),
                 })
         cls._buttons.update({
                 'invoice': {
@@ -796,11 +798,10 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice = Invoice(**values)
         invoice.on_change_party()
         invoice.journal = journal
-        invoice.payment_term = invoice.party.customer_payment_term
-        invoice.account = invoice.party.account_receivable
-        # Compatibility with account_payment_type module
-        if hasattr(Invoice, 'payment_type'):
-            invoice.payment_type = invoice.party.customer_payment_type
+        if not invoice.payment_term:
+            cls.raise_user_error('no_payment_term_found', {
+                    'customer': invoice.party.rec_name,
+                    })
         return invoice
 
     @classmethod
