@@ -176,7 +176,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         handler = TableHandler(cls, module_name)
         first_invoice_date_exist = handler.column_exist('first_invoice_date')
 
-        handler.column_rename('reference', 'number')
+        if not handler.column_exist('number'):
+            handler.column_rename('reference', 'number')
 
         super(Contract, cls).__register__(module_name)
 
