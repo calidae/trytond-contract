@@ -104,6 +104,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     party = fields.Many2One('party.party', 'Party', required=True,
         states=_STATES, depends=_DEPENDS)
     number = fields.Char('Number', readonly=True, select=True)
+    reference = fields.Char('Reference')
     start_date = fields.Function(fields.Date('Start Date'),
             'get_dates', searcher='search_dates')
     end_date = fields.Function(fields.Date('End Date'),
