@@ -4,12 +4,15 @@
 <form string="Contract">
     <label name="number"/>
     <field name="number"/>
-    <label name="company"/>
-    <field name="company"/>
+    <label name="reference"/>
+    <field name="reference"/>
     <label name="party"/>
     <field name="party"/>
+    <label name="company"/>
+    <field name="company"/>
     <label name="currency"/>
     <field name="currency"/>
+    <newline/>
     <label name="start_period_date"/>
     <field name="start_period_date"/>
     <label name="first_invoice_date"/>
