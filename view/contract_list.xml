@@ -4,6 +4,7 @@ this repository contains the full copyright notices and license terms. -->
 <tree string="Contract">
     <field name="company"/>
     <field name="number"/>
+    <field name="reference"/>
     <field name="party"/>
     <field name="start_date"/>
     <field name="end_date"/>
