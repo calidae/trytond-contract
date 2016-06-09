@@ -15,3 +15,7 @@ class Configuration(ModelSingleton, ModelSQL, ModelView):
                     [Eval('context', {}).get('company', -1), None]),
                 ('code', '=', 'contract'),
                 ], required=True))
+    journal = fields.Property(fields.Many2One('account.journal', 'Journal',
+            required=True, domain=[
+                ('type', '=', 'revenue'),
+                ]))
