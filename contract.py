@@ -636,6 +636,8 @@ class ContractConsumption(ModelSQL, ModelView):
                     ' deleted because it is already invoiced.'),
                 'no_payment_term_found': ('No payment term could be found for '
                     'contract invoice of customer "%(customer)s".'),
+                'missing_journal': ('Please, configure a journal before '
+                    'creating contract invoices.'),
                 })
         cls._buttons.update({
                 'invoice': {
@@ -787,14 +789,10 @@ class ContractConsumption(ModelSQL, ModelView):
     def _get_invoice(cls, keys):
         pool = Pool()
         Invoice = pool.get('account.invoice')
-        Journal = pool.get('account.journal')
-        journals = Journal.search([
-                ('type', '=', 'revenue'),
-                ], limit=1)
-        if journals:
-            journal, = journals
-        else:
-            journal = None
+        Config = pool.get('contract.configuration')
+        journal = Config(1).journal
+        if not journal:
+            cls.raise_user_error('missing_journal')
         values = dict(keys)
         values['invoice_address'] = values['party'].address_get('invoice')
         invoice = Invoice(**values)

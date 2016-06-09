@@ -4,4 +4,6 @@ this repository contains the full copyright notices and license terms. -->
 <form string="Contract Configuration">
     <label name="contract_sequence"/>
     <field name="contract_sequence"/>
+    <label name="journal"/>
+    <field name="journal"/>
 </form>
