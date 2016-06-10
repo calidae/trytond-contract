@@ -23,6 +23,10 @@ msgstr ""
 "client \"%(customer)s\"."
 
 msgctxt "error:contract.consumption:"
+msgid "Please, configure a journal before creating contract invoices."
+msgstr "Si us plau, configura un diari abans de crear factures de contractes."
+
+msgctxt "error:contract.consumption:"
 msgid ""
 "Product \"%(product)s\" of contract line %(contract_line)s misses a revenue "
 "account."
@@ -155,6 +159,10 @@ msgstr "Usuari creació"
 msgctxt "field:contract.configuration,id:"
 msgid "ID"
 msgstr "ID"
+
+msgctxt "field:contract.configuration,journal:"
+msgid "Journal"
+msgstr "Diari"
 
 msgctxt "field:contract.configuration,rec_name:"
 msgid "Name"
@@ -589,16 +597,16 @@ msgid "Create Consumptions"
 msgstr "Crea consums"
 
 msgctxt "view:contract.create_consumptions.start:"
-msgid "Create consumptions up to"
-msgstr "Crea consums fins a la "
-
-msgctxt "view:contract.create_invoices.start:"
-msgid "Create Contract Invoices up to"
-msgstr "Crea factures fins a"
+msgid "Create Contract Consumptions up to"
+msgstr "Crea consums de contractes fins a"
 
 msgctxt "view:contract.create_invoices.start:"
 msgid "Create Invoices"
 msgstr "Crea factures"
+
+msgctxt "view:contract.create_invoices.start:"
+msgid "Create invoices up to"
+msgstr "Crea factures fins a"
 
 msgctxt "view:contract.line:"
 msgid "Contract Line"
