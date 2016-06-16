@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <!-- The COPYRIGHT file at the top level of this repository contains the full
      copyright notices and license terms. -->
 <tryton>
     <data>
-
         <record model="res.group" id="group_contract_admin">
             <field name="name">Contracts Administration</field>
         </record>
@@ -298,7 +297,6 @@
             <field name="type">form</field>
             <field name="name">create_invoices_start_form</field>
         </record>
-
 
         <!-- Menus -->
         <record model="ir.ui.icon" id="contract_icon">
