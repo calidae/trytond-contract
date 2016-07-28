@@ -18,6 +18,8 @@ from trytond.tools import reduce_ids, grouped_slice
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.modules.product import price_digits
 
+import logging
+
 __all__ = ['ContractService', 'Contract', 'ContractLine',
     'ContractConsumption', 'CreateConsumptionsStart', 'CreateConsumptions']
 
@@ -91,7 +93,7 @@ CONTRACT_STATES = [
 
 
 def todatetime(date):
-    return datetime.datetime.combine(date, datetime.datetime.min.time())
+    return datetime.datetime.combine(date, datetime.time(0, 0, 0))
 
 
 class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
@@ -122,6 +124,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         depends=['state'])
     state = fields.Selection(CONTRACT_STATES, 'State',
         required=True, readonly=True)
+
+    logger = logging.getLogger(__name__)
 
     @classmethod
     def __setup__(cls):
@@ -358,11 +362,14 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         values['dtstart'] = todatetime(self.start_period_date)
         return values
 
-    def get_invoice_date(self, last_invoice_date):
+    def get_invoice_date(self, last_invoice_date, start_period_date):
         last_invoice_date = todatetime(last_invoice_date)
+        start_period_date = todatetime(start_period_date)
         r = rrule(self.rrule._freq, interval=self.rrule._interval,
             dtstart=last_invoice_date)
-        date = r.after(last_invoice_date)
+        date = last_invoice_date
+        while date < start_period_date:
+            date = r.after(last_invoice_date)
         return date.date()
 
     def get_start_period_date(self, start_date):
@@ -383,6 +390,9 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         consumptions = []
 
         for line in self.lines:
+            line_limit_date = limit_date
+            if line.end_date and line.end_date < limit_date:
+                line_limit_date = line.end_date
             start_period_date = self.get_start_period_date(line.start_date)
 
             last_consumption_date = line.last_consumption_date
@@ -394,8 +404,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                 start = (last_consumption_date + relativedelta(days=+1)).date()
 
             last_invoice_date = line.last_consumption_invoice_date
-
-            next_period = (self.rrule.after(todatetime(limit_date)) +
+            next_period = (self.rrule.after(todatetime(line_limit_date)) +
                 relativedelta(days=+1))
 
             if line.end_date and next_period.date() < line.end_date:
@@ -405,12 +414,14 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             for date in rrule.between(todatetime(start), next_period,
                     inc=True):
                 start_period = date.date()
-                if last_invoice_date:
-                    invoice_date = self.get_invoice_date(last_invoice_date)
-                else:
-                    invoice_date = line.contract.first_invoice_date
 
-                if start_period > limit_date or invoice_date > limit_date:
+                last_invoice_date = (last_invoice_date
+                    or line.contract.first_invoice_date)
+
+                invoice_date = self.get_invoice_date(last_invoice_date,
+                        start_period)
+
+                if (start_period > line_limit_date):
                     break
                 end_period = rrule.after(date).date() - relativedelta(days=1)
 
@@ -434,6 +445,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         to_create = []
         for contract in contracts:
             to_create += contract.get_consumptions(date)
+
         return ContractConsumption.create([x._save_values for x in to_create])
 
 
@@ -537,7 +549,7 @@ class ContractLine(ModelSQL, ModelView):
         line_ids = [l.id for l in lines]
         values = dict.fromkeys(line_ids, None)
         cursor.execute(*table.select(table.contract_line,
-                    Max(table.end_period_date),
+                    Max(table.end_period_date).cast(Consumption.end_period_date.sql_type().base),
                 where=reduce_ids(table.contract_line, line_ids),
                 group_by=table.contract_line))
         values.update(dict(cursor.fetchall()))
@@ -558,6 +570,7 @@ class ContractLine(ModelSQL, ModelView):
                 group_by=table.contract_line))
         values.update(dict(cursor.fetchall()))
         return values
+
 
     def get_consumption(self, start_date, end_date, invoice_date, start_period,
             finish_period):
@@ -709,8 +722,13 @@ class ContractConsumption(ModelSQL, ModelView):
             rate = 0.0
         else:
             # Compute quantity based on dates
-            rate = Decimal((self.end_date - self.start_date).total_seconds() /
-                (self.end_period_date - self.init_period_date).total_seconds())
+            # We add 1 day to end_date and end_period date to correctly
+            #   calculate periods. for example:
+            #   (31-01-2015 - 01-01-2015) = 30 days + 1
+            rate = Decimal((self.end_date + datetime.timedelta(days=1)
+                    - self.start_date).total_seconds() /
+                (self.end_period_date + datetime.timedelta(days=1) -
+                    self.init_period_date).total_seconds())
         unit_price = self.contract_line.unit_price * rate
         digits = invoice_line.__class__.unit_price.digits
         unit_price = unit_price.quantize(Decimal(str(10 ** -digits[1])))
