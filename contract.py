@@ -18,8 +18,6 @@ from trytond.tools import reduce_ids, grouped_slice
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.modules.product import price_digits
 
-import logging
-
 __all__ = ['ContractService', 'Contract', 'ContractLine',
     'ContractConsumption', 'CreateConsumptionsStart', 'CreateConsumptions']
 
@@ -124,8 +122,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         depends=['state'])
     state = fields.Selection(CONTRACT_STATES, 'State',
         required=True, readonly=True)
-
-    logger = logging.getLogger(__name__)
 
     @classmethod
     def __setup__(cls):
@@ -369,7 +365,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             dtstart=last_invoice_date)
         date = last_invoice_date
         while date < start_period_date:
-            date = r.after(last_invoice_date)
+            date = r.after(date)
         return date.date()
 
     def get_start_period_date(self, start_date):
@@ -391,6 +387,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
         for line in self.lines:
             line_limit_date = limit_date
+            if line.end_date and line.end_date <= line.last_consumption_date:
+                continue
             if line.end_date and line.end_date < limit_date:
                 line_limit_date = line.end_date
             start_period_date = self.get_start_period_date(line.start_date)
