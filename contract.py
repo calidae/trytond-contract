@@ -364,7 +364,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         r = rrule(self.rrule._freq, interval=self.rrule._interval,
             dtstart=last_invoice_date)
         date = last_invoice_date
-        while date < start_period_date:
+        while date <= start_period_date:
             date = r.after(last_invoice_date)
         return date.date()
 
@@ -387,6 +387,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
         for line in self.lines:
             line_limit_date = limit_date
+            if line.end_date and line.end_date <= line.last_consumption_date:
+                continue
             if line.end_date and line.end_date < limit_date:
                 line_limit_date = line.end_date
             start_period_date = self.get_start_period_date(line.start_date)
