@@ -387,7 +387,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
         for line in self.lines:
             line_limit_date = limit_date
-            if line.end_date and line.end_date <= line.last_consumption_date:
+            if (line.end_date and line.last_consumption_date
+                    and line.end_date <= line.last_consumption_date):
                 continue
             if line.end_date and line.end_date < limit_date:
                 line_limit_date = line.end_date
