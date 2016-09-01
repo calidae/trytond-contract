@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -21,6 +21,10 @@ msgid ""
 msgstr ""
 "No s'ha trobat cap termini de pagament per la factura de contracte del "
 "client \"%(customer)s\"."
+
+msgctxt "error:contract.consumption:"
+msgid "Please, configure a journal before creating contract invoices."
+msgstr "Si us plau, configura el diari abans de crear factures de contractes."
 
 msgctxt "error:contract.consumption:"
 msgid ""
@@ -155,6 +159,10 @@ msgstr "Usuari creació"
 msgctxt "field:contract.configuration,id:"
 msgid "ID"
 msgstr "ID"
+
+msgctxt "field:contract.configuration,journal:"
+msgid "Journal"
+msgstr "Diari"
 
 msgctxt "field:contract.configuration,rec_name:"
 msgid "Name"
@@ -391,7 +399,7 @@ msgid "Consumptions"
 msgstr "Consums"
 
 msgctxt "model:ir.action,name:act_contract"
-msgid "Contracts"
+msgid "Contract"
 msgstr "Contractes"
 
 msgctxt "model:ir.action,name:act_contract_configuration_form"
@@ -399,15 +407,15 @@ msgid "Contracts Configuration"
 msgstr "Configuració de contractes"
 
 msgctxt "model:ir.action,name:act_contract_consumption"
-msgid "Contract Consumptions"
+msgid "Contract Consumption"
 msgstr "Consums de contractes"
 
 msgctxt "model:ir.action,name:act_contract_line"
-msgid "Contract Lines"
+msgid "Contract Line"
 msgstr "Línies de contractes"
 
 msgctxt "model:ir.action,name:act_contract_service"
-msgid "Contract Services"
+msgid "Contract Service"
 msgstr "Serveis de contractes"
 
 msgctxt "model:ir.action,name:act_invoices"
@@ -465,7 +473,7 @@ msgid "Configuration"
 msgstr "Configuració"
 
 msgctxt "model:ir.ui.menu,name:menu_contract"
-msgid "Contracts"
+msgid "Contract"
 msgstr "Contractes"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_configuration"
@@ -473,19 +481,19 @@ msgid "Contracts Configuration"
 msgstr "Configuració de contractes"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_consumption"
-msgid "Consumptions"
+msgid "Contract Consumption"
 msgstr "Consums"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_form"
-msgid "Contracts"
+msgid "Contract"
 msgstr "Contractes"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_line_form"
-msgid "Contract Lines"
+msgid "Contract Line"
 msgstr "Línies"
 
 msgctxt "model:ir.ui.menu,name:menu_contract_service"
-msgid "Contract Services"
+msgid "Contract Service"
 msgstr "Serveis de contracte"
 
 msgctxt "model:ir.ui.menu,name:menu_create_consumptions"
@@ -497,11 +505,11 @@ msgid "Create Invoices"
 msgstr "Crea factures"
 
 msgctxt "model:res.group,name:group_contract"
-msgid "Contracts"
+msgid "Contract"
 msgstr "Contractes"
 
 msgctxt "model:res.group,name:group_contract_admin"
-msgid "Contracts Administration"
+msgid "Contract Administration"
 msgstr "Administració de contractes"
 
 msgctxt "selection:contract,freq:"
@@ -589,16 +597,16 @@ msgid "Create Consumptions"
 msgstr "Crea consums"
 
 msgctxt "view:contract.create_consumptions.start:"
-msgid "Create consumptions up to"
-msgstr "Crea consums fins a la "
-
-msgctxt "view:contract.create_invoices.start:"
-msgid "Create Contract Invoices up to"
-msgstr "Crea factures fins a"
+msgid "Create Contract Consumptions up to"
+msgstr "Crea consums fins a"
 
 msgctxt "view:contract.create_invoices.start:"
 msgid "Create Invoices"
 msgstr "Crea factures"
+
+msgctxt "view:contract.create_invoices.start:"
+msgid "Create invoices up to"
+msgstr "Crea factures fins a"
 
 msgctxt "view:contract.line:"
 msgid "Contract Line"
