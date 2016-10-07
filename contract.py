@@ -770,16 +770,17 @@ class ContractConsumption(ModelSQL, ModelView):
         return invoice_line
 
     def get_amount_to_invoice(self):
-        pool = Pool()
-        Uom = pool.get('product.uom')
+        Uom = Pool().get('product.uom')
+
+        uom, = Uom.search([('name', '=', 'Unit')])
+
         quantity = ((self.end_date - self.start_date).total_seconds() /
             (self.end_period_date - self.init_period_date).total_seconds())
 
-        uom = self.contract_line and self.contract_line.service and \
-            self.contract_line.service.product and \
-            self.contract_line.service.product.default_uom
-        rounding = uom.rounding if uom else 1
-        qty = Uom.round(quantity, rounding)
+        if self.contract_line and self.contract_line.service and \
+                self.contract_line.service.product:
+            uom = self.contract_line.service.product.default_uom
+        qty = uom.round(quantity)
         return Decimal(str(qty)) * self.contract_line.unit_price
 
     @classmethod
