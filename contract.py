@@ -595,6 +595,14 @@ class ContractLine(ModelSQL, ModelView):
                         })
         super(ContractLine, cls).delete(lines)
 
+    @classmethod
+    def copy(cls, lines, default=None):
+        if default is None:
+            default = {}
+        default = default.copy()
+        default['consumptions'] = None
+        return super(ContractLine, cls).copy(lines, default=default)
+
 
 class ContractConsumption(ModelSQL, ModelView):
     'Contract Consumption'
@@ -864,6 +872,15 @@ class ContractConsumption(ModelSQL, ModelView):
             cls.raise_user_error('delete_invoiced_consumption',
                 line.origin.rec_name)
         super(ContractConsumption, cls).delete(consumptions)
+
+    @classmethod
+    def copy(cls, consumptions, default=None):
+        if default is None:
+            default = {}
+        default = default.copy()
+        default['invoice_lines'] = None
+        default['credit_lines'] = None
+        return super(ContractConsumption, cls).copy(consumptions, default=default)
 
 
 class CreateConsumptionsStart(ModelView):
