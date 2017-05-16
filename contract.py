@@ -385,6 +385,9 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
         consumptions = []
 
+        if not self.freq or not self.interval:
+            return consumptions
+
         for line in self.lines:
             line_limit_date = limit_date
             if (line.end_date and line.last_consumption_date
