@@ -836,6 +836,9 @@ class ContractConsumption(ModelSQL, ModelView):
                 cls.raise_user_error('no_payment_term_found', {
                         'customer': invoice.party.rec_name,
                         })
+        if values.get('contract'):
+            contract = values['contract']
+            invoice.description = contract.reference
         return invoice
 
     @classmethod
