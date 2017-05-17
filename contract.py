@@ -829,9 +829,13 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice.on_change_party()
         invoice.journal = journal
         if not invoice.payment_term:
-            cls.raise_user_error('no_payment_term_found', {
-                    'customer': invoice.party.rec_name,
-                    })
+            default_payment_term = Config(1).payment_term
+            if default_payment_term:
+                invoice.payment_term = default_payment_term
+            else:
+                cls.raise_user_error('no_payment_term_found', {
+                        'customer': invoice.party.rec_name,
+                        })
         return invoice
 
     @classmethod
