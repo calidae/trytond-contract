@@ -167,6 +167,10 @@ msgctxt "field:contract.configuration,journal:"
 msgid "Journal"
 msgstr "Journal"
 
+msgctxt "field:contract.configuration,payment_term:"
+msgid "Payment Term"
+msgstr "Zahlungsbedingung"
+
 msgctxt "field:contract.configuration,rec_name:"
 msgid "Name"
 msgstr "Name"
@@ -365,6 +369,12 @@ msgstr ""
 "Bei Aktivierung wird die Abrechnung, die diese Position erzeugt hat, "
 "nochmals fakturiert."
 
+msgctxt "help:contract.configuration,payment_term:"
+msgid "The payment term to be used when there is none set on the party."
+msgstr ""
+"Die Zahlungsbedingung, die verwendet werden soll, wenn keine auf der Partei "
+"eingetragen ist."
+
 msgctxt "model:contract,name:"
 msgid "Contract"
 msgstr "Vertrag"
@@ -513,7 +523,7 @@ msgstr "Verträge Administration"
 
 msgctxt "selection:contract,freq:"
 msgid ""
-msgstr " "
+msgstr ""
 
 msgctxt "selection:contract,freq:"
 msgid "Daily"
