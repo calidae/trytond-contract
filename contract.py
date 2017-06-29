@@ -548,6 +548,8 @@ class ContractConsumption(ModelSQL, ModelView):
                     'property.'),
                 'delete_invoiced_consumption': ('Consumption "%s" can not be'
                     ' deleted because it is already invoiced.'),
+                'party_no_payments': ('The party %(party)s does not have a'
+                    ' payments days')
                 })
         cls._buttons.update({
                 'invoice': {
@@ -740,6 +742,11 @@ class ContractConsumption(ModelSQL, ModelView):
         invoices = []
         for key, grouped_lines in groupby(lines, key=cls._group_invoice_key):
             invoice = cls._get_invoice(key)
+            if (not invoice.payment_term or
+                    not invoice.payment_term):
+                cls.raise_user_error('party_no_payments', {
+                    'party': invoice.party.rec_name,
+                    })
             invoice.lines = (list(getattr(invoice, 'lines', [])) +
                 list(x[1] for x in grouped_lines))
             invoices.append(invoice)

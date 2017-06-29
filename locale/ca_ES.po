@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -21,6 +21,10 @@ msgid ""
 msgstr ""
 "Falta el compte d'ingressos al producte \"%(product)s\" de la línia de "
 "contracte \"%(contract_line)s\"."
+
+msgctxt "error:contract.consumption:"
+msgid "The party %(party)s does not have a payments days"
+msgstr "El tercer %(party)s no té un plaç de pagament establert"
 
 msgctxt "field:account.invoice.credit.start,from_contract:"
 msgid "From Contract"
