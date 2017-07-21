@@ -511,6 +511,8 @@ class ContractLine(ModelSQL, ModelView):
         cursor = Transaction().cursor
         table = TableHandler(cursor, cls, module_name)
 
+        super(ContractLine, cls).__register__(module_name)
+
         # start_date not null
         table.not_null_action('start_date', 'remove')
 
