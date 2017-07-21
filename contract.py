@@ -465,10 +465,10 @@ class ContractLine(ModelSQL, ModelView):
         states={
             'readonly': Eval('contract_state') == 'confirmed',
             })
-    start_date = fields.Date('Start Date', required=True,
+    start_date = fields.Date('Start Date',
         states={
             'readonly': Eval('contract_state') == 'confirmed',
-            'required': ~Eval('contract_state').in_(['draft', 'cancelled']),
+            'required': Eval('contract_state') == 'confirmed',
             },
         domain=[
             If(Bool(Eval('end_date')),
@@ -506,6 +506,15 @@ class ContractLine(ModelSQL, ModelView):
                     'because contract "%(contract)s" is not in draft state.')
                 })
 
+    @classmethod
+    def __register__(cls, module_name):
+        TableHandler = backend.get('TableHandler')
+        cursor = Transaction().cursor
+        table = TableHandler(cursor, cls, module_name)
+
+        # start_date not null
+        table.not_null_action('start_date', 'remove')
+
     @staticmethod
     def order_sequence(tables):
         table, _ = tables[None]
@@ -525,7 +534,7 @@ class ContractLine(ModelSQL, ModelView):
             ]
 
     def get_contract_state(self, name):
-        return self.contract.state
+        return self.contract and self.contract.state or 'draft'
 
     @classmethod
     def search_contract_state(cls, name, clause):
