@@ -510,6 +510,7 @@ class ContractLine(ModelSQL, ModelView):
     def __register__(cls, module_name):
         TableHandler = backend.get('TableHandler')
         table = TableHandler(cls, module_name)
+        super(ContractLine, cls).__register__(module_name)
 
         # start_date not null
         table.not_null_action('start_date', 'remove')
