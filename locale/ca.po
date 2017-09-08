@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -21,6 +21,10 @@ msgid ""
 msgstr ""
 "No s'ha trobat cap termini de pagament per la factura de contracte del "
 "client \"%(customer)s\"."
+
+msgctxt "error:contract.consumption:"
+msgid "Please, configure a journal before creating contract invoices."
+msgstr "Si us plau, configura el diari abans de crear factures de contractes."
 
 msgctxt "error:contract.consumption:"
 msgid ""
@@ -70,11 +74,11 @@ msgstr "Empresa"
 
 msgctxt "field:contract,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:contract,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:contract,currency:"
 msgid "Currency"
@@ -134,11 +138,11 @@ msgstr "Estat"
 
 msgctxt "field:contract,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:contract,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:contract.configuration,contract_sequence:"
 msgid "Contract Reference Sequence"
@@ -146,15 +150,19 @@ msgstr "Seqüencia referència contracte"
 
 msgctxt "field:contract.configuration,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:contract.configuration,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:contract.configuration,id:"
 msgid "ID"
 msgstr "ID"
+
+msgctxt "field:contract.configuration,journal:"
+msgid "Journal"
+msgstr "Diari"
 
 msgctxt "field:contract.configuration,rec_name:"
 msgid "Name"
@@ -162,11 +170,11 @@ msgstr "Nom"
 
 msgctxt "field:contract.configuration,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:contract.configuration,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:contract.consumption,contract:"
 msgid "Contract"
@@ -178,11 +186,11 @@ msgstr "Línia de contracte"
 
 msgctxt "field:contract.consumption,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:contract.consumption,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:contract.consumption,credit_lines:"
 msgid "Credit Lines"
@@ -222,11 +230,11 @@ msgstr "Data inici"
 
 msgctxt "field:contract.consumption,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:contract.consumption,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:contract.create_consumptions.start,date:"
 msgid "Date"
@@ -258,11 +266,11 @@ msgstr "Estat del contracte"
 
 msgctxt "field:contract.line,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:contract.line,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:contract.line,description:"
 msgid "Description"
@@ -306,19 +314,19 @@ msgstr "Preu unitat"
 
 msgctxt "field:contract.line,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:contract.line,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:contract.service,create_date:"
 msgid "Create Date"
-msgstr "Data creació"
+msgstr "Data de creació"
 
 msgctxt "field:contract.service,create_uid:"
 msgid "Create User"
-msgstr "Usuari creació"
+msgstr "Usuari de creació"
 
 msgctxt "field:contract.service,id:"
 msgid "ID"
@@ -338,11 +346,11 @@ msgstr "Nom"
 
 msgctxt "field:contract.service,write_date:"
 msgid "Write Date"
-msgstr "Data modificació"
+msgstr "Data de modificació"
 
 msgctxt "field:contract.service,write_uid:"
 msgid "Write User"
-msgstr "Usuari modificació"
+msgstr "Usuari de modificació"
 
 msgctxt "field:party.party,contract_grouping_method:"
 msgid "Contract Grouping Method"
@@ -577,28 +585,16 @@ msgid "Contract Configuration"
 msgstr "Configuració de contractes"
 
 msgctxt "view:contract.consumption:"
-msgid "Contract Consumption"
-msgstr "Consum de contractes"
-
-msgctxt "view:contract.consumption:"
 msgid "Invoice"
 msgstr "Factura"
 
 msgctxt "view:contract.create_consumptions.start:"
-msgid "Create Consumptions"
-msgstr "Crea consums"
-
-msgctxt "view:contract.create_consumptions.start:"
-msgid "Create consumptions up to"
-msgstr "Crea consums fins a la "
+msgid "Create Contract Consumptions up to"
+msgstr "Crear consums desde"
 
 msgctxt "view:contract.create_invoices.start:"
-msgid "Create Contract Invoices up to"
-msgstr "Crea factures fins a"
-
-msgctxt "view:contract.create_invoices.start:"
-msgid "Create Invoices"
-msgstr "Crea factures"
+msgid "Create invoices up to"
+msgstr "Crear factures desde"
 
 msgctxt "view:contract.line:"
 msgid "Contract Line"
@@ -659,4 +655,4 @@ msgstr "D'acord"
 
 msgctxt "wizard_button:contract.create_invoices,start,end:"
 msgid "Cancel"
-msgstr "Cancel·lat"
+msgstr "Cancel·la"
