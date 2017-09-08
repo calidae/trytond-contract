@@ -104,7 +104,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         states=_STATES, depends=_DEPENDS)
     party = fields.Many2One('party.party', 'Party', required=True,
         states=_STATES, depends=_DEPENDS)
-    number = fields.Char('Number', readonly=True, select=True)
+    number = fields.Char('Number',  select=True, states=_STATES,
+        depends=_DEPENDS)
     reference = fields.Char('Reference')
     start_date = fields.Function(fields.Date('Start Date'),
         'get_dates', searcher='search_dates')
@@ -508,8 +509,7 @@ class ContractLine(ModelSQL, ModelView):
     @classmethod
     def __register__(cls, module_name):
         TableHandler = backend.get('TableHandler')
-        cursor = Transaction().cursor
-        table = TableHandler(cursor, cls, module_name)
+        table = TableHandler(cls, module_name)
         super(ContractLine, cls).__register__(module_name)
 
         # start_date not null
@@ -838,9 +838,16 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice.on_change_party()
         invoice.journal = journal
         if not invoice.payment_term:
-            cls.raise_user_error('no_payment_term_found', {
-                    'customer': invoice.party.rec_name,
-                    })
+            default_payment_term = Config(1).payment_term
+            if default_payment_term:
+                invoice.payment_term = default_payment_term
+            else:
+                cls.raise_user_error('no_payment_term_found', {
+                        'customer': invoice.party.rec_name,
+                        })
+        if values.get('contract'):
+            contract = values['contract']
+            invoice.description = contract.reference
         return invoice
 
     @classmethod

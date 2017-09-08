@@ -164,6 +164,10 @@ msgctxt "field:contract.configuration,journal:"
 msgid "Journal"
 msgstr "Diari"
 
+msgctxt "field:contract.configuration,payment_term:"
+msgid "Payment Term"
+msgstr "Plazo de pago"
+
 msgctxt "field:contract.configuration,rec_name:"
 msgid "Name"
 msgstr "Nom"
@@ -362,6 +366,11 @@ msgstr ""
 "Si es marca, es tornaran a facturar els consums que han generat aquestes "
 "línies de factura."
 
+msgctxt "help:contract.configuration,payment_term:"
+msgid "The payment term to be used when there is none set on the party."
+msgstr ""
+"El plazo de pago que se usará cuando no disponga uno por defecto el tercero."
+
 msgctxt "model:contract,name:"
 msgid "Contract"
 msgstr "Contracte"
@@ -514,7 +523,7 @@ msgstr "Administració de contractes"
 
 msgctxt "selection:contract,freq:"
 msgid ""
-msgstr " "
+msgstr ""
 
 msgctxt "selection:contract,freq:"
 msgid "Daily"

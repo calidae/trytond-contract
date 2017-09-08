@@ -164,6 +164,10 @@ msgctxt "field:contract.configuration,journal:"
 msgid "Journal"
 msgstr "Diario"
 
+msgctxt "field:contract.configuration,payment_term:"
+msgid "Payment Term"
+msgstr "Plazo de pago"
+
 msgctxt "field:contract.configuration,rec_name:"
 msgid "Name"
 msgstr "Nombre"
@@ -361,6 +365,11 @@ msgid "If true, the consumption that generated this line will be reinvoiced."
 msgstr ""
 "Si se marca, el consumo que ha generado estas líneas de contracto será "
 "refacturado."
+
+msgctxt "help:contract.configuration,payment_term:"
+msgid "The payment term to be used when there is none set on the party."
+msgstr ""
+"El plazo de pago que se usará cuando no disponga uno por defecto el tercero."
 
 msgctxt "model:contract,name:"
 msgid "Contract"

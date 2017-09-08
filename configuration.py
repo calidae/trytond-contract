@@ -19,3 +19,7 @@ class Configuration(ModelSingleton, ModelSQL, ModelView):
             required=True, domain=[
                 ('type', '=', 'revenue'),
                 ]))
+    payment_term = fields.Property(fields.Many2One(
+            'account.invoice.payment_term', 'Payment Term',
+            help='The payment term to be used when there is none set on the '
+            'party.'))
