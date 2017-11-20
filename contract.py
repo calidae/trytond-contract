@@ -21,15 +21,17 @@ from trytond.modules.product import price_digits
 __all__ = ['ContractService', 'Contract', 'ContractLine',
     'ContractConsumption', 'CreateConsumptionsStart', 'CreateConsumptions']
 
+FREQS = [
+    (None, ''),
+    ('daily', 'Daily'),
+    ('weekly', 'Weekly'),
+    ('monthly', 'Monthly'),
+    ('yearly', 'Yearly'),
+    ]
+
 
 class RRuleMixin(Model):
-    freq = fields.Selection([
-            (None, ''),
-            ('daily', 'Daily'),
-            ('weekly', 'Weekly'),
-            ('monthly', 'Monthly'),
-            ('yearly', 'Yearly'),
-            ], 'Frequency', sort=False)
+    freq = fields.Selection(FREQS, 'Frequency', sort=False)
     interval = fields.Integer('Interval', domain=[
             If(Bool(Eval('freq')),
                 [('interval', '>', 0)], [])
