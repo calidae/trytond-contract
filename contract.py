@@ -444,6 +444,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                 end = end_period
                 if line.end_date and line.end_date <= end:
                     end = line.end_date
+                if not (end >= start):
+                    continue
 
                 consumptions.append(line.get_consumption(start, end,
                         invoice_date, start_period, end_period))
