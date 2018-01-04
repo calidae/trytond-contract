@@ -77,7 +77,6 @@ class CreditInvoiceStart:
             ]
 
 
-
 class CreditInvoice:
     __name__ = 'account.invoice.credit'
     __metaclass__ = PoolMeta

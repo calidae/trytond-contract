@@ -1,14 +1,16 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
 from trytond.pool import Pool
-import contract
-import configuration
-import invoice
-import party
+from . import configuration
+from . import contract
+from . import invoice
+from . import party
+
 
 def register():
     Pool.register(
         party.Party,
+        party.PartyContractGroupingMethod,
         contract.ContractService,
         contract.Contract,
         contract.ContractLine,
@@ -16,6 +18,8 @@ def register():
         contract.CreateConsumptionsStart,
         invoice.CreateInvoicesStart,
         configuration.Configuration,
+        configuration.ConfigurationSequence,
+        configuration.ConfigurationAccount,
         invoice.InvoiceLine,
         invoice.CreditInvoiceStart,
         module='contract', type_='model')

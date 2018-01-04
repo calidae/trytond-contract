@@ -22,11 +22,5 @@
         <menuitem parent="menu_configuration"
             action="act_contract_configuration_form"
             id="menu_contract_configuration" icon="tryton-list"/>
-
-        <record model="ir.property" id="property_contract_sequence">
-            <field name="field"
-                search="[('model.model', '=', 'contract.configuration'), ('name', '=', 'contract_sequence')]"/>
-            <field name="value" eval="'ir.sequence,' + str(ref('sequence_contract'))"/>
-        </record>
     </data>
 </tryton>

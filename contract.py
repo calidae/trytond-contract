@@ -10,7 +10,8 @@ from sql.conditionals import Case
 from sql.aggregate import Max, Min, Sum
 
 from trytond import backend
-from trytond.model import Workflow, ModelSQL, ModelView, Model, fields
+from trytond.model import (Workflow, ModelSQL, ModelView, Model, fields,
+    sequence_ordered)
 from trytond.pool import Pool
 from trytond.pyson import Eval, Bool, If
 from trytond.transaction import Transaction
@@ -108,7 +109,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         'on_change_with_currency_digits')
     party = fields.Many2One('party.party', 'Party', required=True,
         states=_STATES, depends=_DEPENDS)
-    number = fields.Char('Number',  select=True, states=_STATES,
+    number = fields.Char('Number', select=True, states=_STATES,
         depends=_DEPENDS)
     reference = fields.Char('Reference')
     start_date = fields.Function(fields.Date('Start Date'),
@@ -133,7 +134,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         super(Contract, cls).__setup__()
         for field_name in ('freq', 'interval'):
             field = getattr(cls, field_name)
-            field.states = _STATES
+            field.states = _STATES.copy()
             field.states['required'] = True
             field.depends += _DEPENDS
         cls._transitions |= set((
@@ -464,7 +465,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         return ContractConsumption.create([x._save_values for x in to_create])
 
 
-class ContractLine(ModelSQL, ModelView):
+class ContractLine(sequence_ordered(), ModelSQL, ModelView):
     'Contract Line'
     __name__ = 'contract.line'
 
@@ -509,12 +510,10 @@ class ContractLine(ModelSQL, ModelView):
             searcher='search_last_consumption_dates')
     consumptions = fields.One2Many('contract.consumption', 'contract_line',
         'Consumptions', readonly=True)
-    sequence = fields.Integer('Sequence')
 
     @classmethod
     def __setup__(cls):
         super(ContractLine, cls).__setup__()
-        cls._order = [('contract', 'ASC'), ('sequence', 'ASC')]
         cls._error_messages.update({
                 'cannot_delete': ('Contract Line "%(line)s" cannot be removed '
                     'because contract "%(contract)s" is not in draft state.')
@@ -528,11 +527,6 @@ class ContractLine(ModelSQL, ModelView):
 
         # start_date not null
         table.not_null_action('start_date', 'remove')
-
-    @staticmethod
-    def order_sequence(tables):
-        table, _ = tables[None]
-        return [table.sequence == None, table.sequence]
 
     def get_rec_name(self, name):
         rec_name = self.contract.rec_name
@@ -575,10 +569,14 @@ class ContractLine(ModelSQL, ModelView):
         line_ids = [l.id for l in lines]
         values = dict.fromkeys(line_ids, None)
         cursor.execute(*table.select(table.contract_line,
-                    Max(table.end_period_date).cast(Consumption.end_period_date.sql_type().base),
+                Max(table.end_period_date),
                 where=reduce_ids(table.contract_line, line_ids),
                 group_by=table.contract_line))
         values.update(dict(cursor.fetchall()))
+        if backend.name() == 'sqlite':
+            for id, value in values.items():
+                if value is not None:
+                    values[id] = datetime.date(*map(int, value.split('-', 2)))
         return values
 
     @classmethod
@@ -599,20 +597,20 @@ class ContractLine(ModelSQL, ModelView):
 
     @classmethod
     def search_last_consumption_dates(cls, name, clause):
-        Consumption= Pool().get('contract.consumption')
+        Consumption = Pool().get('contract.consumption')
         consumption = Consumption.__table__()
 
         res = {
-            'last_consumption_date' : 'end_period_date',
-            'last_consumption_invoice_date' : 'invoice_date',
+            'last_consumption_date': 'end_period_date',
+            'last_consumption_invoice_date': 'invoice_date',
             }
         Operator = fields.SQL_OPERATORS[clause[1]]
         column = Column(consumption, res[clause[0]])
         query = consumption.select(consumption.contract_line,
             group_by=(consumption.contract_line),
-            having=Operator(Max(column),clause[2]))
+            having=Operator(Max(column), clause[2]))
 
-        return [('id','in', query)]
+        return [('id', 'in', query)]
 
     def get_consumption(self, start_date, end_date, invoice_date, start_period,
             finish_period):
@@ -643,7 +641,7 @@ class ContractLine(ModelSQL, ModelView):
         if default is None:
             default = {}
         default = default.copy()
-        default['consumptions'] = None
+        default.setdefault('consumptions')
         return super(ContractLine, cls).copy(lines, default=default)
 
 
@@ -697,8 +695,6 @@ class ContractConsumption(ModelSQL, ModelView):
                     'property.'),
                 'delete_invoiced_consumption': ('Consumption "%s" can not be'
                     ' deleted because it is already invoiced.'),
-                'no_payment_term_found': ('No payment term could be found for '
-                    'contract invoice of customer "%(customer)s".'),
                 'missing_journal': ('Please, configure a journal before '
                     'creating contract invoices.'),
                 })
@@ -734,21 +730,16 @@ class ContractConsumption(ModelSQL, ModelView):
         if self.contract.party.lang:
             lang = self.contract.party.lang
         else:
-            language = Transaction().language
-            languages = Lang.search([('code', '=', language)])
-            if not languages:
-                languages = Lang.search([('code', '=', 'en_US')])
-            lang = languages[0]
-        start = Lang.strftime(self.start_date,
-            lang.code, lang.date)
-        end = Lang.strftime(self.end_date, lang.code,
-            lang.date)
+            lang = Lang.get()
+        start = lang.strftime(self.start_date)
+        end = lang.strftime(self.end_date)
         return start, end
 
     def get_invoice_line(self):
         pool = Pool()
         InvoiceLine = pool.get('account.invoice.line')
-        Property = pool.get('ir.property')
+        AccountConfiguration = pool.get('account.configuration')
+        account_config = AccountConfiguration(1)
         if (self.invoice_lines and
                 not Transaction().context.get('force_reinvoice', False)):
             return
@@ -808,8 +799,9 @@ class ContractConsumption(ModelSQL, ModelView):
                         })
         else:
             invoice_line.unit = None
-            for model in ('product.template', 'product.category'):
-                invoice_line.account = Property.get('account_revenue', model)
+            for name in ['default_product_account_revenue',
+                    'default_category_account_revenue']:
+                invoice_line.account = account_config.get_multivalue(name)
                 if invoice_line.account:
                     break
             if not invoice_line.account:
@@ -868,13 +860,7 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice.on_change_party()
         invoice.journal = journal
         if not invoice.payment_term:
-            default_payment_term = Config(1).payment_term
-            if default_payment_term:
-                invoice.payment_term = default_payment_term
-            else:
-                cls.raise_user_error('no_payment_term_found', {
-                        'customer': invoice.party.rec_name,
-                        })
+            invoice.payment_term = Config(1).payment_term
         if values.get('contract'):
             contract = values['contract']
             invoice.description = contract.reference
@@ -929,9 +915,10 @@ class ContractConsumption(ModelSQL, ModelView):
         if default is None:
             default = {}
         default = default.copy()
-        default['invoice_lines'] = None
-        default['credit_lines'] = None
-        return super(ContractConsumption, cls).copy(consumptions, default=default)
+        default.setdefault('invoice_lines')
+        default.setdefault('credit_lines')
+        return super(ContractConsumption, cls).copy(
+            consumptions, default=default)
 
 
 class CreateConsumptionsStart(ModelView):
