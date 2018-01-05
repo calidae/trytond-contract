@@ -572,10 +572,17 @@ class ContractLine(ModelSQL, ModelView):
         table = Consumption.__table__()
         cursor = Transaction().connection.cursor()
 
+        if name == 'last_consumption_invoice_date':
+            consumption_date = table.invoice_date
+            cast_ = Consumption.invoice_date.sql_type().base
+        else:
+            consumption_date = table.end_period_date
+            cast_ = Consumption.end_period_date.sql_type().base
+
         line_ids = [l.id for l in lines]
         values = dict.fromkeys(line_ids, None)
         cursor.execute(*table.select(table.contract_line,
-                    Max(table.end_period_date).cast(Consumption.end_period_date.sql_type().base),
+                    Max(consumption_date).cast(cast_),
                 where=reduce_ids(table.contract_line, line_ids),
                 group_by=table.contract_line))
         values.update(dict(cursor.fetchall()))
