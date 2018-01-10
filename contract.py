@@ -514,6 +514,7 @@ class ContractLine(sequence_ordered(), ModelSQL, ModelView):
     @classmethod
     def __setup__(cls):
         super(ContractLine, cls).__setup__()
+        cls._order.insert(0, ('contract', 'ASC'))
         cls._error_messages.update({
                 'cannot_delete': ('Contract Line "%(line)s" cannot be removed '
                     'because contract "%(contract)s" is not in draft state.')
@@ -566,10 +567,15 @@ class ContractLine(sequence_ordered(), ModelSQL, ModelView):
         table = Consumption.__table__()
         cursor = Transaction().connection.cursor()
 
+        if name == 'last_consumption_invoice_date':
+            consumption_date = table.invoice_date
+        else:
+            consumption_date = table.end_period_date
+
         line_ids = [l.id for l in lines]
         values = dict.fromkeys(line_ids, None)
         cursor.execute(*table.select(table.contract_line,
-                Max(table.end_period_date),
+                Max(consumption_date),
                 where=reduce_ids(table.contract_line, line_ids),
                 group_by=table.contract_line))
         values.update(dict(cursor.fetchall()))
@@ -695,6 +701,8 @@ class ContractConsumption(ModelSQL, ModelView):
                     'property.'),
                 'delete_invoiced_consumption': ('Consumption "%s" can not be'
                     ' deleted because it is already invoiced.'),
+                'no_payment_term_found': ('No payment term could be found for '
+                    'contract invoice of customer "%(customer)s".'),
                 'missing_journal': ('Please, configure a journal before '
                     'creating contract invoices.'),
                 })
@@ -851,16 +859,25 @@ class ContractConsumption(ModelSQL, ModelView):
         pool = Pool()
         Invoice = pool.get('account.invoice')
         Config = pool.get('contract.configuration')
-        journal = Config(1).journal
+
+        config = Config(1)
+        journal = config.journal
         if not journal:
             cls.raise_user_error('missing_journal')
+
         values = dict(keys)
         values['invoice_address'] = values['party'].address_get('invoice')
         invoice = Invoice(**values)
         invoice.on_change_party()
         invoice.journal = journal
         if not invoice.payment_term:
-            invoice.payment_term = Config(1).payment_term
+            default_payment_term = config.payment_term
+            if default_payment_term:
+                invoice.payment_term = default_payment_term
+            else:
+                cls.raise_user_error('no_payment_term_found', {
+                        'customer': invoice.party.rec_name,
+                        })
         if values.get('contract'):
             contract = values['contract']
             invoice.description = contract.reference
