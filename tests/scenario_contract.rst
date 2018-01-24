@@ -13,7 +13,7 @@ Imports::
     >>> from trytond.modules.account.tests.tools import create_fiscalyear, \
     ...     create_chart, get_accounts, create_tax
     >>> from trytond.modules.account_invoice.tests.tools import \
-    ...     set_fiscalyear_invoice_sequences
+    ...     set_fiscalyear_invoice_sequences, create_payment_term
     >>> today = datetime.date(2015, 1, 1)
 
 Install contract::
@@ -41,6 +41,11 @@ Create tax::
     >>> tax = create_tax(Decimal('.10'))
     >>> tax.save()
 
+Create payment term::
+
+    >>> payment_term = create_payment_term()
+    >>> payment_term.save()
+
 Create party::
 
     >>> Party = Model.get('party.party')
@@ -54,6 +59,7 @@ Configure contract::
 
     >>> contract_config = ContractConfig(1)
     >>> contract_config.journal, = Journal.find([('type', '=', 'revenue')])
+    >>> contract_config.payment_term = payment_term
     >>> contract_config.save()
 
 Create product::
@@ -172,11 +178,11 @@ Check consumptions dates::
     ...     ('service1',
     ...         '2015-02-01', '2015-02-28',
     ...         '2015-02-01', '2015-02-28',
-    ...         '2015-03-31'),  # XXX
+    ...         '2015-02-01'),  # XXX
     ...     ('service2',
     ...         '2015-02-01', '2015-02-28',
     ...         '2015-02-01', '2015-02-15',
-    ...         '2015-03-31'),  # XXX
+    ...         '2015-02-01'),  # XXX
     ...     ('service3',
     ...         '2015-02-01', '2015-02-28',
     ...         '2015-02-15', '2015-02-28',
@@ -188,15 +194,15 @@ Check consumptions dates::
     ...     ('service1',
     ...         '2015-03-01', '2015-03-31',
     ...         '2015-03-01', '2015-03-01',
-    ...         '2015-03-28'),  # XXX
+    ...         '2015-03-01'),  # XXX
     ...     ('service4',
     ...         '2015-03-01', '2015-03-31',
     ...         '2015-03-01', '2015-03-31',
-    ...         '2015-03-28'),  # XXX
+    ...         '2015-03-01'),  # XXX
     ...     ('service4',
     ...         '2015-04-01', '2015-04-30',
     ...         '2015-04-01', '2015-04-30',
-    ...         '2015-04-28'),
+    ...         '2015-04-01'),
     ...     ]
     True
 
@@ -228,13 +234,14 @@ Check invoice lines amount::
     >>> [(l.origin.contract_line.service.name,
     ...         str(l.invoice.invoice_date), l.amount)
     ...     for l in lines] == \
-    ... [('service1', '2015-01-01', Decimal('100.00')),
-    ...     ('service2', '2015-01-01', Decimal('200.00')),
-    ...     ('service3', '2015-02-01', Decimal('150.00')),
-    ...     ('service4', '2015-02-01', Decimal('200.00')),
-    ...     ('service4', '2015-03-28', Decimal('400.00')),
-    ...     ('service1', '2015-03-28', Decimal('3.23')),
-    ...     ('service1', '2015-03-31', Decimal('100.00')),
-    ...     ('service2', '2015-03-31', Decimal('107.14')),
+    ... [(u'service1', '2015-01-01', Decimal('100.00')),
+    ...     (u'service2', '2015-01-01', Decimal('200.00')),
+    ...     (u'service1', '2015-02-01', Decimal('100.00')),
+    ...     (u'service2', '2015-02-01', Decimal('107.14')),
+    ...     (u'service3', '2015-02-01', Decimal('150.00')),
+    ...     (u'service4', '2015-02-01', Decimal('200.00')),
+    ...     (u'service4', '2015-03-01', Decimal('400.00')),
+    ...     (u'service1', '2015-03-01', Decimal('3.23')),
+    ...     (u'service4', '2015-04-01', Decimal('400.00')),
     ...     ]
     True
