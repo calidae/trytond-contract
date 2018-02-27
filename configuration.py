@@ -112,8 +112,8 @@ class ConfigurationAccount(ModelSQL, CompanyValueMixin):
 
     @classmethod
     def _migrate_property(cls, field_names, value_names, fields):
-        field_names.extend(['journal', 'payment_term'])
-        value_names.append(['journal', 'payment_term'])
+        field_names += ['journal', 'payment_term']
+        value_names += ['journal', 'payment_term']
         fields.append('company')
         migrate_property(
             'contract.configuration', field_names, cls, value_names,
