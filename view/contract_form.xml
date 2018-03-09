@@ -34,10 +34,10 @@
             <label name="state"/>
             <field name="state"/>
             <group id="buttons" colspan="2">
-                <button name="cancel" string="Cancel" confirm="Cancelled contracts no longer create consumptions. Are you sure you want to cancel this contract?"/>
-                <button name="draft" string="Draft"/>
-                <button name="confirm" string="Confirm"/>
-                <button name="finish" string="Finish"/>
+                <button name="cancel"/>
+                <button name="draft"/>
+                <button name="confirm"/>
+                <button name="finish"/>
             </group>
         </page>
     </notebook>

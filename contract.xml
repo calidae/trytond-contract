@@ -85,6 +85,32 @@
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="True"/>
         </record>
+
+        <record model="ir.model.button" id="contract_draft_button">
+            <field name="name">draft</field>
+            <field name="string">Draft</field>
+            <field name="model" search="[('model', '=', 'contract')]"/>
+        </record>
+
+        <record model="ir.model.button" id="contract_confirm_button">
+            <field name="name">confirm</field>
+            <field name="string">Confirm</field>
+            <field name="model" search="[('model', '=', 'contract')]"/>
+        </record>
+
+        <record model="ir.model.button" id="contract_finish_button">
+            <field name="name">finish</field>
+            <field name="string">Finish</field>
+            <field name="model" search="[('model', '=', 'contract')]"/>
+        </record>
+
+        <record model="ir.model.button" id="contract_cancel_button">
+            <field name="name">cancel</field>
+            <field name="string">Cancel</field>
+            <field name="confirm">Cancelled contracts no longer create consumptions. Are you sure you want to cancel this contract?</field>
+            <field name="model" search="[('model', '=', 'contract')]"/>
+        </record>
+
         <record model="ir.ui.view" id="contract_consumption_view_form">
             <field name="model">contract.consumption</field>
             <field name="type">form</field>
@@ -172,6 +198,13 @@
             <field name="perm_create" eval="True"/>
             <field name="perm_delete" eval="True"/>
         </record>
+
+        <record model="ir.model.button" id="contract_consumption_invoice_button">
+            <field name="name">invoice</field>
+            <field name="string">Invoice</field>
+            <field name="model" search="[('model', '=', 'contract.consumption')]"/>
+        </record>
+
         <record model="ir.ui.view" id="contract_line_view_list_sequence">
             <field name="model">contract.line</field>
             <field name="type">tree</field>

@@ -11,7 +11,7 @@
     <field name="interval"/>
     <field name="freq"/>
     <field name="state"/>
-    <button name="draft" string="Draft" tree_invisible="1"/>
-    <button name="confirm" string="Confirm" tree_invisible="1"/>
-    <button name="cancel" string="Cancel" tree_invisible="1" confirm="Cancelled contracts no longer create consumptions. Are you sure you want to cancel this contract?"/>
+    <button name="draft" tree_invisible="1"/>
+    <button name="confirm" tree_invisible="1"/>
+    <button name="cancel" tree_invisible="1"/>
 </tree>
