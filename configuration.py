@@ -52,7 +52,7 @@ class ConfigurationSequence(ModelSQL, CompanyValueMixin):
     __name__ = 'contract.configuration.sequence'
 
     contract_sequence = fields.Many2One(
-        'ir.sequence', "Contract Reference Sequence", required=True,
+        'ir.sequence', "Contract Reference Sequence",
         domain=[
             ('company', 'in', [Eval('company', -1), None]),
             ('code', '=', 'contract'),
@@ -93,7 +93,7 @@ class ConfigurationAccount(ModelSQL, CompanyValueMixin):
     __name__ = 'contract.configuration.account'
 
     journal = fields.Many2One(
-        'account.journal', "Journal", required=True,
+        'account.journal', "Journal",
         domain=[
             ('type', '=', 'revenue'),
             ])
