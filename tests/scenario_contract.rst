@@ -231,10 +231,10 @@ Check invoice lines amount::
 
     >>> InvoiceLine = Model.get('account.invoice.line')
     >>> lines = InvoiceLine.find([])
-    >>> [(l.origin.contract_line.service.name,
+    >>> sorted([(l.origin.contract_line.service.name,
     ...         str(l.invoice.invoice_date), l.amount)
-    ...     for l in lines] == \
-    ... [(u'service1', '2015-01-01', Decimal('100.00')),
+    ...     for l in lines]) == \
+    ... sorted([(u'service1', '2015-01-01', Decimal('100.00')),
     ...     (u'service2', '2015-01-01', Decimal('200.00')),
     ...     (u'service1', '2015-02-01', Decimal('100.00')),
     ...     (u'service2', '2015-02-01', Decimal('107.14')),
@@ -243,5 +243,5 @@ Check invoice lines amount::
     ...     (u'service4', '2015-03-01', Decimal('400.00')),
     ...     (u'service1', '2015-03-01', Decimal('3.23')),
     ...     (u'service4', '2015-04-01', Decimal('400.00')),
-    ...     ]
+    ...     ])
     True
