@@ -271,8 +271,9 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                         group_by=line.contract))
                 for contract, value in cursor.fetchall():
                     # SQlite returns unicode for dates
-                    if isinstance(value, unicode):
-                        value = datetime.date(*map(int, value.split('-')))
+                    if isinstance(value, str):
+                        value = datetime.date(*[int(x) for x in
+                                value.split('-')])
                     result[name][contract] = value
         return result
 
@@ -582,7 +583,7 @@ class ContractLine(sequence_ordered(), ModelSQL, ModelView):
         if backend.name() == 'sqlite':
             for id, value in values.items():
                 if value is not None:
-                    values[id] = datetime.date(*map(int, value.split('-', 2)))
+                    values[id] = datetime.date(*[int(x) for x in value.split('-', 2)])
         return values
 
     @classmethod
@@ -900,8 +901,7 @@ class ContractConsumption(ModelSQL, ModelView):
 
         if not lines:
             return []
-        lines = lines.items()
-        lines = sorted(lines, key=cls._group_invoice_key)
+        lines = sorted(lines.items(), key=cls._group_invoice_key)
 
         invoices = []
         for key, grouped_lines in groupby(lines, key=cls._group_invoice_key):

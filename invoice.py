@@ -10,9 +10,8 @@ __all__ = ['InvoiceLine', 'CreateInvoicesStart', 'CreateInvoices',
     'CreditInvoiceStart', 'CreditInvoice']
 
 
-class InvoiceLine:
+class InvoiceLine(metaclass=PoolMeta):
     __name__ = 'account.invoice.line'
-    __metaclass__ = PoolMeta
 
     @classmethod
     def _get_origin(cls):
@@ -56,9 +55,8 @@ class CreateInvoices(Wizard):
         return action, data
 
 
-class CreditInvoiceStart:
+class CreditInvoiceStart(metaclass=PoolMeta):
     __name__ = 'account.invoice.credit.start'
-    __metaclass__ = PoolMeta
     from_contract = fields.Boolean('From Contract', readonly=True)
     reinvoice_contract = fields.Boolean('Reinvoice Contract',
         states={
@@ -77,9 +75,8 @@ class CreditInvoiceStart:
             ]
 
 
-class CreditInvoice:
+class CreditInvoice(metaclass=PoolMeta):
     __name__ = 'account.invoice.credit'
-    __metaclass__ = PoolMeta
 
     def default_start(self, fields):
         pool = Pool()
