@@ -846,8 +846,7 @@ class ContractConsumption(ModelSQL, ModelView):
 
         line is a tuple of consumption id and invoice line
         '''
-        consumption_id, invoice_line = line
-        consumption = cls(consumption_id)
+        consumption, invoice_line = line
         grouping = [
             ('party', invoice_line.party),
             ('company', invoice_line.company),
@@ -895,7 +894,7 @@ class ContractConsumption(ModelSQL, ModelView):
         for consumption in consumptions:
             line = consumption.get_invoice_line()
             if line:
-                lines[consumption.id] = line
+                lines[consumption] = line
 
         if not lines:
             return []
