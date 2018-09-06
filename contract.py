@@ -248,6 +248,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
 
     @fields.depends('party')
     def on_change_party(self):
+        self.payment_term = None
         if self.party:
             self.payment_term = self.party.customer_payment_term
 
