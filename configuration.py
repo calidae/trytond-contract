@@ -27,17 +27,13 @@ class Configuration(
             domain=[
                 ('type', '=', 'revenue'),
                 ]))
-    payment_term = fields.MultiValue(fields.Many2One(
-            'account.invoice.payment_term', 'Payment Term',
-            help='The payment term to be used when there is none set on the '
-            'party.'))
 
     @classmethod
     def multivalue_model(cls, field):
         pool = Pool()
         if field == 'contract_sequence':
             return pool.get('contract.configuration.sequence')
-        elif field in {'journal', 'payment_term'}:
+        elif field == 'journal':
             return pool.get('contract.configuration.account')
         return super(Configuration, cls).multivalue_model(field)
 
@@ -97,8 +93,6 @@ class ConfigurationAccount(ModelSQL, CompanyValueMixin):
         domain=[
             ('type', '=', 'revenue'),
             ])
-    payment_term = fields.Many2One(
-        'account.invoice.payment_term', "Payment Term")
 
     @classmethod
     def __register__(cls, module_name):
@@ -112,8 +106,8 @@ class ConfigurationAccount(ModelSQL, CompanyValueMixin):
 
     @classmethod
     def _migrate_property(cls, field_names, value_names, fields):
-        field_names += ['journal', 'payment_term']
-        value_names += ['journal', 'payment_term']
+        field_names += ['journal']
+        value_names += ['journal']
         fields.append('company')
         migrate_property(
             'contract.configuration', field_names, cls, value_names,

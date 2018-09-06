@@ -128,6 +128,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         depends=['state'])
     state = fields.Selection(CONTRACT_STATES, 'State',
         required=True, readonly=True)
+    payment_term = fields.Many2One('account.invoice.payment_term',
+        'Payment Term')
 
     @classmethod
     def __setup__(cls):
@@ -243,6 +245,11 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     @staticmethod
     def default_state():
         return 'draft'
+
+    @fields.depends('party')
+    def on_change_party(self):
+        if self.party:
+            self.payment_term = self.party.customer_payment_term
 
     @fields.depends('currency')
     def on_change_with_currency_digits(self, name=None):
@@ -701,8 +708,6 @@ class ContractConsumption(ModelSQL, ModelView):
                     'property.'),
                 'delete_invoiced_consumption': ('Consumption "%s" can not be'
                     ' deleted because it is already invoiced.'),
-                'no_payment_term_found': ('No payment term could be found for '
-                    'contract invoice of customer "%(customer)s".'),
                 'missing_journal': ('Please, configure a journal before '
                     'creating contract invoices.'),
                 })
@@ -849,6 +854,7 @@ class ContractConsumption(ModelSQL, ModelView):
             ('currency', invoice_line.currency),
             ('type', invoice_line.invoice_type),
             ('invoice_date', consumption.invoice_date),
+            ('payment_term', consumption.contract.payment_term),
             ]
         if invoice_line.party.contract_grouping_method is None:
             grouping.append(('contract', consumption.contract_line.contract))
@@ -870,14 +876,7 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice = Invoice(**values)
         invoice.on_change_party()
         invoice.journal = journal
-        if not invoice.payment_term:
-            default_payment_term = config.payment_term
-            if default_payment_term:
-                invoice.payment_term = default_payment_term
-            else:
-                cls.raise_user_error('no_payment_term_found', {
-                        'customer': invoice.party.rec_name,
-                        })
+        invoice.payment_term = values['payment_term']
         if values.get('contract'):
             contract = values['contract']
             invoice.description = contract.reference

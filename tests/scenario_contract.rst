@@ -50,6 +50,7 @@ Create party::
 
     >>> Party = Model.get('party.party')
     >>> customer = Party(name='Customer')
+    >>> customer.customer_payment_term = payment_term
     >>> customer.save()
 
 Configure contract::
@@ -59,7 +60,6 @@ Configure contract::
 
     >>> contract_config = ContractConfig(1)
     >>> contract_config.journal, = Journal.find([('type', '=', 'revenue')])
-    >>> contract_config.payment_term = payment_term
     >>> contract_config.save()
 
 Create product::
@@ -98,6 +98,8 @@ Create Monthly Contract::
     >>> Contract = Model.get('contract')
     >>> contract = Contract()
     >>> contract.party = customer
+    >>> contract.payment_term == payment_term
+    True
     >>> contract.freq = 'monthly'
     >>> contract.interval = 1
     >>> contract.start_period_date = datetime.date(2015, 1, 1)

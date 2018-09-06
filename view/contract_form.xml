@@ -12,6 +12,8 @@
     <field name="company"/>
     <label name="currency"/>
     <field name="currency"/>
+    <label name="payment_term"/>
+    <field name="payment_term"/>
     <newline/>
     <label name="start_period_date"/>
     <field name="start_period_date"/>

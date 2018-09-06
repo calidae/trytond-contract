@@ -6,6 +6,4 @@
     <field name="contract_sequence"/>
     <label name="journal"/>
     <field name="journal"/>
-    <label name="payment_term"/>
-    <field name="payment_term"/>
 </form>
