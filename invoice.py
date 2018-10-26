@@ -70,7 +70,6 @@ class CreditInvoiceStart(metaclass=PoolMeta):
     def view_attributes(cls):
         states = {'invisible': ~Bool(Eval('from_contract'))}
         return [
-            ('/form//image[@name="tryton-dialog-warning"]', 'states', states),
             ('/form//label[@id="credit_contract"]', 'states', states),
             ]
 
