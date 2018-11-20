@@ -332,11 +332,11 @@
         </record>
 
         <!-- Menus -->
-        <record model="ir.ui.icon" id="contract_icon">
-            <field name="name">tryton-contract</field>
-            <field name="path">icons/tryton-contract.svg</field>
+        <record model="ir.ui.icon" id="repeat_icon">
+            <field name="name">tryton-repeat</field>
+            <field name="path">icons/tryton-repeat.svg</field>
         </record>
-        <menuitem id="menu_contract" name="Contracts" icon="tryton-contract"/>
+        <menuitem id="menu_contract" name="Contracts" icon="tryton-repeat"/>
 
         <record model="ir.ui.menu-res.group" id="menu_contract_group_contract">
             <field name="menu" ref="menu_contract"/>
