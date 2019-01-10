@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!-- This file is part of Tryton.  The COPYRIGHT file at the top level of
+this repository contains the full copyright notices and license terms. -->
+<tryton>
+    <data group="1">
+      <record model="ir.message" id="line_start_date_required">
+          <field name="text">Start Date is required in line "%(line)s" of contract "%(contract)s".</field>
+      </record>
+      <record model="ir.message" id="cannot_finish">
+          <field name="text">Contract "%(contract)s" can not be finished because line "%(line)s" has no end date.</field>
+      </record>
+      <record model="ir.message" id="cannot_draft">
+          <field name="text">Contract "%s" can not be moved to draft because it has consumptions.</field>
+      </record>
+      <record model="ir.message" id="cannot_delete">
+          <field name="text">Contract Line "%(line)s" cannot be removed because contract "%(contract)s" is not in draft state.</field>
+      </record>
+      <record model="ir.message" id="missing_account_revenue">
+          <field name="text">Product "%(product)s" of contract line %(contract_line)s misses a revenue account.</field>
+      </record>
+      <record model="ir.message" id="missing_account_revenue_property">
+          <field name="text">Contract Line "%(contract_line)s" misses an "account revenue" default property.</field>
+      </record>
+      <record model="ir.message" id="delete_invoiced_consumption">
+          <field name="text">Consumption "%(consumption)s" can not be  deleted because it is already invoiced.</field>
+      </record>
+      <record model="ir.message" id="missing_journal">
+          <field name="text">Please, configure a journal before creating contract invoices.</field>
+      </record>
+    </data>
+</tryton>

@@ -18,6 +18,8 @@ from trytond.transaction import Transaction
 from trytond.tools import reduce_ids, grouped_slice
 from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.modules.product import price_digits
+from trytond.i18n import gettext
+from trytond.exceptions import UserError
 
 __all__ = ['ContractService', 'Contract', 'ContractLine',
     'ContractConsumption', 'CreateConsumptionsStart', 'CreateConsumptions']
@@ -166,14 +168,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                     'invisible': ~Eval('state').in_(['draft', 'confirmed']),
                     'icon': 'tryton-cancel',
                     },
-                })
-        cls._error_messages.update({
-                'line_start_date_required': ('Start Date is required in line '
-                    '"%(line)s" of contract "%(contract)s".'),
-                'cannot_finish': ('Contract "%(contract)s" can not be '
-                    'finished because line "%(line)s" has no end date.'),
-                'cannot_draft': ('Contract "%s" can not be moved to '
-                    'draft because it has consumptions.'),
                 })
 
     @classmethod
@@ -340,8 +334,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
                 ('contract', 'in', [x.id for x in contracts]),
                 ])
         if consumptions:
-            cls.raise_user_error('cannot_draft',
-                consumptions[0].contract.rec_name)
+            raise UserError(gettext('contract.cannot_draft',
+                contract=consumptions[0].contract.rec_name))
 
     @classmethod
     @ModelView.button
@@ -351,10 +345,9 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         for contract in contracts:
             for line in contract.lines:
                 if not line.start_date:
-                    cls.raise_user_error('line_start_date_required', {
-                            'line': line.rec_name,
-                            'contract': line.contract.rec_name,
-                            })
+                    raise UserError(gettext('contract.line_start_date_required',
+                            line=line.rec_name,
+                            contract=line.contract.rec_name))
 
     @classmethod
     @ModelView.button
@@ -369,10 +362,9 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         for contract in contracts:
             for line in contract.lines:
                 if not line.end_date:
-                    cls.raise_user_error('cannot_finish', {
-                            'line': line.rec_name,
-                            'contract': line.contract.rec_name,
-                            })
+                    raise UserError(gettext('contract.cannot_finish',
+                            line=line.rec_name,
+                            contract=line.contract.rec_name))
 
     def rrule_values(self):
         values = super(Contract, self).rrule_values()
@@ -524,10 +516,6 @@ class ContractLine(sequence_ordered(), ModelSQL, ModelView):
     def __setup__(cls):
         super(ContractLine, cls).__setup__()
         cls._order.insert(0, ('contract', 'ASC'))
-        cls._error_messages.update({
-                'cannot_delete': ('Contract Line "%(line)s" cannot be removed '
-                    'because contract "%(contract)s" is not in draft state.')
-                })
 
     @classmethod
     def __register__(cls, module_name):
@@ -645,10 +633,9 @@ class ContractLine(sequence_ordered(), ModelSQL, ModelView):
     def delete(cls, lines):
         for line in lines:
             if line.contract_state != 'draft':
-                cls.raise_user_error('cannot_delete', {
-                        'line': line.rec_name,
-                        'contract': line.contract.rec_name,
-                        })
+                raise UserError(gettext('contract.cannot_delete',
+                        line=line.rec_name,
+                        contract=line.contract.rec_name))
         super(ContractLine, cls).delete(lines)
 
     @classmethod
@@ -701,18 +688,6 @@ class ContractConsumption(ModelSQL, ModelView):
     @classmethod
     def __setup__(cls):
         super(ContractConsumption, cls).__setup__()
-        cls._error_messages.update({
-                'missing_account_revenue': ('Product "%(product)s" of '
-                    'contract line %(contract_line)s misses a revenue '
-                    'account.'),
-                'missing_account_revenue_property': ('Contract Line '
-                    '"%(contract_line)s" misses an "account revenue" default '
-                    'property.'),
-                'delete_invoiced_consumption': ('Consumption "%s" can not be'
-                    ' deleted because it is already invoiced.'),
-                'missing_journal': ('Please, configure a journal before '
-                    'creating contract invoices.'),
-                })
         cls._buttons.update({
                 'invoice': {
                     'icon': 'tryton-go-next',
@@ -808,10 +783,10 @@ class ContractConsumption(ModelSQL, ModelView):
                     taxes.extend(tax_ids)
             invoice_line.account = invoice_line.product.account_revenue_used
             if not invoice_line.account:
-                self.raise_user_error('missing_account_revenue', {
-                        'contract_line': self.contract_line.rec_name,
-                        'product': invoice_line.product.rec_name,
-                        })
+                raise UserError(gettext(
+                    'contract.missing_account_revenue',
+                        contract_line=self.contract_line.rec_name,
+                        product=invoice_line.product.rec_name))
         else:
             invoice_line.unit = None
             for name in ['default_product_account_revenue',
@@ -820,9 +795,10 @@ class ContractConsumption(ModelSQL, ModelView):
                 if invoice_line.account:
                     break
             if not invoice_line.account:
-                self.raise_user_error('missing_account_revenue_property', {
-                        'contract_line': self.contract_line.rec_name,
-                        })
+                raise UserError(gettext(
+                    'contract.missing_account_revenue_property',
+                        contract_line=self.contract_line.rec_name))
+
         invoice_line.taxes = taxes
         invoice_line.invoice_type = 'out'
         return invoice_line
@@ -870,7 +846,7 @@ class ContractConsumption(ModelSQL, ModelView):
         config = Config(1)
         journal = config.journal
         if not journal:
-            cls.raise_user_error('missing_journal')
+            raise UserError(gettext('contract.missing_journal'))
 
         values = dict(keys)
         values['invoice_address'] = values['party'].address_get('invoice')
@@ -922,8 +898,9 @@ class ContractConsumption(ModelSQL, ModelView):
                 ], limit=1)
         if lines:
             line, = lines
-            cls.raise_user_error('delete_invoiced_consumption',
-                line.origin.rec_name)
+            raise UserError(gettext(
+                'contract.delete_invoiced_consumption',
+                consumption=line.origin.rec_name))
         super(ContractConsumption, cls).delete(consumptions)
 
     @classmethod
