@@ -5,7 +5,7 @@ from trytond.model import ModelSQL, ValueMixin, fields
 from trytond.pool import PoolMeta, Pool
 from trytond.tools.multivalue import migrate_property
 
-__all__ = ['Party', 'PartyContractGroupingMethod']
+__all__ = ['Party', 'PartyContractGroupingMethod', 'PartyReplace', 'PartyErase']
 
 
 class Party:
@@ -55,3 +55,44 @@ class PartyContractGroupingMethod(ModelSQL, ValueMixin):
         Party = pool.get('party.party')
         field_name = 'contract_grouping_method'
         return Party.fields_get([field_name])[field_name]['selection']
+
+
+class PartyReplace:
+    __metaclass__ = PoolMeta
+    __name__ = 'party.replace'
+
+    @classmethod
+    def fields_to_replace(cls):
+        return super(PartyReplace, cls).fields_to_replace() + [
+            ('contract', 'party'),
+            ]
+
+
+class PartyErase:
+    __metaclass__ = PoolMeta
+    __name__ = 'party.erase'
+
+    @classmethod
+    def __setup__(cls):
+        super(PartyErase, cls).__setup__()
+        cls._error_messages.update({
+                'pending_contract': (
+                    'The party "%(party)s" can not be erased '
+                    'because he has pending contracts '
+                    'for the company "%(company)s".'),
+                })
+
+    def check_erase_company(self, party, company):
+        pool = Pool()
+        Contract = pool.get('contract')
+        super(PartyErase, self).check_erase_company(party, company)
+
+        contracts = Contract.search([
+                ('party', '=', party.id),
+                ('state', 'not in', ['finished', 'cancelled']),
+                ])
+        if contracts:
+            self.raise_user_error('pending_contract', {
+                    'party': party.rec_name,
+                    'company': company.rec_name,
+                    })

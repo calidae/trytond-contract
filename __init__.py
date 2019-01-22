@@ -27,4 +27,6 @@ def register():
         contract.CreateConsumptions,
         invoice.CreateInvoices,
         invoice.CreditInvoice,
+        party.PartyReplace,
+        party.PartyErase,
         module='contract', type_='wizard')
