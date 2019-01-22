@@ -4,8 +4,10 @@ from trytond import backend
 from trytond.model import ModelSQL, ValueMixin, fields
 from trytond.pool import PoolMeta, Pool
 from trytond.tools.multivalue import migrate_property
+from trytond.i18n import gettext
+from trytond.exceptions import UserError
 
-__all__ = ['Party', 'PartyContractGroupingMethod']
+__all__ = ['Party', 'PartyContractGroupingMethod', 'PartyReplace', 'PartyErase']
 
 
 class Party(metaclass=PoolMeta):
@@ -54,3 +56,31 @@ class PartyContractGroupingMethod(ModelSQL, ValueMixin):
         Party = pool.get('party.party')
         field_name = 'contract_grouping_method'
         return Party.fields_get([field_name])[field_name]['selection']
+
+
+class PartyReplace(metaclass=PoolMeta):
+    __name__ = 'party.replace'
+
+    @classmethod
+    def fields_to_replace(cls):
+        return super(PartyReplace, cls).fields_to_replace() + [
+            ('contract', 'party'),
+            ]
+
+
+class PartyErase(metaclass=PoolMeta):
+    __name__ = 'party.erase'
+
+    def check_erase_company(self, party, company):
+        pool = Pool()
+        Contract = pool.get('contract')
+        super(PartyErase, self).check_erase_company(party, company)
+
+        contracts = Contract.search([
+                ('party', '=', party.id),
+                ('state', 'not in', ['finished', 'cancelled']),
+                ])
+        if contracts:
+            raise UserError(gettext('contract.pending_contract',
+                party=party.rec_name,
+                company=company.rec_name))

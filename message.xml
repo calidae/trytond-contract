@@ -27,5 +27,8 @@ this repository contains the full copyright notices and license terms. -->
       <record model="ir.message" id="missing_journal">
           <field name="text">Please, configure a journal before creating contract invoices.</field>
       </record>
+      <record model="ir.message" id="pending_contract">
+          <field name="text">The party "%(party)s" can not be erased because he has pending contracts for the company "%(company)s".</field>
+      </record>
     </data>
 </tryton>
