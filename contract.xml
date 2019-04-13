@@ -10,19 +10,11 @@
             <field name="user" ref="res.user_admin"/>
             <field name="group" ref="group_contract_admin"/>
         </record>
-        <record model="res.user-res.group" id="user_trigger_group_contract_admin">
-            <field name="user" ref="res.user_trigger"/>
-            <field name="group" ref="group_contract_admin"/>
-        </record>
         <record model="res.group" id="group_contract">
             <field name="name">Contracts</field>
         </record>
         <record model="res.user-res.group" id="user_admin_group_contract">
             <field name="user" ref="res.user_admin"/>
-            <field name="group" ref="group_contract"/>
-        </record>
-        <record model="res.user-res.group" id="user_trigger_group_contract">
-            <field name="user" ref="res.user_trigger"/>
             <field name="group" ref="group_contract"/>
         </record>
         <record model="ir.ui.view" id="contract_view_form">
