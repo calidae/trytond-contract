@@ -855,6 +855,7 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice.on_change_party()
         invoice.journal = journal
         invoice.payment_term = values['payment_term']
+        invoice.account = invoice.on_change_with_account()
         if values.get('contract'):
             contract = values['contract']
             invoice.description = contract.reference
