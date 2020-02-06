@@ -2,72 +2,6 @@
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
-msgctxt "error:contract.consumption:"
-msgid "Consumption \"%s\" can not be deleted because it is already invoiced."
-msgstr "No se puede eliminar el consumo \"%s\" porqué ya esta facturado."
-
-msgctxt "error:contract.consumption:"
-msgid ""
-"Contract Line \"%(contract_line)s\" misses an \"account revenue\" default "
-"property."
-msgstr ""
-"Falta la propiedad por defecto \"cuenta de ingresos\" para la línia de "
-"contrato \"%(contract_line)s\"."
-
-msgctxt "error:contract.consumption:"
-msgid ""
-"No payment term could be found for contract invoice of customer "
-"\"%(customer)s\"."
-msgstr ""
-"No se ha encontrado ningún plazo de pago para la factura de contrato del "
-"cliente \"%(customer)s\"."
-
-msgctxt "error:contract.consumption:"
-msgid "Please, configure a journal before creating contract invoices."
-msgstr "Por favor, configura el diario antes de crear facturas."
-
-msgctxt "error:contract.consumption:"
-msgid ""
-"Product \"%(product)s\" of contract line %(contract_line)s misses a revenue "
-"account."
-msgstr ""
-"Falta la cuenta de ingresos par el producto \"%(product)s\" de la linea de "
-"contracto \"%(contract_line)s\"."
-
-msgctxt "error:contract.line:"
-msgid ""
-"Contract Line \"%(line)s\" cannot be removed because contract "
-"\"%(contract)s\" is not in draft state."
-msgstr ""
-"La línea de contrato \"%(line)s\" no se puede eliminar porqué el contrato "
-"\"%(contract)s\" no está en estado borrador."
-
-msgctxt "error:contract:"
-msgid ""
-"Contract \"%(contract)s\" can not be finished because line \"%(line)s\" has "
-"no end date."
-msgstr ""
-"El contrato \"%(contract)s\" no se puede finalizar porque la línea "
-"\"%(line)s\" no tiene fecha final."
-
-msgctxt "error:contract:"
-msgid "Contract \"%s\" can not be moved to draft because it has consumptions."
-msgstr "El contrato \"%s\" no se puede pasar a borrador porqué tiene consumos."
-
-msgctxt "error:contract:"
-msgid "Start Date is required in line \"%(line)s\" of contract \"%(contract)s\"."
-msgstr ""
-"La fecha de inicio es obligatoria en la línea \"%(line)s\" del contrato "
-"\"%(contract)s\"."
-
-msgctxt "error:party.erase:"
-msgid ""
-"The party \"%(party)s\" can not be erased because he has pending contracts for "
-"the company \"%(company)s\"."
-msgstr ""
-"No se puede eliminar el tercero \"%(party)s\" porqué tiene contractos pendientes"
-" para la empresa \"%(company)s\"."
-
 msgctxt "field:account.invoice.credit.start,from_contract:"
 msgid "From Contract"
 msgstr "Proveniente de contrato"
@@ -91,6 +25,10 @@ msgstr "Usuario de creación"
 msgctxt "field:contract,currency:"
 msgid "Currency"
 msgstr "Moneda"
+
+msgctxt "field:contract,currency_digits:"
+msgid "Currency Digits"
+msgstr "Decimales de la moneda"
 
 msgctxt "field:contract,end_date:"
 msgid "End Date"
@@ -124,8 +62,12 @@ msgctxt "field:contract,party:"
 msgid "Party"
 msgstr "Tercero"
 
+msgctxt "field:contract,payment_term:"
+msgid "Payment Term"
+msgstr "Plazo de pago"
+
 msgctxt "field:contract,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Nombre"
 
 msgctxt "field:contract,reference:"
@@ -172,12 +114,8 @@ msgctxt "field:contract.configuration,journal:"
 msgid "Journal"
 msgstr "Diario"
 
-msgctxt "field:contract.configuration,payment_term:"
-msgid "Payment Term"
-msgstr "Plazo de pago"
-
 msgctxt "field:contract.configuration,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Nombre"
 
 msgctxt "field:contract.configuration,write_date:"
@@ -185,6 +123,70 @@ msgid "Write Date"
 msgstr "Fecha de modificación"
 
 msgctxt "field:contract.configuration,write_uid:"
+msgid "Write User"
+msgstr "Usuario de modificación"
+
+msgctxt "field:contract.configuration.account,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:contract.configuration.account,create_date:"
+msgid "Create Date"
+msgstr "Fecha de creación"
+
+msgctxt "field:contract.configuration.account,create_uid:"
+msgid "Create User"
+msgstr "Usuario de creación"
+
+msgctxt "field:contract.configuration.account,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:contract.configuration.account,journal:"
+msgid "Journal"
+msgstr "Diario"
+
+msgctxt "field:contract.configuration.account,rec_name:"
+msgid "Record Name"
+msgstr "Nombre registro"
+
+msgctxt "field:contract.configuration.account,write_date:"
+msgid "Write Date"
+msgstr "Fecha de modificación"
+
+msgctxt "field:contract.configuration.account,write_uid:"
+msgid "Write User"
+msgstr "Usuario de modificación"
+
+msgctxt "field:contract.configuration.sequence,company:"
+msgid "Company"
+msgstr "Empresa"
+
+msgctxt "field:contract.configuration.sequence,contract_sequence:"
+msgid "Contract Reference Sequence"
+msgstr "Sequencia de la referencia de contrato"
+
+msgctxt "field:contract.configuration.sequence,create_date:"
+msgid "Create Date"
+msgstr "Fecha de creación"
+
+msgctxt "field:contract.configuration.sequence,create_uid:"
+msgid "Create User"
+msgstr "Usuario de creación"
+
+msgctxt "field:contract.configuration.sequence,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:contract.configuration.sequence,rec_name:"
+msgid "Record Name"
+msgstr "Nombre registro"
+
+msgctxt "field:contract.configuration.sequence,write_date:"
+msgid "Write Date"
+msgstr "Fecha de modificación"
+
+msgctxt "field:contract.configuration.sequence,write_uid:"
 msgid "Write User"
 msgstr "Usuario de modificación"
 
@@ -233,7 +235,7 @@ msgid "Invoice Lines"
 msgstr "Líneas de factura"
 
 msgctxt "field:contract.consumption,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Nombre"
 
 msgctxt "field:contract.consumption,start_date:"
@@ -305,7 +307,7 @@ msgid "Last Invoice Date"
 msgstr "Fecha última factura"
 
 msgctxt "field:contract.line,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Nombre"
 
 msgctxt "field:contract.line,sequence:"
@@ -353,7 +355,7 @@ msgid "Product"
 msgstr "Producto"
 
 msgctxt "field:contract.service,rec_name:"
-msgid "Name"
+msgid "Record Name"
 msgstr "Nombre"
 
 msgctxt "field:contract.service,write_date:"
@@ -368,16 +370,43 @@ msgctxt "field:party.party,contract_grouping_method:"
 msgid "Contract Grouping Method"
 msgstr "Método agrupación contratos"
 
+msgctxt "field:party.party.contract_grouping_method,contract_grouping_method:"
+msgid "Contract Grouping Method"
+msgstr "Método agrupación contratos"
+
+msgctxt "field:party.party.contract_grouping_method,create_date:"
+msgid "Create Date"
+msgstr "Fecha de creación"
+
+msgctxt "field:party.party.contract_grouping_method,create_uid:"
+msgid "Create User"
+msgstr "Usuario de creación"
+
+msgctxt "field:party.party.contract_grouping_method,id:"
+msgid "ID"
+msgstr "ID"
+
+msgctxt "field:party.party.contract_grouping_method,party:"
+msgid "Party"
+msgstr "Tercero"
+
+msgctxt "field:party.party.contract_grouping_method,rec_name:"
+msgid "Record Name"
+msgstr "Nombre registro"
+
+msgctxt "field:party.party.contract_grouping_method,write_date:"
+msgid "Write Date"
+msgstr "Fecha de modificación"
+
+msgctxt "field:party.party.contract_grouping_method,write_uid:"
+msgid "Write User"
+msgstr "Usuario de modificación"
+
 msgctxt "help:account.invoice.credit.start,reinvoice_contract:"
 msgid "If true, the consumption that generated this line will be reinvoiced."
 msgstr ""
 "Si se marca, el consumo que ha generado estas líneas de contracto será "
 "refacturado."
-
-msgctxt "help:contract.configuration,payment_term:"
-msgid "The payment term to be used when there is none set on the party."
-msgstr ""
-"El plazo de pago que se usará cuando no disponga uno por defecto el tercero."
 
 msgctxt "model:contract,name:"
 msgid "Contract"
@@ -386,6 +415,14 @@ msgstr "Contrato"
 msgctxt "model:contract.configuration,name:"
 msgid "Contract Configuration"
 msgstr "Configuración de contratos"
+
+msgctxt "model:contract.configuration.account,name:"
+msgid "Contract Configuration Accounting"
+msgstr "Configuración contable de contrato"
+
+msgctxt "model:contract.configuration.sequence,name:"
+msgid "Contract Configuration Sequence"
+msgstr "Secuencia de configuración del contrato"
 
 msgctxt "model:contract.consumption,name:"
 msgid "Contract Consumption"
@@ -477,6 +514,108 @@ msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_draft"
 msgid "Draft"
 msgstr "Borrador"
 
+msgctxt "model:ir.message,text:cannot_delete"
+msgid ""
+"Contract Line \"%(line)s\" cannot be removed because contract "
+"\"%(contract)s\" is not in draft state."
+msgstr ""
+"La línea de contrato \"%(line)s\" no se puede eliminar porqué el contrato "
+"\"%(contract)s\" no está en estado borrador."
+
+msgctxt "model:ir.message,text:cannot_draft"
+msgid "Contract \"%s\" can not be moved to draft because it has consumptions."
+msgstr "El contrato \"%s\" no se puede pasar a borrador porqué tiene consumos."
+
+msgctxt "model:ir.message,text:cannot_finish"
+msgid ""
+"Contract \"%(contract)s\" can not be finished because line \"%(line)s\" has "
+"no end date."
+msgstr ""
+"El contrato \"%(contract)s\" no se puede finalizar porque la línea "
+"\"%(line)s\" no tiene fecha final."
+
+msgctxt "model:ir.message,text:delete_invoiced_consumption"
+msgid ""
+"Consumption \"%(consumption)s\" can not be  deleted because it is already "
+"invoiced."
+msgstr ""
+"No se puede eliminar el consumo \"%(consumption)s\" porqué ya esta "
+"facturado."
+
+msgctxt "model:ir.message,text:line_start_date_required"
+msgid "Start Date is required in line \"%(line)s\" of contract \"%(contract)s\"."
+msgstr ""
+"La fecha de inicio es obligatoria en la línea \"%(line)s\" del contrato "
+"\"%(contract)s\"."
+
+msgctxt "model:ir.message,text:missing_account_revenue"
+msgid ""
+"Product \"%(product)s\" of contract line %(contract_line)s misses a revenue "
+"account."
+msgstr ""
+"Falta la cuenta de ingresos para el producto \"%(product)s\" de la linea de "
+"contracto \"%(contract_line)s\"."
+
+msgctxt "model:ir.message,text:missing_account_revenue_property"
+msgid ""
+"Contract Line \"%(contract_line)s\" misses an \"account revenue\" default "
+"property."
+msgstr ""
+"Falta la propiedad por defecto cuenta de ingresos para la línia de contrato "
+"\"%(contract_line)s\""
+
+msgctxt "model:ir.message,text:missing_journal"
+msgid "Please, configure a journal before creating contract invoices."
+msgstr "Por favor, configura el diario antes de crear facturas."
+
+msgctxt "model:ir.message,text:pending_contract"
+msgid ""
+"The party \"%(party)s\" can not be erased because he has pending contracts "
+"for the company \"%(company)s\"."
+msgstr ""
+"No se puede eliminar el tercero \"%(party)s\" porqué tiene contractos "
+"pendientes para la empresa \"%(company)s\"."
+
+msgctxt "model:ir.model.button,confirm:contract_cancel_button"
+msgid ""
+"Cancelled contracts no longer create consumptions. Are you sure you want to "
+"cancel this contract?"
+msgstr ""
+"Los contratos cancelados ya no generan consumos. ¿Está seguro que quiere "
+"cancelar el contrato?"
+
+msgctxt "model:ir.model.button,string:contract_cancel_button"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "model:ir.model.button,string:contract_confirm_button"
+msgid "Confirm"
+msgstr "Confirmación"
+
+msgctxt "model:ir.model.button,string:contract_consumption_invoice_button"
+msgid "Invoice"
+msgstr "Factura"
+
+msgctxt "model:ir.model.button,string:contract_draft_button"
+msgid "Draft"
+msgstr "Borrador"
+
+msgctxt "model:ir.model.button,string:contract_finish_button"
+msgid "Finish"
+msgstr "Finalizar"
+
+msgctxt "model:ir.rule.group,name:rule_group_contract"
+msgid "Contract Company Rule"
+msgstr "Regla de contrato de la empresa"
+
+msgctxt "model:ir.rule.group,name:rule_group_contract_consumption"
+msgid "Contract Consumption Company Rule"
+msgstr "Norma de empresa de consumo de contrato"
+
+msgctxt "model:ir.rule.group,name:rule_group_contract_line"
+msgid "Contract Line Company Rule"
+msgstr "Regla de la empresa de línea de contrato"
+
 msgctxt "model:ir.sequence,name:sequence_contract"
 msgid "Contract"
 msgstr "Contrato"
@@ -521,6 +660,10 @@ msgctxt "model:ir.ui.menu,name:menu_create_invoices"
 msgid "Create Invoices"
 msgstr "Crear facturas"
 
+msgctxt "model:party.party.contract_grouping_method,name:"
+msgid "Party Contract Grouping Method"
+msgstr "Método de agrupación de contratos de terceros"
+
 msgctxt "model:res.group,name:group_contract"
 msgid "Contracts"
 msgstr "Contratos"
@@ -528,10 +671,6 @@ msgstr "Contratos"
 msgctxt "model:res.group,name:group_contract_admin"
 msgid "Contracts Administration"
 msgstr "Administración de contratos"
-
-msgctxt "selection:contract,freq:"
-msgid ""
-msgstr ""
 
 msgctxt "selection:contract,freq:"
 msgid "Daily"
@@ -622,32 +761,8 @@ msgid "Contract Service"
 msgstr "Servicio de contrato"
 
 msgctxt "view:contract:"
-msgid "Cancel"
-msgstr "Cancelar"
-
-msgctxt "view:contract:"
-msgid ""
-"Cancelled contracts no longer create consumptions. Are you sure you want to "
-"cancel this contract?"
-msgstr ""
-"Los contratos cancelados ya no generan consumos. ¿Está seguro que quiere "
-"cancelar el contrato?"
-
-msgctxt "view:contract:"
-msgid "Confirm"
-msgstr "Confirmar"
-
-msgctxt "view:contract:"
 msgid "Contract"
 msgstr "Contrato"
-
-msgctxt "view:contract:"
-msgid "Draft"
-msgstr "Borrador"
-
-msgctxt "view:contract:"
-msgid "Finish"
-msgstr "Terminar"
 
 msgctxt "view:contract:"
 msgid "Invoice recurrence"
