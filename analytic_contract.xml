@@ -1,0 +1,20 @@
+<tryton>
+    <data depends='analytic_invoice'>
+        <record model="ir.ui.view" id="analytic_contract_line_view_list_sequence">
+            <field name="model">contract.line</field>
+            <field name="inherit" ref="contract.contract_line_view_list_sequence"/>
+            <field name="priority">20</field>
+            <field name="name">analytic_contract_line_list_sequence</field>
+        </record>
+        <record model="ir.ui.view" id="analytic_contract_line_view_form">
+            <field name="model">contract.line</field>
+            <field name="inherit" ref="contract.contract_line_view_form"/>
+            <field name="name">analytic_contract_line_form</field>
+        </record>
+        <record model="ir.ui.view" id="analytic_contract_line_view_list">
+            <field name="model">contract.line</field>
+            <field name="inherit" ref="contract.contract_line_view_list"/>
+            <field name="name">analytic_contract_line_list</field>
+        </record>
+    </data>
+</tryton>

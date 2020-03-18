@@ -266,6 +266,14 @@ msgctxt "field:contract.create_invoices.start,id:"
 msgid "ID"
 msgstr "Identificador"
 
+msgctxt "field:contract.line,analytic_accounts:"
+msgid "Analytic Accounts"
+msgstr "Comptes analítics"
+
+msgctxt "field:contract.line,analytic_accounts_size:"
+msgid "Analytic Accounts Size"
+msgstr "Mida dels comptes analítics"
+
 msgctxt "field:contract.line,consumptions:"
 msgid "Consumptions"
 msgstr "Consums"
@@ -407,6 +415,10 @@ msgid "If true, the consumption that generated this line will be reinvoiced."
 msgstr ""
 "Si es marca, es tornaran a facturar els consums que han generat aquestes "
 "línies de factura."
+
+msgctxt "help:account.invoice.credit.start,with_refund:"
+msgid "If true, the current invoice(s) will be cancelled."
+msgstr "Si és cert, la actual factura(es) serà cancel·lada."
 
 msgctxt "model:contract,name:"
 msgid "Contract"
@@ -613,10 +625,6 @@ msgstr "Regla de l’empresa de consum de contracte"
 msgctxt "model:ir.rule.group,name:rule_group_contract_line"
 msgid "Contract Line Company Rule"
 msgstr "Regla de l'empresa de línia de contracte"
-
-msgctxt "model:ir.sequence,name:sequence_contract"
-msgid "Contract"
-msgstr "Contracte"
 
 msgctxt "model:ir.sequence.type,name:sequence_type_contract"
 msgid "Contract"

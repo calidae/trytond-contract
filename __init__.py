@@ -24,6 +24,11 @@ def register():
         invoice.CreditInvoiceStart,
         module='contract', type_='model')
     Pool.register(
+        contract.AnalyticAccountEntry,
+        contract.AnalyticContractLine,
+        depends=['analytic_invoice'],
+        module='contract', type_='model')
+    Pool.register(
         contract.CreateConsumptions,
         invoice.CreateInvoices,
         invoice.CreditInvoice,

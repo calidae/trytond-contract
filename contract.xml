@@ -192,7 +192,7 @@
         </record>
 
         <record model="ir.model.button" id="contract_consumption_invoice_button">
-            <field name="name">invoice</field>
+            <field name="name">generate_invoice</field>
             <field name="string">Invoice</field>
             <field name="model" search="[('model', '=', 'contract.consumption')]"/>
         </record>
