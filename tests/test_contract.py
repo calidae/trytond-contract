@@ -20,6 +20,10 @@ def suite():
             tearDown=doctest_teardown, encoding='utf-8',
             optionflags=doctest.REPORT_ONLY_FIRST_FAILURE,
             checker=doctest_checker))
+    suite.addTests(doctest.DocFileSuite('scenario_contract_with_analytics.rst',
+            tearDown=doctest_teardown, encoding='utf-8',
+            optionflags=doctest.REPORT_ONLY_FIRST_FAILURE,
+            checker=doctest_checker))
     suite.addTests(doctest.DocFileSuite('scenario_party_replace.rst',
             tearDown=doctest_teardown, encoding='utf-8',
             optionflags=doctest.REPORT_ONLY_FIRST_FAILURE,
