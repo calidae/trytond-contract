@@ -12,7 +12,7 @@ from sql.aggregate import Max, Min, Sum
 from trytond import backend
 from trytond.model import (Workflow, ModelSQL, ModelView, Model, fields,
     sequence_ordered)
-from trytond.pool import Pool
+from trytond.pool import Pool, PoolMeta
 from trytond.pyson import Eval, Bool, If
 from trytond.transaction import Transaction
 from trytond.tools import reduce_ids, grouped_slice
@@ -20,9 +20,11 @@ from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.modules.product import price_digits
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
+from trytond.modules.analytic_account import AnalyticMixin
 
 __all__ = ['ContractService', 'Contract', 'ContractLine',
-    'ContractConsumption', 'CreateConsumptionsStart', 'CreateConsumptions']
+    'ContractConsumption', 'CreateConsumptionsStart', 'CreateConsumptions',
+    'AnalyticAccountEntry', 'AnalyticContractLine']
 
 FREQS = [
     (None, ''),
@@ -81,6 +83,7 @@ class ContractService(ModelSQL, ModelView):
         domain=[
             ('type', '=', 'service'),
             ])
+
 
 _STATES = {
     'readonly': Eval('state') != 'draft',
@@ -647,6 +650,20 @@ class ContractLine(sequence_ordered(), ModelSQL, ModelView):
         return super(ContractLine, cls).copy(lines, default=default)
 
 
+class AnalyticContractLine(AnalyticMixin, metaclass=PoolMeta):
+    __name__ = 'contract.line'
+
+
+class AnalyticAccountEntry(metaclass=PoolMeta):
+    __name__ = 'analytic.account.entry'
+
+    @classmethod
+    def _get_origin(cls):
+        origins = super()._get_origin()
+        origins.append('contract.line')
+        return origins
+
+
 class ContractConsumption(ModelSQL, ModelView):
     'Contract Consumption'
     __name__ = 'contract.consumption'
@@ -689,7 +706,7 @@ class ContractConsumption(ModelSQL, ModelView):
     def __setup__(cls):
         super(ContractConsumption, cls).__setup__()
         cls._buttons.update({
-                'invoice': {
+                'generate_invoice': {
                     'icon': 'tryton-forward',
                     },
                 })
@@ -729,6 +746,13 @@ class ContractConsumption(ModelSQL, ModelView):
         pool = Pool()
         InvoiceLine = pool.get('account.invoice.line')
         AccountConfiguration = pool.get('account.configuration')
+        Module = pool.get('ir.module')
+        analytic_invoice_installed = Module.search([
+              ('name', '=', 'analytic_invoice'),
+              ('state', '=', 'activated'),
+                ], limit=1)
+        if analytic_invoice_installed:
+            AnalyticAccountEntry = pool.get('analytic.account.entry')
         account_config = AccountConfiguration(1)
         if (self.invoice_lines and
                 not Transaction().context.get('force_reinvoice', False)):
@@ -801,6 +825,11 @@ class ContractConsumption(ModelSQL, ModelView):
 
         invoice_line.taxes = taxes
         invoice_line.invoice_type = 'out'
+        if analytic_invoice_installed:
+            invoice_line.analytic_accounts = AnalyticAccountEntry.copy(
+                self.contract_line.analytic_accounts, default={
+                    'origin': invoice_line.id})
+
         return invoice_line
 
     def get_amount_to_invoice(self):
@@ -860,12 +889,12 @@ class ContractConsumption(ModelSQL, ModelView):
         invoice.account = invoice.on_change_with_account()
         if values.get('contract'):
             contract = values['contract']
-            invoice.description = contract.reference
+            invoice.reference = contract.reference
         return invoice
 
     @classmethod
     @ModelView.button
-    def invoice(cls, consumptions):
+    def generate_invoice(cls, consumptions):
         cls._invoice(consumptions)
 
     @classmethod
