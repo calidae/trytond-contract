@@ -554,7 +554,6 @@ class ContractLine(sequence_ordered(), ModelSQL, ModelView):
     @fields.depends('service', '_parent_service.rec_name', 'unit_price', 'description')
     def on_change_service(self):
         if self.service:
-            name = self.service.rec_name
             if not self.unit_price:
                 self.unit_price = self.service.product.list_price
             if not self.description:
