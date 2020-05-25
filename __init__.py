@@ -11,15 +11,19 @@ def register():
     Pool.register(
         party.Party,
         party.PartyContractGroupingMethod,
+        configuration.Configuration,
+        configuration.ConfigurationSequence,
+        configuration.ConfigurationAccount,
         contract.ContractService,
         contract.Contract,
         contract.ContractLine,
         contract.ContractConsumption,
         contract.CreateConsumptionsStart,
+        contract.ContractReview,
+        contract.ContractReviewLine,
+        contract.CreateReviewsStart,
+        contract.Cron,
         invoice.CreateInvoicesStart,
-        configuration.Configuration,
-        configuration.ConfigurationSequence,
-        configuration.ConfigurationAccount,
         invoice.InvoiceLine,
         invoice.CreditInvoiceStart,
         module='contract', type_='model')
@@ -30,6 +34,7 @@ def register():
         module='contract', type_='model')
     Pool.register(
         contract.CreateConsumptions,
+        contract.CreateReviews,
         invoice.CreateInvoices,
         invoice.CreditInvoice,
         party.PartyReplace,

@@ -22,9 +22,6 @@ from trytond.i18n import gettext
 from trytond.exceptions import UserError
 from trytond.modules.analytic_account import AnalyticMixin
 
-__all__ = ['ContractService', 'Contract', 'ContractLine',
-    'ContractConsumption', 'CreateConsumptionsStart', 'CreateConsumptions',
-    'AnalyticAccountEntry', 'AnalyticContractLine']
 
 FREQS = [
     (None, ''),
@@ -135,6 +132,33 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         required=True, readonly=True)
     payment_term = fields.Many2One('account.invoice.payment_term',
         'Payment Term')
+    months_renewal = fields.Integer('Months Renewal',
+        states={
+            'required': Bool(Eval('first_review_date')),
+            },
+        depends=['first_review_date'])
+    first_review_date = fields.Date('First Review Date',
+        help="Date on which the actions should be performed.",
+        states={
+            'required': Bool(Eval('months_renewal')),
+            },
+        depends=['months_renewal'])
+    reviews = fields.One2Many('contract.review', 'contract',
+        'Reviews', readonly=True, order=[
+            ('review_date', 'ASC')
+            ])
+    review_limit_date = fields.TimeDelta('Limit Date',
+        help="The deadline date on which the actions should be performed.",
+        states={
+            'required': Bool(Eval('first_review_date')),
+            },
+        depends=['first_review_date'])
+    review_alarm = fields.TimeDelta('Alarm Date',
+        help="The date when actions related to reviews should start to be managed.",
+        states={
+            'required': Bool(Eval('first_review_date')),
+            },
+        depends=['first_review_date'])
 
     @classmethod
     def __setup__(cls):
@@ -466,6 +490,37 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             to_create += contract.get_consumptions(date)
 
         return ContractConsumption.create([x._save_values for x in to_create])
+
+    @classmethod
+    def default_months_renewal(cls):
+        pool = Pool()
+        Config = pool.get('contract.configuration')
+
+        config = Config(1)
+        if config.default_months_renewal:
+            return config.default_months_renewal
+
+    @classmethod
+    def default_review_alarm(cls):
+        pool = Pool()
+        Config = pool.get('contract.configuration')
+
+        config = Config(1)
+        return config.default_review_alarm
+
+    @classmethod
+    def default_review_limit_date(cls):
+        pool = Pool()
+        Config = pool.get('contract.configuration')
+
+        config = Config(1)
+        return config.default_review_limit_date
+
+    @fields.depends('start_period_date', 'months_renewal')
+    def on_change_with_first_review_date(self, name=None):
+        if self.months_renewal and self.start_period_date:
+            return (self.start_period_date +
+                relativedelta(months=self.months_renewal))
 
 
 class ContractLine(sequence_ordered(), ModelSQL, ModelView):
@@ -977,3 +1032,270 @@ class CreateConsumptions(Wizard):
         if len(consumptions) == 1:
             action['views'].reverse()
         return action, data
+
+
+class ContractReview(Workflow, ModelSQL, ModelView):
+    "Contract Review"
+    __name__ = 'contract.review'
+    review_date = fields.Date('Review Date')
+    limit_date = fields.Date('Limit Date')
+    alarm_date = fields.Date('Alarm Date')
+    state = fields.Selection([
+        ('pending', 'Pending'),
+        ('processing', 'Processing'),
+        ('done', 'Done'),
+        ('cancelled', 'Canceled'),
+        ], 'State', readonly=True,
+        help="The current state of the review.")
+    lines = fields.One2Many('contract.review.line', 'review', 'Lines',
+        states={
+            'readonly': ~Eval('state').in_(['pending', 'processing']),
+            },
+        depends=['state'])
+    contract = fields.Many2One('contract', 'Contract', required=True,
+        ondelete='CASCADE')
+    activities = fields.One2Many('activity.activity', 'resource', 'Activities')
+    # TODO: This field is implemented because it is not possible to make
+    # comparisons between dates in pyson
+    visual = fields.Function(fields.Boolean('Visual'), 'get_visual')
+
+    @classmethod
+    def __setup__(cls):
+        super().__setup__()
+        cls._order.insert(0, ('limit_date', 'ASC'))
+        cls._transitions |= set((
+                ('pending', 'cancelled'),
+                ('pending', 'processing'),
+                ('processing', 'cancelled'),
+                ('processing', 'pending'),
+                ('processing', 'done'),
+                ('done', 'processing'),
+                ('done', 'cancelled'),
+                ('cancelled', 'pending'),
+                ))
+        cls._buttons.update({
+                'cancelled': {
+                    'icon': 'tryton-cancel',
+                    'invisible': Eval('state').in_(['cancelled', 'done']),
+                    'depends': ['state'],
+                    },
+                'pending': {
+                    'invisible': Eval('state').in_(['done', 'pending']),
+                    'depends': ['state'],
+                    },
+                'processing': {
+                    'icon': 'tryton-forward',
+                    'invisible': Eval('state').in_(['processing', 'done',
+                        'cancelled']),
+                    'depends': ['state'],
+                    },
+                'done': {
+                    'icon': 'tryton-forward',
+                    'invisible': Eval('state').in_(['cancelled', 'pending',
+                        'done']),
+                    'depends': ['state'],
+                    },
+                })
+
+    @staticmethod
+    def default_state():
+        return 'pending'
+
+    def get_visual(self, name):
+        pool = Pool()
+        Date = pool.get('ir.date')
+        today = Date.today()
+        if self.limit_date < today:
+            return True
+        return False
+
+    @classmethod
+    def view_attributes(cls):
+        return [
+            ('/tree', 'visual', If(Eval('visual'), 'danger', '')),
+            ]
+
+    @classmethod
+    def create_review_cron(cls, args=None):
+        cls.create_reviews()
+
+    def create_reviews():
+        pool = Pool()
+        Date = pool.get('ir.date')
+        today = Date.today()
+        ContractReview = pool.get('contract.review')
+        Contract = pool.get('contract')
+        contracts = Contract.search([
+                    ('state', 'in', ['confirmed', 'done']),
+                    ['OR',
+                        [
+                            ('end_date', '=', None),
+                        ],
+                        [
+                            ('end_date', '>=', today),
+                        ],
+                    ],
+                ])
+
+        to_create = []
+        for contract in contracts:
+            if not contract.first_review_date:
+                continue
+
+            if not contract.reviews:
+                review_date = contract.first_review_date
+            else:
+                last_review = contract.reviews[0]
+                if (last_review.state == 'pending' or
+                    last_review.state == 'processing'):
+                    continue
+
+                review_date = (last_review.review_date +
+                    relativedelta(months=contract.months_renewal))
+
+            review = ContractReview()
+            review.contract = contract
+            review.review_date = review_date
+
+            review.limit_date = (review_date - contract.review_limit_date)
+            review.alarm_date = (review.limit_date - contract.review_alarm)
+
+            to_create.append(review)
+
+        ContractReview.save(to_create)
+        return to_create
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('processing')
+    def processing(cls, reviews):
+        pool = Pool()
+        ReviewLine = pool.get('contract.review.line')
+
+        to_create = []
+        for review in reviews:
+            if not review.contract.lines:
+                continue
+            for line in review.contract.lines:
+                if not line.end_date or line.end_date > review.review_date:
+                    review_line = ReviewLine()
+                    review_line.review = review
+                    review_line.price = line.unit_price
+                    review_line.contract_line = line
+                    to_create.append(review_line)
+
+        ReviewLine.save(to_create)
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('pending')
+    def pending(cls, reviews):
+        for review in reviews:
+            if review.lines:
+                raise UserError(gettext('contract.review_with_lines',
+                        review=review.rec_name))
+        super().pending(reviews)
+
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('done')
+    def done(cls, reviews):
+        pool = Pool()
+        ContractLine = pool.get('contract.line')
+
+        to_save = []
+        for review in reviews:
+            if not review.lines:
+                continue
+
+            for line in review.lines:
+                if not line.updated_price:
+                    continue
+
+                new_line, = ContractLine.copy([line.contract_line])
+                new_line.start_date = review.review_date
+                new_line.unit_price = line.updated_price
+
+                end_date = review.review_date - relativedelta(days=1)
+                line.contract_line.end_date = end_date
+                to_save.append(new_line)
+                to_save.append(line.contract_line)
+
+        ContractLine.save(to_save)
+
+    @classmethod
+    @ModelView.button
+    @Workflow.transition('cancelled')
+    def cancelled(cls, reviews):
+        pass
+
+    @classmethod
+    def delete(cls, reviews):
+        for review in reviews:
+            if review.state != 'pending':
+                raise UserError(gettext('contract.review_cannot_delete',
+                        review=review.rec_name))
+        super().delete(reviews)
+
+class ContractReviewLine(sequence_ordered(), ModelSQL, ModelView):
+    'Contract Review Line'
+    __name__ = 'contract.review.line'
+
+    review = fields.Many2One('contract.review', 'Review', required=True,
+        ondelete='CASCADE')
+    contract_line = fields.Many2One('contract.line', 'Contract Line',
+        required=True, ondelete='CASCADE')
+    price = fields.Numeric('Price', digits=price_digits)
+    increase_percentage = fields.Numeric('Increase Percentage (%)',
+        digits=price_digits)
+    updated_price = fields.Numeric('Updated Price', digits=price_digits)
+
+    @fields.depends('increase_percentage', 'price')
+    def on_change_increase_percentage(self):
+        if self.increase_percentage == None:
+            self.increase_percentage = 0.0
+        self.updated_price = round(self.price + (
+                (self.price * Decimal(self.increase_percentage))), price_digits[1])
+
+    @fields.depends('updated_price', 'price')
+    def on_change_updated_price(self):
+        if (self.updated_price or 0.0) == 0.0:
+            self.increase_percentage = 0.0
+        else:
+            self.increase_percentage = round(((self.updated_price - self.price)
+                / self.price), price_digits[1])
+
+
+class CreateReviewsStart(ModelView):
+    'Create Contract Reviews Start'
+    __name__ = 'contract.create_reviews.start'
+
+
+class CreateReviews(Wizard):
+    'Create Consumptions'
+    __name__ = 'contract.create_reviews'
+    start = StateView('contract.create_reviews.start',
+        'contract.create_reviews_start_view_form', [
+            Button('Cancel', 'end', 'tryton-cancel'),
+            Button('OK', 'create_reviews', 'tryton-ok', True),
+            ])
+    create_reviews = StateAction('contract.act_review')
+
+    def do_create_reviews(self, action):
+        pool = Pool()
+        ContractReview = pool.get('contract.review')
+        reviews = ContractReview.create_reviews()
+        data = {'res_id': [r.id for r in reviews]}
+        return action, data
+
+
+class Cron(metaclass=PoolMeta):
+    __name__ = 'ir.cron'
+
+    @classmethod
+    def __setup__(cls):
+        super(Cron, cls).__setup__()
+        cls.method.selection.extend([
+            ('contract.review|create_review_cron', "Contract - Create Reviews"),
+        ])

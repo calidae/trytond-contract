@@ -14,14 +14,6 @@ msgctxt "field:contract,company:"
 msgid "Company"
 msgstr "Empresa"
 
-msgctxt "field:contract,create_date:"
-msgid "Create Date"
-msgstr "Fecha creación"
-
-msgctxt "field:contract,create_uid:"
-msgid "Create User"
-msgstr "Usuario de creación"
-
 msgctxt "field:contract,currency:"
 msgid "Currency"
 msgstr "Moneda"
@@ -38,13 +30,13 @@ msgctxt "field:contract,first_invoice_date:"
 msgid "First Invoice Date"
 msgstr "Fecha primera factura"
 
+msgctxt "field:contract,first_review_date:"
+msgid "First Review Date"
+msgstr "Primera fecha de revisión"
+
 msgctxt "field:contract,freq:"
 msgid "Frequency"
 msgstr "Frecuencia"
-
-msgctxt "field:contract,id:"
-msgid "ID"
-msgstr "ID"
 
 msgctxt "field:contract,interval:"
 msgid "Interval"
@@ -53,6 +45,10 @@ msgstr "Intervalo"
 msgctxt "field:contract,lines:"
 msgid "Lines"
 msgstr "Líneas"
+
+msgctxt "field:contract,months_renewal:"
+msgid "Months Renewal"
+msgstr "Meses de renovación"
 
 msgctxt "field:contract,number:"
 msgid "Number"
@@ -66,13 +62,21 @@ msgctxt "field:contract,payment_term:"
 msgid "Payment Term"
 msgstr "Plazo de pago"
 
-msgctxt "field:contract,rec_name:"
-msgid "Record Name"
-msgstr "Nombre"
-
 msgctxt "field:contract,reference:"
 msgid "Reference"
 msgstr "Referencia"
+
+msgctxt "field:contract,review_alarm:"
+msgid "Alarm Date"
+msgstr "Fecha de alarma"
+
+msgctxt "field:contract,review_limit_date:"
+msgid "Limit Date"
+msgstr "Fecha límite"
+
+msgctxt "field:contract,reviews:"
+msgid "Reviews"
+msgstr "Revisiones"
 
 msgctxt "field:contract,start_date:"
 msgid "Start Date"
@@ -86,77 +90,33 @@ msgctxt "field:contract,state:"
 msgid "State"
 msgstr "Estado"
 
-msgctxt "field:contract,write_date:"
-msgid "Write Date"
-msgstr "Fecha de modificación"
-
-msgctxt "field:contract,write_uid:"
-msgid "Write User"
-msgstr "Usuario de modificación"
-
 msgctxt "field:contract.configuration,contract_sequence:"
 msgid "Contract Reference Sequence"
 msgstr "Sequencia de la referencia de contrato"
 
-msgctxt "field:contract.configuration,create_date:"
-msgid "Create Date"
-msgstr "Fecha creación"
+msgctxt "field:contract.configuration,default_months_renewal:"
+msgid "Review Months Renewal"
+msgstr "Meses de renovación de la revisión"
 
-msgctxt "field:contract.configuration,create_uid:"
-msgid "Create User"
-msgstr "Usuario de creación"
+msgctxt "field:contract.configuration,default_review_alarm:"
+msgid "Alarm Date"
+msgstr "Fecha de alarma"
 
-msgctxt "field:contract.configuration,id:"
-msgid "ID"
-msgstr "ID"
+msgctxt "field:contract.configuration,default_review_limit_date:"
+msgid "Limit Date"
+msgstr "Fecha límite"
 
 msgctxt "field:contract.configuration,journal:"
 msgid "Journal"
 msgstr "Diario"
 
-msgctxt "field:contract.configuration,rec_name:"
-msgid "Record Name"
-msgstr "Nombre"
-
-msgctxt "field:contract.configuration,write_date:"
-msgid "Write Date"
-msgstr "Fecha de modificación"
-
-msgctxt "field:contract.configuration,write_uid:"
-msgid "Write User"
-msgstr "Usuario de modificación"
-
 msgctxt "field:contract.configuration.account,company:"
 msgid "Company"
 msgstr "Empresa"
 
-msgctxt "field:contract.configuration.account,create_date:"
-msgid "Create Date"
-msgstr "Fecha de creación"
-
-msgctxt "field:contract.configuration.account,create_uid:"
-msgid "Create User"
-msgstr "Usuario de creación"
-
-msgctxt "field:contract.configuration.account,id:"
-msgid "ID"
-msgstr "ID"
-
 msgctxt "field:contract.configuration.account,journal:"
 msgid "Journal"
 msgstr "Diario"
-
-msgctxt "field:contract.configuration.account,rec_name:"
-msgid "Record Name"
-msgstr "Nombre registro"
-
-msgctxt "field:contract.configuration.account,write_date:"
-msgid "Write Date"
-msgstr "Fecha de modificación"
-
-msgctxt "field:contract.configuration.account,write_uid:"
-msgid "Write User"
-msgstr "Usuario de modificación"
 
 msgctxt "field:contract.configuration.sequence,company:"
 msgid "Company"
@@ -166,30 +126,6 @@ msgctxt "field:contract.configuration.sequence,contract_sequence:"
 msgid "Contract Reference Sequence"
 msgstr "Sequencia de la referencia de contrato"
 
-msgctxt "field:contract.configuration.sequence,create_date:"
-msgid "Create Date"
-msgstr "Fecha de creación"
-
-msgctxt "field:contract.configuration.sequence,create_uid:"
-msgid "Create User"
-msgstr "Usuario de creación"
-
-msgctxt "field:contract.configuration.sequence,id:"
-msgid "ID"
-msgstr "ID"
-
-msgctxt "field:contract.configuration.sequence,rec_name:"
-msgid "Record Name"
-msgstr "Nombre registro"
-
-msgctxt "field:contract.configuration.sequence,write_date:"
-msgid "Write Date"
-msgstr "Fecha de modificación"
-
-msgctxt "field:contract.configuration.sequence,write_uid:"
-msgid "Write User"
-msgstr "Usuario de modificación"
-
 msgctxt "field:contract.consumption,contract:"
 msgid "Contract"
 msgstr "Contrato"
@@ -197,14 +133,6 @@ msgstr "Contrato"
 msgctxt "field:contract.consumption,contract_line:"
 msgid "Contract Line"
 msgstr "Línea de contrato"
-
-msgctxt "field:contract.consumption,create_date:"
-msgid "Create Date"
-msgstr "Fecha creación"
-
-msgctxt "field:contract.consumption,create_uid:"
-msgid "Create User"
-msgstr "Usuario de creación"
 
 msgctxt "field:contract.consumption,credit_lines:"
 msgid "Credit Lines"
@@ -218,10 +146,6 @@ msgctxt "field:contract.consumption,end_period_date:"
 msgid "Finish Period Date"
 msgstr "Fecha final de período"
 
-msgctxt "field:contract.consumption,id:"
-msgid "ID"
-msgstr "ID"
-
 msgctxt "field:contract.consumption,init_period_date:"
 msgid "Start Period Date"
 msgstr "Fecha inicio de período"
@@ -234,45 +158,17 @@ msgctxt "field:contract.consumption,invoice_lines:"
 msgid "Invoice Lines"
 msgstr "Líneas de factura"
 
-msgctxt "field:contract.consumption,rec_name:"
-msgid "Record Name"
-msgstr "Nombre"
-
 msgctxt "field:contract.consumption,start_date:"
 msgid "Start Date"
 msgstr "Fecha inicial"
-
-msgctxt "field:contract.consumption,write_date:"
-msgid "Write Date"
-msgstr "Fecha de modificación"
-
-msgctxt "field:contract.consumption,write_uid:"
-msgid "Write User"
-msgstr "Usuario de modificación"
 
 msgctxt "field:contract.create_consumptions.start,date:"
 msgid "Date"
 msgstr "Fecha"
 
-msgctxt "field:contract.create_consumptions.start,id:"
-msgid "ID"
-msgstr "ID"
-
 msgctxt "field:contract.create_invoices.start,date:"
 msgid "Date"
 msgstr "Fecha"
-
-msgctxt "field:contract.create_invoices.start,id:"
-msgid "ID"
-msgstr "Identificador"
-
-msgctxt "field:contract.line,analytic_accounts:"
-msgid "Analytic Accounts"
-msgstr "Cuentas analíticas"
-
-msgctxt "field:contract.line,analytic_accounts_size:"
-msgid "Analytic Accounts Size"
-msgstr "Tamaño de cuentas analíticas"
 
 msgctxt "field:contract.line,consumptions:"
 msgid "Consumptions"
@@ -286,14 +182,6 @@ msgctxt "field:contract.line,contract_state:"
 msgid "Contract State"
 msgstr "Estado del contrato"
 
-msgctxt "field:contract.line,create_date:"
-msgid "Create Date"
-msgstr "Fecha creación"
-
-msgctxt "field:contract.line,create_uid:"
-msgid "Create User"
-msgstr "Usuario de creación"
-
 msgctxt "field:contract.line,description:"
 msgid "Description"
 msgstr "Descripción"
@@ -302,10 +190,6 @@ msgctxt "field:contract.line,end_date:"
 msgid "End Date"
 msgstr "Fecha finalización"
 
-msgctxt "field:contract.line,id:"
-msgid "ID"
-msgstr "ID"
-
 msgctxt "field:contract.line,last_consumption_date:"
 msgid "Last Consumption Date"
 msgstr "Fecha último consumo"
@@ -313,14 +197,6 @@ msgstr "Fecha último consumo"
 msgctxt "field:contract.line,last_consumption_invoice_date:"
 msgid "Last Invoice Date"
 msgstr "Fecha última factura"
-
-msgctxt "field:contract.line,rec_name:"
-msgid "Record Name"
-msgstr "Nombre"
-
-msgctxt "field:contract.line,sequence:"
-msgid "Sequence"
-msgstr "Secuencia"
 
 msgctxt "field:contract.line,service:"
 msgid "Service"
@@ -334,25 +210,57 @@ msgctxt "field:contract.line,unit_price:"
 msgid "Unit Price"
 msgstr "Precio unidad"
 
-msgctxt "field:contract.line,write_date:"
-msgid "Write Date"
-msgstr "Fecha de modificación"
+msgctxt "field:contract.review,activities:"
+msgid "Activities"
+msgstr "Actividades"
 
-msgctxt "field:contract.line,write_uid:"
-msgid "Write User"
-msgstr "Usuario de modificación"
+msgctxt "field:contract.review,alarm_date:"
+msgid "Alarm Date"
+msgstr "Fecha de alarma"
 
-msgctxt "field:contract.service,create_date:"
-msgid "Create Date"
-msgstr "Fecha creación"
+msgctxt "field:contract.review,contract:"
+msgid "Contract"
+msgstr "Contratos"
 
-msgctxt "field:contract.service,create_uid:"
-msgid "Create User"
-msgstr "Usuario de creación"
+msgctxt "field:contract.review,limit_date:"
+msgid "Limit Date"
+msgstr "Fecha límite"
 
-msgctxt "field:contract.service,id:"
-msgid "ID"
-msgstr "ID"
+msgctxt "field:contract.review,lines:"
+msgid "Lines"
+msgstr "Líneas"
+
+msgctxt "field:contract.review,review_date:"
+msgid "Review Date"
+msgstr "Fecha de revisión"
+
+msgctxt "field:contract.review,state:"
+msgid "State"
+msgstr "Estado"
+
+msgctxt "field:contract.review,visual:"
+msgid "Visual"
+msgstr "Visual"
+
+msgctxt "field:contract.review.line,contract_line:"
+msgid "Contract Line"
+msgstr "Línea de contrato"
+
+msgctxt "field:contract.review.line,increase_percentage:"
+msgid "Increase Percentage (%)"
+msgstr "Porcentage de incremento (%)"
+
+msgctxt "field:contract.review.line,price:"
+msgid "Price"
+msgstr "Precio"
+
+msgctxt "field:contract.review.line,review:"
+msgid "Review"
+msgstr "Revisión"
+
+msgctxt "field:contract.review.line,updated_price:"
+msgid "Updated Price"
+msgstr "Precio actualizado"
 
 msgctxt "field:contract.service,name:"
 msgid "Name"
@@ -362,18 +270,6 @@ msgctxt "field:contract.service,product:"
 msgid "Product"
 msgstr "Producto"
 
-msgctxt "field:contract.service,rec_name:"
-msgid "Record Name"
-msgstr "Nombre"
-
-msgctxt "field:contract.service,write_date:"
-msgid "Write Date"
-msgstr "Fecha de modificación"
-
-msgctxt "field:contract.service,write_uid:"
-msgid "Write User"
-msgstr "Usuario de modificación"
-
 msgctxt "field:party.party,contract_grouping_method:"
 msgid "Contract Grouping Method"
 msgstr "Método agrupación contratos"
@@ -382,33 +278,9 @@ msgctxt "field:party.party.contract_grouping_method,contract_grouping_method:"
 msgid "Contract Grouping Method"
 msgstr "Método agrupación contratos"
 
-msgctxt "field:party.party.contract_grouping_method,create_date:"
-msgid "Create Date"
-msgstr "Fecha de creación"
-
-msgctxt "field:party.party.contract_grouping_method,create_uid:"
-msgid "Create User"
-msgstr "Usuario de creación"
-
-msgctxt "field:party.party.contract_grouping_method,id:"
-msgid "ID"
-msgstr "ID"
-
 msgctxt "field:party.party.contract_grouping_method,party:"
 msgid "Party"
 msgstr "Tercero"
-
-msgctxt "field:party.party.contract_grouping_method,rec_name:"
-msgid "Record Name"
-msgstr "Nombre registro"
-
-msgctxt "field:party.party.contract_grouping_method,write_date:"
-msgid "Write Date"
-msgstr "Fecha de modificación"
-
-msgctxt "field:party.party.contract_grouping_method,write_uid:"
-msgid "Write User"
-msgstr "Usuario de modificación"
 
 msgctxt "help:account.invoice.credit.start,reinvoice_contract:"
 msgid "If true, the consumption that generated this line will be reinvoiced."
@@ -419,6 +291,34 @@ msgstr ""
 msgctxt "help:account.invoice.credit.start,with_refund:"
 msgid "If true, the current invoice(s) will be cancelled."
 msgstr "Si es verdadero, la actual factura(s) será cancelada."
+
+msgctxt "help:contract,first_review_date:"
+msgid "Date on which the actions should be performed."
+msgstr "Fecha en la que se deben realizar las acciones."
+
+msgctxt "help:contract,review_alarm:"
+msgid "The date when actions related to reviews should start to be managed."
+msgstr ""
+" La fecha en que las acciones relacionadas con las revisiones deben comenzar"
+" a administrarse."
+
+msgctxt "help:contract,review_limit_date:"
+msgid "The deadline date on which the actions should be performed."
+msgstr " La fecha límite en la que se deben realizar las acciones."
+
+msgctxt "help:contract.configuration,default_review_alarm:"
+msgid "The date when actions related to reviews should start to be managed."
+msgstr ""
+" La fecha en que las acciones relacionadas con las revisiones deben comenzar"
+" a administrarse."
+
+msgctxt "help:contract.configuration,default_review_limit_date:"
+msgid "The deadline date on which the actions should be performed."
+msgstr " La fecha límite en la que se deben realizar las acciones."
+
+msgctxt "help:contract.review,state:"
+msgid "The current state of the review."
+msgstr "El estado actual de la revisión."
 
 msgctxt "model:contract,name:"
 msgid "Contract"
@@ -448,9 +348,21 @@ msgctxt "model:contract.create_invoices.start,name:"
 msgid "Create Invoices Start"
 msgstr "Inicio crear facturas"
 
+msgctxt "model:contract.create_reviews.start,name:"
+msgid "Create Contract Reviews Start"
+msgstr "Inicio crear revisiones de contrato"
+
 msgctxt "model:contract.line,name:"
 msgid "Contract Line"
 msgstr "Línea de contrato"
+
+msgctxt "model:contract.review,name:"
+msgid "Contract Review"
+msgstr "Revisiones de contrato"
+
+msgctxt "model:contract.review.line,name:"
+msgid "Contract Review Line"
+msgstr " Línea de revisión de contrato"
 
 msgctxt "model:contract.service,name:"
 msgid "Contract Service"
@@ -480,6 +392,14 @@ msgctxt "model:ir.action,name:act_contract_line"
 msgid "Contract Lines"
 msgstr "Líneas de contrato"
 
+msgctxt "model:ir.action,name:act_contract_review_form_relate"
+msgid "Reviews"
+msgstr "Revisiones"
+
+msgctxt "model:ir.action,name:act_contract_review_line"
+msgid "Contract Review Lines"
+msgstr " Líneas de revisión de contrato"
+
 msgctxt "model:ir.action,name:act_contract_service"
 msgid "Contract Services"
 msgstr "Servicios de contrato"
@@ -492,6 +412,10 @@ msgctxt "model:ir.action,name:act_open_contract"
 msgid "Contracts"
 msgstr "Contratos"
 
+msgctxt "model:ir.action,name:act_review"
+msgid "Reviews"
+msgstr "Revisiones"
+
 msgctxt "model:ir.action,name:wizard_create_consumptions"
 msgid "Create Consumptions"
 msgstr "Crear consumos"
@@ -499,6 +423,10 @@ msgstr "Crear consumos"
 msgctxt "model:ir.action,name:wizard_create_invoices"
 msgid "Create Invoices"
 msgstr "Crear facturas"
+
+msgctxt "model:ir.action,name:wizard_create_reviews"
+msgid "Create Reviews"
+msgstr "Crear revisiones"
 
 msgctxt "model:ir.action.act_window.domain,name:"
 msgid "Finished"
@@ -525,6 +453,22 @@ msgstr "Confirmados"
 msgctxt "model:ir.action.act_window.domain,name:act_contract_domain_draft"
 msgid "Draft"
 msgstr "Borrador"
+
+msgctxt "model:ir.action.act_window.domain,name:act_review_domain_all"
+msgid "All"
+msgstr "Todos"
+
+msgctxt "model:ir.action.act_window.domain,name:act_review_domain_pending"
+msgid "Pending"
+msgstr "Pendiente"
+
+msgctxt "model:ir.action.act_window.domain,name:act_review_domain_processing"
+msgid "Processing"
+msgstr "En proceso"
+
+msgctxt "model:ir.action.act_window.domain,name:act_review_domain_to_notice"
+msgid "Notice"
+msgstr "Avisos"
 
 msgctxt "model:ir.message,text:cannot_delete"
 msgid ""
@@ -588,6 +532,22 @@ msgstr ""
 "No se puede eliminar el tercero \"%(party)s\" porqué tiene contractos "
 "pendientes para la empresa \"%(company)s\"."
 
+msgctxt "model:ir.message,text:review_cannot_delete"
+msgid ""
+"Contract Review \"%(review)s\" cannot be removed because is not in pending "
+"state."
+msgstr ""
+"La revisión de contrato \"%(review)s\" no se puede eliminar porque no está "
+"en estado \"Pendiente\"."
+
+msgctxt "model:ir.message,text:review_with_lines"
+msgid ""
+"Contract Review \"%(review)s\" cannot move to \"Pending\" because it has "
+"lines created."
+msgstr ""
+"La revisión del contrato \"%(review)s\" no se puede mover a \"Pendiente\" "
+"porque tiene líneas creadas."
+
 msgctxt "model:ir.model.button,confirm:contract_cancel_button"
 msgid ""
 "Cancelled contracts no longer create consumptions. Are you sure you want to "
@@ -616,6 +576,22 @@ msgctxt "model:ir.model.button,string:contract_finish_button"
 msgid "Finish"
 msgstr "Finalizar"
 
+msgctxt "model:ir.model.button,string:contract_review_cancelled_button"
+msgid "Cancelled"
+msgstr "Cancelado"
+
+msgctxt "model:ir.model.button,string:contract_review_done_button"
+msgid "Done"
+msgstr "Realizado"
+
+msgctxt "model:ir.model.button,string:contract_review_pending_button"
+msgid "Pending"
+msgstr "Pendiente"
+
+msgctxt "model:ir.model.button,string:contract_review_processing_button"
+msgid "Processing"
+msgstr "En proceso"
+
 msgctxt "model:ir.rule.group,name:rule_group_contract"
 msgid "Contract Company Rule"
 msgstr "Regla de contrato de la empresa"
@@ -627,6 +603,10 @@ msgstr "Norma de empresa de consumo de contrato"
 msgctxt "model:ir.rule.group,name:rule_group_contract_line"
 msgid "Contract Line Company Rule"
 msgstr "Regla de la empresa de línea de contrato"
+
+msgctxt "model:ir.sequence,name:sequence_contract"
+msgid "Contract"
+msgstr "Contrato"
 
 msgctxt "model:ir.sequence.type,name:sequence_type_contract"
 msgid "Contract"
@@ -667,6 +647,14 @@ msgstr "Crear consumos"
 msgctxt "model:ir.ui.menu,name:menu_create_invoices"
 msgid "Create Invoices"
 msgstr "Crear facturas"
+
+msgctxt "model:ir.ui.menu,name:menu_create_reviews"
+msgid "Create Reviews"
+msgstr "Crear revisiones"
+
+msgctxt "model:ir.ui.menu,name:menu_review"
+msgid "Reviews"
+msgstr "Revisiones"
 
 msgctxt "model:party.party.contract_grouping_method,name:"
 msgid "Party Contract Grouping Method"
@@ -728,6 +716,26 @@ msgctxt "selection:contract.line,contract_state:"
 msgid "Finished"
 msgstr "Finalizado"
 
+msgctxt "selection:contract.review,state:"
+msgid "Canceled"
+msgstr "Cancelado"
+
+msgctxt "selection:contract.review,state:"
+msgid "Done"
+msgstr "Realizado"
+
+msgctxt "selection:contract.review,state:"
+msgid "Pending"
+msgstr "Pendiente"
+
+msgctxt "selection:contract.review,state:"
+msgid "Processing"
+msgstr "En proceso"
+
+msgctxt "selection:ir.cron,method:"
+msgid "Contract - Create Reviews"
+msgstr "Contrato - Crear revisiones"
+
 msgctxt "selection:party.party,contract_grouping_method:"
 msgid "Group contracts"
 msgstr "Agrupar contratos"
@@ -745,8 +753,12 @@ msgstr ""
 "quieres abonar?"
 
 msgctxt "view:contract.configuration:"
-msgid "Contract Configuration"
-msgstr "Configuración de contratos"
+msgid "Reviews"
+msgstr "Revisiones"
+
+msgctxt "view:contract.consumption:"
+msgid "Contract Consumption"
+msgstr "Consumo de contratos"
 
 msgctxt "view:contract.consumption:"
 msgid "Invoice"
@@ -760,9 +772,17 @@ msgctxt "view:contract.create_invoices.start:"
 msgid "Create invoices up to"
 msgstr "Crear facturas hasta "
 
+msgctxt "view:contract.create_reviews.start:"
+msgid "Create Contract Reviews"
+msgstr "Crear revisiones de contrato"
+
 msgctxt "view:contract.line:"
 msgid "Contract Line"
 msgstr "Línea de contrato"
+
+msgctxt "view:contract.review:"
+msgid "Contract"
+msgstr "Contrato"
 
 msgctxt "view:contract.service:"
 msgid "Contract Service"
@@ -775,6 +795,10 @@ msgstr "Contrato"
 msgctxt "view:contract:"
 msgid "Invoice recurrence"
 msgstr "Recurrencia factura"
+
+msgctxt "view:contract:"
+msgid "Review"
+msgstr "Revisión"
 
 msgctxt "view:party.party:"
 msgid "Contract"
@@ -794,5 +818,13 @@ msgid "OK"
 msgstr "Crear"
 
 msgctxt "wizard_button:contract.create_invoices,start,end:"
+msgid "Cancel"
+msgstr "Cancelar"
+
+msgctxt "wizard_button:contract.create_reviews,start,create_reviews:"
+msgid "OK"
+msgstr "Crear"
+
+msgctxt "wizard_button:contract.create_reviews,start,end:"
 msgid "Cancel"
 msgstr "Cancelar"
