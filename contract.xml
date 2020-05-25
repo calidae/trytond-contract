@@ -323,6 +323,183 @@
             <field name="name">create_invoices_start_form</field>
         </record>
 
+        <!-- Contract review -->
+        <record model="ir.ui.view" id="contract_review_view_form">
+            <field name="model">contract.review</field>
+            <field name="type">form</field>
+            <field name="name">contract_review_form</field>
+        </record>
+        <record model="ir.ui.view" id="contract_review_view_list">
+            <field name="model">contract.review</field>
+            <field name="type">tree</field>
+            <field name="name">contract_review_list</field>
+        </record>
+
+        <record model="ir.action.act_window" id="act_review">
+            <field name="name">Reviews</field>
+            <field name="res_model">contract.review</field>
+        </record>
+
+        <record model="ir.action.act_window.view" id="act_contract_review_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="contract_review_view_list"/>
+            <field name="act_window" ref="act_review"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_contract_review_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="contract_review_view_form"/>
+            <field name="act_window" ref="act_review"/>
+        </record>
+
+        <record model="ir.action.act_window" id="act_contract_review_form_relate">
+            <field name="name">Reviews</field>
+            <field name="res_model">contract.review</field>
+            <field name="domain"
+                eval="[If(Eval('active_ids', []) == [Eval('active_id')], ('contract', '=', Eval('active_id')), ('contract', 'in', Eval('active_ids')))]"
+                pyson="1"/>
+        </record>
+
+        <record model="ir.action.keyword" id="act_review_keyword1">
+            <field name="keyword">form_relate</field>
+            <field name="model">contract,-1</field>
+            <field name="action" ref="act_contract_review_form_relate"/>
+        </record>
+
+        <record model="ir.action.act_window.domain"
+                id="act_review_domain_to_notice">
+            <field name="name">Notice</field>
+            <field name="sequence" eval="10"/>
+            <field name="domain" eval="[('alarm_date', '&lt;', DateTime(hour=0, minute=0, second=0, microsecond=0, delta_days=1)),
+                ('state', '!=', 'cancelled')]"
+                pyson="1"/>
+            <field name="act_window" ref="act_review"/>
+        </record>
+        <record model="ir.action.act_window.domain"
+                id="act_review_domain_all">
+            <field name="name">All</field>
+            <field name="sequence" eval="9999"/>
+            <field name="act_window" ref="act_review"/>
+        </record>
+        <record model="ir.action.act_window.domain"
+                id="act_review_domain_pending">
+            <field name="name">Pending</field>
+            <field name="sequence" eval="20"/>
+            <field name="domain" eval="[('state', '=', 'pending')]"
+                pyson="1"/>
+            <field name="act_window" ref="act_review"/>
+        </record>
+        <record model="ir.action.act_window.domain"
+                id="act_review_domain_processing">
+            <field name="name">Processing</field>
+            <field name="sequence" eval="20"/>
+            <field name="domain" eval="[('state', '=', 'processing')]"
+                pyson="1"/>
+            <field name="act_window" ref="act_review"/>
+        </record>
+
+        <record model="ir.model.access" id="access_contract_review">
+            <field name="model" search="[('model', '=', 'contract.review')]"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="False"/>
+            <field name="perm_create" eval="False"/>
+            <field name="perm_delete" eval="False"/>
+        </record>
+        <record model="ir.model.access" id="access_contract_review_admin">
+            <field name="model" search="[('model', '=', 'contract.review')]"/>
+            <field name="group" ref="group_contract_admin"/>
+            <field name="perm_read" eval="True"/>
+            <field name="perm_write" eval="True"/>
+            <field name="perm_create" eval="True"/>
+            <field name="perm_delete" eval="True"/>
+        </record>
+
+        <!-- create review cron -->
+        <record model="ir.cron" id="cron_create_review">
+            <field name="interval_number" eval="1"/>
+            <field name="interval_type">days</field>
+            <field name="method">contract.review|create_review_cron</field>
+        </record>
+
+        <record model="ir.action.wizard" id="wizard_create_reviews">
+            <field name="name">Create Reviews</field>
+            <field name="wiz_name">contract.create_reviews</field>
+        </record>
+
+        <record model="ir.ui.view" id="create_reviews_start_view_form">
+            <field name="model">contract.create_reviews.start</field>
+            <field name="type">form</field>
+            <field name="name">create_reviews_start_form</field>
+        </record>
+
+        <record model="ir.model.button" id="contract_review_pending_button">
+            <field name="name">pending</field>
+            <field name="string">Pending</field>
+            <field name="model" search="[('model', '=', 'contract.review')]"/>
+        </record>
+        <record model="ir.model.button-res.group"
+            id="contract_review_pending_button_contract_admin">
+            <field name="button" ref="contract_review_pending_button"/>
+            <field name="group" ref="group_contract_admin"/>
+        </record>
+
+        <record model="ir.model.button" id="contract_review_processing_button">
+            <field name="name">processing</field>
+            <field name="string">Processing</field>
+            <field name="model" search="[('model', '=', 'contract.review')]"/>
+        </record>
+        <record model="ir.model.button-res.group"
+            id="contract_review_processing_button_contract_admin">
+            <field name="button" ref="contract_review_processing_button"/>
+            <field name="group" ref="group_contract_admin"/>
+        </record>
+
+        <record model="ir.model.button" id="contract_review_done_button">
+            <field name="name">done</field>
+            <field name="string">Done</field>
+            <field name="model" search="[('model', '=', 'contract.review')]"/>
+        </record>
+        <record model="ir.model.button-res.group"
+            id="contract_review_done_button_contract_admin">
+            <field name="button" ref="contract_review_done_button"/>
+            <field name="group" ref="group_contract_admin"/>
+        </record>
+
+        <record model="ir.model.button" id="contract_review_cancelled_button">
+            <field name="name">cancelled</field>
+            <field name="string">Cancelled</field>
+            <field name="model" search="[('model', '=', 'contract.review')]"/>
+        </record>
+        <record model="ir.model.button-res.group"
+            id="contract_review_cancelled_button_contract_admin">
+            <field name="button" ref="contract_review_cancelled_button"/>
+            <field name="group" ref="group_contract_admin"/>
+        </record>
+
+        <record model="ir.ui.view" id="contract_review_line_view_form">
+            <field name="model">contract.review.line</field>
+            <field name="type">form</field>
+            <field name="name">contract_review_line_form</field>
+        </record>
+        <record model="ir.ui.view" id="contract_review_line_view_list">
+            <field name="model">contract.review.line</field>
+            <field name="type">tree</field>
+            <field name="name">contract_review_line_list</field>
+        </record>
+        <record model="ir.action.act_window" id="act_contract_review_line">
+            <field name="name">Contract Review Lines</field>
+            <field name="res_model">contract.review.line</field>
+        </record>
+        <record model="ir.action.act_window.view" id="act_contract_review_line_view1">
+            <field name="sequence" eval="10"/>
+            <field name="view" ref="contract_review_line_view_list"/>
+            <field name="act_window" ref="act_contract_review_line"/>
+        </record>
+        <record model="ir.action.act_window.view" id="act_contract_review_line_view2">
+            <field name="sequence" eval="20"/>
+            <field name="view" ref="contract_review_line_view_form"/>
+            <field name="act_window" ref="act_contract_review_line"/>
+        </record>
+
         <!-- Menus -->
         <record model="ir.ui.icon" id="repeat_icon">
             <field name="name">tryton-repeat</field>
@@ -391,6 +568,7 @@
 
         <menuitem action="act_contract_line" id="menu_contract_line_form"
             parent="menu_contract_form" sequence="10"/>
+
         <menuitem action="act_contract_consumption"
             id="menu_contract_consumption" parent="menu_contract"
             sequence="30" name="Consumptions"/>
@@ -402,5 +580,13 @@
         <menuitem name="Create Invoices" parent="menu_contract"
             sequence="40" action="wizard_create_invoices"
             id="menu_create_invoices"/>
+
+        <menuitem parent="menu_contract_form" sequence="10" id="menu_review"
+            action="act_review" icon="tryton-list"/>
+
+        <menuitem name="Create Reviews" parent="menu_contract_form"
+            sequence="20" action="wizard_create_reviews"
+            id="menu_create_reviews"/>
+
     </data>
 </tryton>

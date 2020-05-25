@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<form>
+    <notebook>
+        <page string="Contract" id="contract">
+          <label name="contract"/>
+          <field name="contract"/>
+          <label name="review_date"/>
+          <field name="review_date"/>
+          <label name="limit_date"/>
+          <field name="limit_date"/>
+          <label name="alarm_date"/>
+          <field name="alarm_date"/>
+          <field name="lines" colspan="4" mode="tree,form"/>
+          <label name="state"/>
+          <field name="state"/>
+          <group id="buttons" colspan="2">
+              <button name="cancelled"/>
+              <button name="pending"/>
+              <button name="processing"/>
+              <button name="done"/>
+          </group>
+        </page>
+        <page name="activities">
+            <field name="activities" colspan="4"/>
+        </page>
+    </notebook>
+</form>

@@ -42,5 +42,15 @@
                 <button name="finish"/>
             </group>
         </page>
+        <page string="Review" id="review">
+            <label name="months_renewal"/>
+            <field name="months_renewal"/>
+            <label name="first_review_date"/>
+            <field name="first_review_date"/>
+            <label name="review_alarm"/>
+            <field name="review_alarm"/>
+            <label name="review_limit_date"/>
+            <field name="review_limit_date"/>
+        </page>
     </notebook>
 </form>

@@ -6,4 +6,13 @@
     <field name="contract_sequence"/>
     <label name="journal"/>
     <field name="journal"/>
+    <group string="Reviews" id="review_conf" colspan="4">
+        <label name="default_months_renewal"/>
+        <field name="default_months_renewal"/>
+        <newline/>
+        <label name="default_review_limit_date"/>
+        <field name="default_review_limit_date"/>
+        <label name="default_review_alarm"/>
+        <field name="default_review_alarm"/>
+    </group>
 </form>

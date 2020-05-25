@@ -3,7 +3,7 @@
 from trytond import backend
 from trytond.model import ModelView, ModelSQL, ModelSingleton, fields
 from trytond.pool import Pool
-from trytond.pyson import Eval
+from trytond.pyson import Eval, Bool, If
 from trytond.tools.multivalue import migrate_property
 from trytond.modules.company.model import (
     CompanyMultiValueMixin, CompanyValueMixin)
@@ -27,6 +27,11 @@ class Configuration(
             domain=[
                 ('type', '=', 'revenue'),
                 ]))
+    default_months_renewal = fields.Integer('Review Months Renewal')
+    default_review_limit_date = fields.TimeDelta('Limit Date',
+        help="The deadline date on which the actions should be performed.")
+    default_review_alarm = fields.TimeDelta('Alarm Date',
+        help="The date when actions related to reviews should start to be managed.")
 
     @classmethod
     def multivalue_model(cls, field):

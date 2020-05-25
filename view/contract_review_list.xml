@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<tree>
+    <field name="contract"/>
+    <field name="review_date"/>
+    <field name="limit_date"/>
+    <field name="alarm_date"/>
+    <field name="state"/>
+    <field name="visual" tree_invisible="1"/>
+</tree>

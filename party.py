@@ -7,8 +7,6 @@ from trytond.tools.multivalue import migrate_property
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
 
-__all__ = ['Party', 'PartyContractGroupingMethod', 'PartyReplace', 'PartyErase']
-
 
 class Party(metaclass=PoolMeta):
     __name__ = 'party.party'
