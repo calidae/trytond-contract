@@ -1238,6 +1238,7 @@ class ContractReview(Workflow, ModelSQL, ModelView):
                         review=review.rec_name))
         super().delete(reviews)
 
+
 class ContractReviewLine(sequence_ordered(), ModelSQL, ModelView):
     'Contract Review Line'
     __name__ = 'contract.review.line'
@@ -1253,10 +1254,10 @@ class ContractReviewLine(sequence_ordered(), ModelSQL, ModelView):
 
     @fields.depends('increase_percentage', 'price')
     def on_change_increase_percentage(self):
-        if self.increase_percentage == None:
-            self.increase_percentage = 0.0
-        self.updated_price = round(self.price + (
-                (self.price * Decimal(self.increase_percentage))), price_digits[1])
+        price = self.price or Decimal(0.0)
+        increase_percentage = self.increase_percentage or Decimal(0.0)
+        self.updated_price = round(price + (
+                (price * increase_percentage)), price_digits[1])
 
     @fields.depends('updated_price', 'price')
     def on_change_updated_price(self):
