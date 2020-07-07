@@ -6,29 +6,42 @@ from trytond.pool import PoolMeta, Pool
 from trytond.tools.multivalue import migrate_property
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
+from trytond.modules.company.model import CompanyValueMixin
+
+contract_grouping_method = fields.Selection([
+        (None, 'None'),
+        ('contract', 'Group contracts'),
+        ], 'Contract Grouping Method')
 
 
 class Party(metaclass=PoolMeta):
     __name__ = 'party.party'
-    contract_grouping_method = fields.MultiValue(fields.Selection([
-                (None, 'None'),
-                ('contract', 'Group contracts'),
-                ],
-            'Contract Grouping Method'))
+    contract_grouping_method = fields.MultiValue(contract_grouping_method)
+    contract_grouping_methods = fields.One2Many(
+        'party.party.contract_grouping_method', 'party',
+        'Contract Grouping Methods')
 
     @classmethod
     def default_contract_grouping_method(cls, **pattern):
-        return None
+        field_name = 'contract_grouping_method'
+        return getattr(
+            cls.multivalue_model(field_name),
+            'default_%s' % field_name, lambda: None)()
+
+    @classmethod
+    def multivalue_model(cls, field):
+        pool = Pool()
+        if field in {'contract_grouping_method'}:
+            return pool.get('party.party.contract_grouping_method')
+        return super(Party, cls).multivalue_model(field)
 
 
-class PartyContractGroupingMethod(ModelSQL, ValueMixin):
+class PartyContractGroupingMethod(CompanyValueMixin, ModelSQL):
     "Party Contract Grouping Method"
     __name__ = 'party.party.contract_grouping_method'
-
     party = fields.Many2One(
         'party.party', "Party", ondelete='CASCADE', select=True)
-    contract_grouping_method = fields.Selection(
-        'get_contract_grouping_method', "Contract Grouping Method")
+    contract_grouping_method = contract_grouping_method
 
     @classmethod
     def __register__(cls, module_name):
@@ -40,6 +53,10 @@ class PartyContractGroupingMethod(ModelSQL, ValueMixin):
         if not exist:
             cls._migrate_property([], [], [])
 
+    @staticmethod
+    def default_contract_grouping_method():
+        return None
+
     @classmethod
     def _migrate_property(cls, field_names, value_names, fields):
         field_names.append('contract_grouping_method')
@@ -47,13 +64,6 @@ class PartyContractGroupingMethod(ModelSQL, ValueMixin):
         migrate_property(
             'party.party', field_names, cls, value_names,
             parent='party', fields=fields)
-
-    @classmethod
-    def get_contract_grouping_method(cls):
-        pool = Pool()
-        Party = pool.get('party.party')
-        field_name = 'contract_grouping_method'
-        return Party.fields_get([field_name])[field_name]['selection']
 
 
 class PartyReplace(metaclass=PoolMeta):
