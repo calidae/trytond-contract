@@ -30,10 +30,10 @@ this repository contains the full copyright notices and license terms. -->
       <record model="ir.message" id="pending_contract">
           <field name="text">The party "%(party)s" can not be erased because he has pending contracts for the company "%(company)s".</field>
       </record>
-      <record model="ir.message" id="review_cannot_delete">
+      <record model="ir.message" id="msg_review_cannot_delete">
           <field name="text">Contract Review "%(review)s" cannot be removed because is not in pending state.</field>
       </record>
-      <record model="ir.message" id="review_with_lines">
+      <record model="ir.message" id="msg_review_with_lines">
           <field name="text">Contract Review "%(review)s" cannot move to "Pending" because it has lines created.</field>
       </record>
     </data>
