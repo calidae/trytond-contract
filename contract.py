@@ -1058,7 +1058,7 @@ class ContractReview(Workflow, ModelSQL, ModelView):
     # TODO: This field is implemented because it is not possible to make
     # comparisons between dates in pyson
     visual = fields.Function(fields.Boolean('Visual'), 'get_visual')
-    company = fields.Many2One('company.company', 'Company',
+    company = fields.Many2One('company.company', 'Company', required=True,
         domain=[
             ('id',
                 If(Bool(Eval('_parent_contract', {}).get('company', 0)),
@@ -1136,6 +1136,7 @@ class ContractReview(Workflow, ModelSQL, ModelView):
         today = Date.today()
         ContractReview = pool.get('contract.review')
         Contract = pool.get('contract')
+
         contracts = Contract.search([
                     ('state', 'in', ['confirmed', 'done']),
                     ['OR',
@@ -1153,28 +1154,26 @@ class ContractReview(Workflow, ModelSQL, ModelView):
             if not contract.first_review_date:
                 continue
 
-            if not contract.reviews:
-                review_date = contract.first_review_date
-            else:
+            if contract.reviews:
                 last_review = contract.reviews[0]
                 if (last_review.state == 'pending' or
-                    last_review.state == 'processing'):
+                        last_review.state == 'processing'):
                     continue
-
                 review_date = (last_review.review_date +
                     relativedelta(months=contract.months_renewal))
+            else:
+                review_date = contract.first_review_date
 
             review = ContractReview()
             review.contract = contract
+            review.company = contract.company
             review.review_date = review_date
-
             review.limit_date = (review_date - contract.review_limit_date)
             review.alarm_date = (review.limit_date - contract.review_alarm)
-
             to_create.append(review)
 
-        ContractReview.save(to_create)
-        return to_create
+        if to_create:
+            return ContractReview.save(to_create)
 
     @classmethod
     @ModelView.button
@@ -1295,7 +1294,7 @@ class CreateReviews(Wizard):
     def do_create_reviews(self, action):
         pool = Pool()
         ContractReview = pool.get('contract.review')
-        reviews = ContractReview.create_reviews()
+        reviews = ContractReview.create_reviews() or []
         data = {'res_id': [r.id for r in reviews]}
         return action, data
 
