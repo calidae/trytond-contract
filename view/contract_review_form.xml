@@ -6,6 +6,8 @@
         <page string="Contract" id="contract">
           <label name="contract"/>
           <field name="contract"/>
+          <label name="company"/>
+          <field name="company"/>
           <label name="review_date"/>
           <field name="review_date"/>
           <label name="limit_date"/>

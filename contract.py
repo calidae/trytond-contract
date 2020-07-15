@@ -1060,6 +1060,13 @@ class ContractReview(Workflow, ModelSQL, ModelView):
     # TODO: This field is implemented because it is not possible to make
     # comparisons between dates in pyson
     visual = fields.Function(fields.Boolean('Visual'), 'get_visual')
+    company = fields.Many2One('company.company', 'Company',
+        domain=[
+            ('id',
+                If(Bool(Eval('_parent_contract', {}).get('company', 0)),
+                    '=', '!='),
+                Eval('_parent_contract', {}).get('company', -1)),
+            ], depends=['contract'], select=True)
 
     @classmethod
     def __setup__(cls):
@@ -1102,6 +1109,10 @@ class ContractReview(Workflow, ModelSQL, ModelView):
     @staticmethod
     def default_state():
         return 'pending'
+
+    @staticmethod
+    def default_company():
+        return Transaction().context.get('company')
 
     def get_visual(self, name):
         pool = Pool()
@@ -1194,10 +1205,8 @@ class ContractReview(Workflow, ModelSQL, ModelView):
     def pending(cls, reviews):
         for review in reviews:
             if review.lines:
-                raise UserError(gettext('contract.review_with_lines',
+                raise UserError(gettext('contract.msg_review_with_lines',
                         review=review.rec_name))
-        super().pending(reviews)
-
 
     @classmethod
     @ModelView.button
@@ -1236,7 +1245,7 @@ class ContractReview(Workflow, ModelSQL, ModelView):
     def delete(cls, reviews):
         for review in reviews:
             if review.state != 'pending':
-                raise UserError(gettext('contract.review_cannot_delete',
+                raise UserError(gettext('contract.msg_review_cannot_delete',
                         review=review.rec_name))
         super().delete(reviews)
 
