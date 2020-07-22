@@ -5,6 +5,7 @@ Contract Scenario
 Imports::
 
     >>> import datetime
+    >>> from dateutil.relativedelta import relativedelta
     >>> from decimal import Decimal
     >>> from proteus import Model, Wizard, Report
     >>> from trytond.tests.tools import activate_modules
@@ -14,7 +15,9 @@ Imports::
     ...     create_chart, get_accounts, create_tax
     >>> from trytond.modules.account_invoice.tests.tools import \
     ...     set_fiscalyear_invoice_sequences, create_payment_term
-    >>> today = datetime.date(2015, 1, 1)
+    >>> today = datetime.date.today()
+    >>> d2015 = datetime.date(2015, 1, 1)
+    >>> next_year = today + relativedelta(years=1)
 
 Install contract::
 
@@ -28,7 +31,7 @@ Create company::
 Create fiscal year::
 
     >>> fiscalyear = set_fiscalyear_invoice_sequences(
-    ...     create_fiscalyear(company, today))
+    ...     create_fiscalyear(company, d2015))
     >>> fiscalyear.click('create_period')
 
 Create chart of accounts::
@@ -61,6 +64,9 @@ Configure contract::
 
     >>> contract_config = ContractConfig(1)
     >>> contract_config.journal, = Journal.find([('type', '=', 'revenue')])
+    >>> contract_config.default_months_renewal = 1
+    >>> contract_config.default_review_alarm = datetime.timedelta(days=1)
+    >>> contract_config.default_review_limit_date = datetime.timedelta(days=1)
     >>> contract_config.save()
 
 Create account category::
@@ -255,4 +261,95 @@ Check invoice lines amount::
     ...     ('service1', '2015-03-01', Decimal('3.23')),
     ...     ('service4', '2015-04-01', Decimal('400.00')),
     ...     ])
+    True
+
+Create reviews::
+
+    >>> contract = Contract()
+    >>> contract.party = customer
+    >>> contract.freq = 'monthly'
+    >>> contract.interval = 1
+    >>> contract.start_period_date = datetime.date(2015, 1, 1)
+    >>> contract.first_invoice_date = datetime.date(2015, 1, 1)
+    >>> contract.first_review_date = datetime.date(2015, 3, 1)
+    >>> line1 = contract.lines.new(
+    ...     service=service1,
+    ...     unit_price=Decimal(100),
+    ...     start_date=datetime.date(2015, 1, 1),
+    ...     end_date=datetime.date(2015, 3, 1))
+    >>> line2 = contract.lines.new(
+    ...     service=service2,
+    ...     unit_price=Decimal(200),
+    ...     start_date=datetime.date(2015, 1, 1),
+    ...     end_date=datetime.date(2015, 2, 15))
+    >>> contract.save()
+    >>> contract.click('confirm')
+    >>> contract.state
+    'confirmed'
+
+    >>> contract = Contract()
+    >>> contract.party = customer
+    >>> contract.freq = 'monthly'
+    >>> contract.interval = 1
+    >>> contract.start_period_date = today
+    >>> contract.first_invoice_date = today
+    >>> contract.first_review_date = next_year
+    >>> line1 = contract.lines.new(
+    ...     service=service1,
+    ...     unit_price=Decimal(100),
+    ...     start_date=today,
+    ...     end_date=next_year)
+    >>> line2 = contract.lines.new(
+    ...     service=service2,
+    ...     unit_price=Decimal(200),
+    ...     start_date=today,
+    ...     end_date=next_year)
+    >>> contract.save()
+    >>> contract.click('confirm')
+    >>> contract.state
+    'confirmed'
+
+    >>> create_reviews = Wizard('contract.create_reviews')
+    >>> create_reviews.execute('create_reviews')
+
+    >>> ContractReview = Model.get('contract.review')
+    >>> review1, review2 = ContractReview.find([])
+
+    >>> review1.review_date == datetime.date(2015, 2, 1)
+    True
+    >>> review1.limit_date == datetime.date(2015, 1, 31)
+    True
+    >>> review1.alarm_date == datetime.date(2015, 1, 30)
+    True
+
+    >>> review2.review_date == next_year
+    True
+    >>> review2.limit_date == (next_year - relativedelta(days=1))
+    True
+    >>> review2.alarm_date == (next_year - relativedelta(days=2))
+    True
+
+    >>> create_reviews = Wizard('contract.create_reviews')
+    >>> create_reviews.execute('create_reviews')
+    >>> len(ContractReview.find([])) == 2
+    True
+
+    >>> review2.click('processing')
+    >>> review2.click('done')
+    >>> review2.state == 'done'
+    True
+
+    >>> create_reviews = Wizard('contract.create_reviews')
+    >>> create_reviews.execute('create_reviews')
+    >>> len(ContractReview.find([])) == 3
+    True
+
+    >>> _, _, review3 = ContractReview.find([])
+    >>> review3.review_date == next_year + relativedelta(months=1)
+    True
+    >>> review3.limit_date == (next_year - relativedelta(days=1)
+    ...     + relativedelta(months=1))
+    True
+    >>> review3.alarm_date == (next_year - relativedelta(days=2)
+    ...     + relativedelta(months=1))
     True
