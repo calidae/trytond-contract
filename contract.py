@@ -1156,12 +1156,16 @@ class ContractReview(Workflow, ModelSQL, ModelView):
             if not contract.first_review_date:
                 continue
 
-            if contract.reviews:
-                last_review = contract.reviews[0]
-                if (last_review.state == 'pending' or
-                        last_review.state == 'processing'):
-                    continue
-                review_date = (last_review.review_date +
+            # in case have reviews not done or cancelled, not create new reviews
+            if [r.review_date for r in contract.reviews
+                    if r.state not in ('cancelled', 'done')]:
+                continue
+
+            review_dates = [r.review_date for r in contract.reviews
+                    if r.state == 'done']
+            if review_dates:
+                review_dates.sort(reverse=True)
+                review_date = (review_dates[0] +
                     relativedelta(months=contract.months_renewal))
             else:
                 review_date = contract.first_review_date
