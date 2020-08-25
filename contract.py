@@ -347,6 +347,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     def copy(cls, contracts, default=None):
         if default is None:
             default = {}
+        else:
+            default = default.copy()
         default.setdefault('number', None)
         default.setdefault('end_date', None)
         return super(Contract, cls).copy(contracts, default=default)
