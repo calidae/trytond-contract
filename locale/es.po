@@ -717,7 +717,7 @@ msgid "Finished"
 msgstr "Finalizado"
 
 msgctxt "selection:contract.review,state:"
-msgid "Canceled"
+msgid "Cancelled"
 msgstr "Cancelado"
 
 msgctxt "selection:contract.review,state:"

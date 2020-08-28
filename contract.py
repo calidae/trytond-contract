@@ -1046,7 +1046,7 @@ class ContractReview(Workflow, ModelSQL, ModelView):
         ('pending', 'Pending'),
         ('processing', 'Processing'),
         ('done', 'Done'),
-        ('cancelled', 'Canceled'),
+        ('cancelled', 'Cancelled'),
         ], 'State', readonly=True,
         help="The current state of the review.")
     lines = fields.One2Many('contract.review.line', 'review', 'Lines',

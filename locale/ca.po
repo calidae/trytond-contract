@@ -715,7 +715,7 @@ msgid "Finished"
 msgstr "Finalitzat"
 
 msgctxt "selection:contract.review,state:"
-msgid "Canceled"
+msgid "Cancelled"
 msgstr "Cancel·lat"
 
 msgctxt "selection:contract.review,state:"
