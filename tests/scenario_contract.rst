@@ -347,9 +347,9 @@ Create reviews::
     >>> _, _, review3 = ContractReview.find([])
     >>> review3.review_date == next_year + relativedelta(months=1)
     True
-    >>> review3.limit_date == (next_year - relativedelta(days=1)
-    ...     + relativedelta(months=1))
+    >>> review3.limit_date == (next_year + relativedelta(months=1)
+    ...     - relativedelta(days=1))
     True
-    >>> review3.alarm_date == (next_year - relativedelta(days=2)
-    ...     + relativedelta(months=1))
+    >>> review3.alarm_date == (next_year + relativedelta(months=1)
+    ...     - relativedelta(days=2))
     True
