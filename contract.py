@@ -20,7 +20,12 @@ from trytond.wizard import Wizard, StateView, StateAction, Button
 from trytond.modules.product import price_digits
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
-from trytond.modules.analytic_account import AnalyticMixin
+
+try:
+    from trytond.modules.analytic_account import AnalyticMixin
+except ModuleNotFoundError:
+    AnalyticMixin = object
+
 
 __all__ = ['ContractService', 'Contract', 'ContractLine',
     'ContractConsumption', 'CreateConsumptionsStart', 'CreateConsumptions',
