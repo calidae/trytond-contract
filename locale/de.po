@@ -735,7 +735,7 @@ msgstr "Verträge gruppieren"
 
 msgctxt "selection:party.party,contract_grouping_method:"
 msgid "None"
-msgstr "Keine"
+msgstr " - "
 
 msgctxt ""
 "selection:party.party.contract_grouping_method,contract_grouping_method:"
@@ -745,7 +745,7 @@ msgstr "Verträge gruppieren"
 msgctxt ""
 "selection:party.party.contract_grouping_method,contract_grouping_method:"
 msgid "None"
-msgstr "Keine"
+msgstr " - "
 
 msgctxt "view:account.invoice.credit.start:"
 msgid ""
