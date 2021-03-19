@@ -1,7 +1,7 @@
 # The COPYRIGHT file at the top level of this repository contains the full
 # copyright notices and license terms.
 from trytond import backend
-from trytond.model import ModelSQL, ValueMixin, fields
+from trytond.model import ModelSQL, fields
 from trytond.pool import PoolMeta, Pool
 from trytond.tools.multivalue import migrate_property
 from trytond.i18n import gettext
