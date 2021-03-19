@@ -3,7 +3,7 @@
 from trytond import backend
 from trytond.model import ModelView, ModelSQL, ModelSingleton, fields
 from trytond.pool import Pool
-from trytond.pyson import Eval, Bool, If
+from trytond.pyson import Eval, Id
 from trytond.tools.multivalue import migrate_property
 from trytond.modules.company.model import (
     CompanyMultiValueMixin, CompanyValueMixin)
@@ -20,7 +20,8 @@ class Configuration(
             domain=[
                 ('company', 'in',
                     [Eval('context', {}).get('company', -1), None]),
-                ('code', '=', 'contract'),
+                ('sequence_type', '=', Id('contract',
+                        'sequence_type_contract')),
                 ]))
     journal = fields.MultiValue(fields.Many2One(
             'account.journal', "Journal", required=True,
@@ -56,7 +57,7 @@ class ConfigurationSequence(ModelSQL, CompanyValueMixin):
         'ir.sequence', "Contract Reference Sequence",
         domain=[
             ('company', 'in', [Eval('company', -1), None]),
-            ('code', '=', 'contract'),
+            ('sequence_type', '=', Id('contract', 'sequence_type_contract')),
             ],
         depends=['company'])
 

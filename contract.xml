@@ -294,7 +294,6 @@
         </record>
         <record model="ir.sequence.type" id="sequence_type_contract">
             <field name="name">Contract</field>
-            <field name="code">contract</field>
         </record>
         <record model="ir.sequence.type-res.group"
             id="sequence_type_contract_group_admin">
@@ -309,7 +308,7 @@
 
         <record model="ir.sequence" id="sequence_contract">
             <field name="name">Contract</field>
-            <field name="code">contract</field>
+            <field name="sequence_type" ref="sequence_type_contract"/>
         </record>
 
         <record model="ir.action.wizard" id="wizard_create_invoices">

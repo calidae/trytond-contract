@@ -333,7 +333,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     def set_number(cls, contracts):
         'Fill the number field with the contract sequence'
         pool = Pool()
-        Sequence = pool.get('ir.sequence')
         Config = pool.get('contract.configuration')
 
         config = Config(1)
@@ -341,7 +340,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         for contract in contracts:
             if contract.number:
                 continue
-            number = Sequence.get_id(config.contract_sequence.id)
+            number = config.contract_sequence.get()
             to_write.extend(([contract], {
                         'number': number,
                         }))
