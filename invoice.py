@@ -69,7 +69,7 @@ class CreditInvoiceStart(metaclass=PoolMeta):
     @classmethod
     def view_attributes(cls):
         states = {'invisible': ~Bool(Eval('from_contract'))}
-        return [
+        return super().view_attributes() + [
             ('/form//label[@id="credit_contract"]', 'states', states),
             ]
 
