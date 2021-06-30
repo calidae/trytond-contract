@@ -136,7 +136,7 @@ msgstr "Línea de contrato"
 
 msgctxt "field:contract.consumption,credit_lines:"
 msgid "Credit Lines"
-msgstr "Lineas de abono"
+msgstr "Líneas de abono"
 
 msgctxt "field:contract.consumption,end_date:"
 msgid "End Date"
