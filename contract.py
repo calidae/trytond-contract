@@ -925,7 +925,7 @@ class ContractConsumption(ModelSQL, ModelView):
         return grouping
 
     @classmethod
-    def _get_invoice(cls, keys):
+    def _get_invoice(cls, keys, lines):
         pool = Pool()
         Invoice = pool.get('account.invoice')
         Config = pool.get('contract.configuration')
@@ -948,6 +948,14 @@ class ContractConsumption(ModelSQL, ModelView):
         if values.get('contract'):
             contract = values['contract']
             invoice.reference = contract.reference
+        elif lines:
+            # consumption, invoice_line = line
+            references = set()
+            for line in lines:
+                reference = line[0].contract_line.contract.reference
+                if reference:
+                    references.add(reference)
+            invoice.reference = ', '.join(list(references))
         return invoice
 
     @classmethod
@@ -971,9 +979,10 @@ class ContractConsumption(ModelSQL, ModelView):
 
         invoices = []
         for key, grouped_lines in groupby(lines, key=cls._group_invoice_key):
-            invoice = cls._get_invoice(key)
+            cons_lines = [cons_line for cons_line in grouped_lines]
+            invoice = cls._get_invoice(key, cons_lines)
             invoice.lines = (list(getattr(invoice, 'lines', [])) +
-                list(x[1] for x in grouped_lines))
+                list(x[1] for x in cons_lines))
             invoices.append(invoice)
 
         invoices = Invoice.create([x._save_values for x in invoices])
