@@ -18,10 +18,6 @@ msgctxt "field:contract,currency:"
 msgid "Currency"
 msgstr "Moneda"
 
-msgctxt "field:contract,currency_digits:"
-msgid "Currency Digits"
-msgstr "Dígits de la moneda"
-
 msgctxt "field:contract,end_date:"
 msgid "End Date"
 msgstr "Data final"

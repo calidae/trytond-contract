@@ -112,8 +112,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         states=_STATES, depends=_DEPENDS)
     currency = fields.Many2One('currency.currency', 'Currency', required=True,
         states=_STATES, depends=_DEPENDS)
-    currency_digits = fields.Function(fields.Integer('Currency Digits'),
-        'on_change_with_currency_digits')
     party = fields.Many2One('party.party', 'Party', required=True,
         states=_STATES, depends=_DEPENDS)
     number = fields.Char('Number', select=True, states=_STATES,
@@ -276,12 +274,6 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         self.payment_term = None
         if self.party:
             self.payment_term = self.party.customer_payment_term
-
-    @fields.depends('currency')
-    def on_change_with_currency_digits(self, name=None):
-        if self.currency:
-            return self.currency.digits
-        return 2
 
     @classmethod
     def get_dates(cls, contracts, names):
