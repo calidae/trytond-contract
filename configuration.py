@@ -3,7 +3,7 @@
 from trytond import backend
 from trytond.model import ModelView, ModelSQL, ModelSingleton, fields
 from trytond.pool import Pool
-from trytond.pyson import Eval, Bool, If
+from trytond.pyson import Eval
 from trytond.tools.multivalue import migrate_property
 from trytond.modules.company.model import (
     CompanyMultiValueMixin, CompanyValueMixin)
