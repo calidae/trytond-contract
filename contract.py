@@ -918,8 +918,15 @@ class ContractConsumption(ModelSQL, ModelView):
             ('currency', invoice_line.currency),
             ('type', invoice_line.invoice_type),
             ('invoice_date', consumption.invoice_date),
-            ('payment_term', consumption.contract.payment_term),
             ]
+
+        # We need to add the payment_term id instead of payment_term object to
+        # be able to search consumptions without payment_term
+        if consumption.contract.payment_term:
+            grouping.append(('payment_term', consumption.contract.payment_term.id))
+        else:
+            grouping.append(('payment_term', -1),)
+
         if invoice_line.party.contract_grouping_method is None:
             grouping.append(('contract', consumption.contract_line.contract))
         return grouping
@@ -985,6 +992,11 @@ class ContractConsumption(ModelSQL, ModelView):
                 list(x[1] for x in cons_lines))
             invoices.append(invoice)
 
+        for x in invoices:
+            # We need to emtpy all the payment terms with id -1, this
+            # payments_terms come from "group_invoic_key" function
+            if x.payment_term.id == -1:
+                x.payment_term = None
         invoices = Invoice.create([x._save_values for x in invoices])
         Invoice.update_taxes(invoices)
         return invoices
