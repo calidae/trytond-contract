@@ -1143,7 +1143,7 @@ class ContractReview(Workflow, ModelSQL, ModelView):
         pool = Pool()
         Date = pool.get('ir.date')
         today = Date.today()
-        if self.limit_date < today:
+        if self.limit_date and (self.limit_date < today):
             return True
         return False
 
