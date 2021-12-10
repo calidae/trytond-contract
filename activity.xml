@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!-- The COPYRIGHT file at the top level of this repository contains the full
+     copyright notices and license terms. -->
+<tryton>
+    <data>
+        <record model="activity.reference" id="contract_activity_reference">
+            <field name="model" search="[('model', '=', 'contract.review')]"/>
+        </record>
+    </data>
+</tryton>
