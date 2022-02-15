@@ -13,7 +13,7 @@ this repository contains the full copyright notices and license terms. -->
           <field name="text">Contract "%s" can not be moved to draft because it has consumptions.</field>
       </record>
       <record model="ir.message" id="cannot_delete">
-          <field name="text">Contract Line "%(line)s" cannot be removed because contract "%(contract)s" is not in draft state.</field>
+          <field name="text">Contract Line "%(line)s" cannot be removed because contract "%(contract)s" has consumptions.</field>
       </record>
       <record model="ir.message" id="missing_account_revenue">
           <field name="text">Product "%(product)s" of contract line %(contract_line)s misses a revenue account.</field>

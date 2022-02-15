@@ -532,11 +532,11 @@ class ContractLine(sequence_ordered(), ModelSQL, ModelView):
         searcher='search_contract_state')
     service = fields.Many2One('contract.service', 'Service', required=True,
         states={
-            'readonly': Eval('contract_state') == 'confirmed',
-            })
+            'readonly': Bool(Eval('consumptions', [-1])),
+        }, depends=['consumptions'])
     start_date = fields.Date('Start Date',
         states={
-            'readonly': Eval('contract_state') == 'confirmed',
+            'readonly': Bool(Eval('consumptions', [-1])),
             'required': Eval('contract_state') == 'confirmed',
             },
         domain=[
@@ -544,7 +544,7 @@ class ContractLine(sequence_ordered(), ModelSQL, ModelView):
                 ('start_date', '<=', Eval('end_date', None)),
                 ()),
             ],
-        depends=['end_date', 'contract_state'])
+        depends=['end_date', 'contract_state', 'consumptions'])
     end_date = fields.Date('End Date',
         states={
             'required': Eval('contract_state') == 'finished',
@@ -685,7 +685,7 @@ class ContractLine(sequence_ordered(), ModelSQL, ModelView):
     @classmethod
     def delete(cls, lines):
         for line in lines:
-            if line.contract_state != 'draft':
+            if line.consumptions:
                 raise UserError(gettext('contract.cannot_delete',
                         line=line.rec_name,
                         contract=line.contract.rec_name))
