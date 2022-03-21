@@ -412,7 +412,7 @@
         </record>
         <record model="ir.rule" id="rule_contract_review1">
             <field name="domain"
-                eval="[('company', '=', Eval('user', {}).get('company', None))]"
+                eval="[('company', 'in', Eval('companies', []))]"
                 pyson="1"/>
             <field name="rule_group" ref="rule_group_contract_review"/>
         </record>
@@ -529,7 +529,7 @@
         </record>
         <record model="ir.rule" id="rule_contract1">
             <field name="domain"
-                eval="[('company', '=', Eval('user', {}).get('company', None))]"
+                eval="[('company', 'in', Eval('companies', []))]"
                 pyson="1"/>
             <field name="rule_group" ref="rule_group_contract"/>
         </record>
@@ -540,7 +540,7 @@
         </record>
         <record model="ir.rule" id="rule_contract_line1">
             <field name="domain"
-                eval="[('contract.company', '=', Eval('user', {}).get('company', None))]"
+                eval="[('contract.company', 'in', Eval('companies', []))]"
                 pyson="1"/>
             <field name="rule_group" ref="rule_group_contract_line"/>
         </record>
@@ -551,7 +551,7 @@
         </record>
         <record model="ir.rule" id="rule_contract_consumption1">
             <field name="domain"
-                eval="[('contract_line.contract.company', '=', Eval('user', {}).get('company', None))]"
+                eval="[('contract_line.contract.company', 'in', Eval('companies', []))]"
                 pyson="1"/>
             <field name="rule_group" ref="rule_group_contract_consumption"/>
         </record>

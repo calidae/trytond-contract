@@ -97,7 +97,10 @@ class ConfigurationAccount(ModelSQL, CompanyValueMixin):
         'account.journal', "Journal",
         domain=[
             ('type', '=', 'revenue'),
-            ])
+            ],
+        context={
+            'company': Eval('company'),
+        }, depends=['company'])
 
     @classmethod
     def __register__(cls, module_name):
