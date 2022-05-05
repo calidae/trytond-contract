@@ -173,7 +173,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             field = getattr(cls, field_name)
             field.states = _STATES.copy()
             field.states['required'] = True
-            field.depends += _DEPENDS
+            field.depends.update(set(_DEPENDS))
         cls._transitions |= set((
                 ('draft', 'confirmed'),
                 ('draft', 'cancelled'),
