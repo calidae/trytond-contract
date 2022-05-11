@@ -359,6 +359,8 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         Consumption = Pool().get('contract.consumption')
         consumptions = Consumption.search([
                 ('contract', 'in', [x.id for x in contracts]),
+                ('contract_line.contract.company', '=',
+                    Transaction().context.get('company')),
                 ])
         if consumptions:
             raise UserError(gettext('contract.cannot_draft',
@@ -895,9 +897,11 @@ class ContractConsumption(ModelSQL, ModelView):
         return invoice_line
 
     def get_amount_to_invoice(self):
-        Uom = Pool().get('product.uom')
+        pool = Pool()
+        Uom = pool.get('product.uom')
+        ModelData = pool.get('ir.model.data')
 
-        uom, = Uom.search([('name', '=', 'Unit')])
+        uom = Uom(ModelData.get_id('product', 'uom_unit'))
 
         quantity = ((self.end_date - self.start_date).total_seconds() /
             (self.end_period_date - self.init_period_date).total_seconds())
@@ -1055,8 +1059,10 @@ class CreateConsumptions(Wizard):
     def do_create_consumptions(self, action):
         pool = Pool()
         Contract = pool.get('contract')
+
         contracts = Contract.search([
                 ('state', 'in', ['confirmed', 'finished']),
+                ('company', '=', Transaction().context.get('company')),
                 ])
         consumptions = Contract.consume(contracts, self.start.date)
         data = {'res_id': [c.id for c in consumptions]}
@@ -1170,6 +1176,7 @@ class ContractReview(Workflow, ModelSQL, ModelView):
 
         contracts = Contract.search([
                     ('state', 'in', ['confirmed', 'done']),
+                    ('company', '=', Transaction().context.get('company')),
                     ['OR',
                         [
                             ('end_date', '=', None),
