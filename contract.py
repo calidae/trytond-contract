@@ -118,7 +118,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             'company': Eval('company'),
             },
         states=_STATES, depends=_DEPENDS + ['company'])
-    number = fields.Char('Number', select=True, states=_STATES,
+    number = fields.Char('Number', states=_STATES,
         depends=_DEPENDS)
     reference = fields.Char('Reference')
     start_date = fields.Function(fields.Date('Start Date'),
@@ -1099,7 +1099,7 @@ class ContractReview(Workflow, ModelSQL, ModelView):
                 If(Bool(Eval('_parent_contract', {}).get('company', 0)),
                     '=', '!='),
                 Eval('_parent_contract', {}).get('company', -1)),
-            ], depends=['contract'], select=True)
+            ], depends=['contract'])
 
     @classmethod
     def __setup__(cls):
