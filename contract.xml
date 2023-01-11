@@ -200,7 +200,7 @@
         <record model="ir.ui.view" id="contract_line_view_list_sequence">
             <field name="model">contract.line</field>
             <field name="type">tree</field>
-            <field name="priority">20</field>
+            <field name="priority" eval="20"/>
             <field name="name">contract_line_list_sequence</field>
         </record>
         <record model="ir.ui.view" id="contract_line_view_form">
@@ -504,12 +504,41 @@
             <field name="act_window" ref="act_contract_review_line"/>
         </record>
 
+        <!-- Global rules -->
+        <record model="ir.rule.group" id="rule_group_contract_companies">
+            <field name="name">User in companies</field>
+            <field name="model" search="[('model', '=', 'contract')]"/>
+            <field name="global_p" eval="True"/>
+        </record>
+        <record model="ir.rule" id="rule_contract_companies">
+            <field name="domain"
+                eval="[('company', 'in', Eval('companies', []))]"
+                pyson="1"/>
+            <field name="rule_group" ref="rule_group_contract_companies"/>
+        </record>
+
+        <record model="ir.rule.group" id="rule_group_contract_review_companies">
+            <field name="name">User in companies</field>
+            <field name="model" search="[('model', '=', 'contract.review')]"/>
+            <field name="global_p" eval="True"/>
+        </record>
+        <record model="ir.rule" id="rule_contract_review_companies">
+            <field name="domain"
+                eval="[('company', 'in', Eval('companies', []))]"
+                pyson="1"/>
+            <field name="rule_group" ref="rule_group_contract_review_companies"/>
+        </record>
+
         <!-- Menus -->
         <record model="ir.ui.icon" id="contract_icon">
             <field name="name">tryton-membership</field>
             <field name="path">icons/tryton-membership.svg</field>
         </record>
-        <menuitem id="menu_contract" name="Contracts" icon="tryton-membership"/>
+        <menuitem
+            name="Contracts"
+            sequence="100"
+            id="menu_contract"
+            icon="tryton-membership"/>
 
         <record model="ir.ui.menu-res.group" id="menu_contract_group_contract">
             <field name="menu" ref="menu_contract"/>
@@ -556,16 +585,25 @@
             <field name="rule_group" ref="rule_group_contract_consumption"/>
         </record>
 
-        <menuitem name="Configuration" parent="menu_contract"
-            id="menu_configuration" sequence="0" icon="tryton-settings"/>
+        <menuitem
+            name="Configuration"
+            parent="menu_contract"
+            id="menu_configuration"
+            sequence="0"
+            icon="tryton-settings"/>
+
         <record model="ir.ui.menu-res.group"
             id="menu_configuration_group_contract_admin">
             <field name="menu" ref="menu_configuration"/>
             <field name="group" ref="group_contract_admin"/>
         </record>
 
-        <menuitem action="act_contract_service" id="menu_contract_service"
-          parent="menu_configuration" sequence="10" name="Contract Services"/>
+        <menuitem
+            parent="menu_configuration"
+            name="Contract Services"
+            sequence="10"
+            action="act_contract_service"
+            id="menu_contract_service"/>
 
         <menuitem action="act_contract" id="menu_contract_form"
             parent="menu_contract" sequence="20" name="Contracts"/>

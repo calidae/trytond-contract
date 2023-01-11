@@ -43,8 +43,9 @@ class PartyContractGroupingMethod(CompanyValueMixin, ModelSQL):
     party = fields.Many2One(
         'party.party', "Party", ondelete='CASCADE',
         context={
-            'company': Eval('company'),
-        }, depends=['company'])
+            'company': Eval('company', -1),
+            },
+        depends=['company'])
     contract_grouping_method = contract_grouping_method
 
     @classmethod
