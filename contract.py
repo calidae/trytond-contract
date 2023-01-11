@@ -115,7 +115,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         states=_STATES, depends=_DEPENDS)
     party = fields.Many2One('party.party', 'Party', required=True,
         context={
-            'company': Eval('company'),
+            'company': Eval('company', -1),
             },
         states=_STATES, depends=_DEPENDS + ['company'])
     number = fields.Char('Number', select=True, states=_STATES,
