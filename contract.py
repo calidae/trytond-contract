@@ -117,7 +117,7 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
         'on_change_with_currency_digits')
     party = fields.Many2One('party.party', 'Party', required=True,
         context={
-            'company': Eval('company'),
+            'company': Eval('company', -1),
             },
         states=_STATES, depends=_DEPENDS + ['company'])
     number = fields.Char('Number', select=True, states=_STATES,
