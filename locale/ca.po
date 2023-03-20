@@ -606,6 +606,10 @@ msgctxt "model:ir.rule.group,name:rule_group_contract"
 msgid "User in company"
 msgstr "Usuari a les empreses"
 
+msgctxt "model:ir.rule.group,name:rule_group_contract_companies"
+msgid "User in companies"
+msgstr "Usuari a les empreses"
+
 msgctxt "model:ir.rule.group,name:rule_group_contract_consumption"
 msgid "User in company"
 msgstr "Usuari a les empreses"
@@ -616,6 +620,10 @@ msgstr "Usuari a les empreses"
 
 msgctxt "model:ir.rule.group,name:rule_group_contract_review"
 msgid "User in company"
+msgstr "Usuari a les empreses"
+
+msgctxt "model:ir.rule.group,name:rule_group_contract_review_companies"
+msgid "User in companies"
 msgstr "Usuari a les empreses"
 
 msgctxt "model:ir.sequence,name:sequence_contract"
@@ -794,7 +802,7 @@ msgstr "Crear consums desde"
 
 msgctxt "view:contract.create_invoices.start:"
 msgid "Create invoices up to"
-msgstr "Crear factures desde"
+msgstr "Crear factures fins"
 
 msgctxt "view:contract.create_reviews.start:"
 msgid "Create Contract Reviews"
