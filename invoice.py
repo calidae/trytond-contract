@@ -41,15 +41,12 @@ class CreateInvoices(Wizard):
 
     def do_create_invoices(self, action):
         pool = Pool()
-        Contract = pool.get('contract')
         Consumptions = pool.get('contract.consumption')
 
-        conntracts = Contract.search([
-            ('company', '=', Transaction().context.get('company'))
-        ])
         consumptions = Consumptions.search([
             ('invoice_date', '<=', self.start.date),
-            ('contract', 'in', conntracts)
+            ('contract_line.contract.company', '=',
+                Transaction().context.get('company')),
             ])
 
         invoices = Consumptions._invoice(consumptions)
