@@ -4,7 +4,6 @@ from trytond import backend
 from trytond.model import ModelView, ModelSQL, ModelSingleton, fields
 from trytond.pool import Pool
 from trytond.pyson import Eval, Id
-from trytond.tools.multivalue import migrate_property
 from trytond.modules.company.model import (
     CompanyMultiValueMixin, CompanyValueMixin)
 
@@ -62,24 +61,6 @@ class ConfigurationSequence(ModelSQL, CompanyValueMixin):
         depends=['company'])
 
     @classmethod
-    def __register__(cls, module_name):
-        exist = backend.TableHandler.table_exist(cls._table)
-
-        super(ConfigurationSequence, cls).__register__(module_name)
-
-        if not exist:
-            cls._migrate_property([], [], [])
-
-    @classmethod
-    def _migrate_property(cls, field_names, value_names, fields):
-        field_names.append('contract_sequence')
-        value_names.append('contract_sequence')
-        fields.append('company')
-        migrate_property(
-            'contract.configuration', field_names, cls, value_names,
-            fields=fields)
-
-    @classmethod
     def default_contract_sequence(cls):
         pool = Pool()
         ModelData = pool.get('ir.model.data')
@@ -101,21 +82,3 @@ class ConfigurationAccount(ModelSQL, CompanyValueMixin):
         context={
             'company': Eval('company'),
         }, depends=['company'])
-
-    @classmethod
-    def __register__(cls, module_name):
-        exist = backend.TableHandler.table_exist(cls._table)
-
-        super(ConfigurationAccount, cls).__register__(module_name)
-
-        if not exist:
-            cls._migrate_property([], [], [])
-
-    @classmethod
-    def _migrate_property(cls, field_names, value_names, fields):
-        field_names += ['journal']
-        value_names += ['journal']
-        fields.append('company')
-        migrate_property(
-            'contract.configuration', field_names, cls, value_names,
-            fields=fields)
