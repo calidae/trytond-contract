@@ -4,7 +4,6 @@ from trytond import backend
 from trytond.model import ModelSQL, fields
 from trytond.pool import PoolMeta, Pool
 from trytond.pyson import Eval
-from trytond.tools.multivalue import migrate_property
 from trytond.i18n import gettext
 from trytond.exceptions import UserError
 from trytond.modules.company.model import CompanyValueMixin
@@ -48,26 +47,9 @@ class PartyContractGroupingMethod(CompanyValueMixin, ModelSQL):
         depends=['company'])
     contract_grouping_method = contract_grouping_method
 
-    @classmethod
-    def __register__(cls, module_name):
-        exist = backend.TableHandler.table_exist(cls._table)
-
-        super(PartyContractGroupingMethod, cls).__register__(module_name)
-
-        if not exist:
-            cls._migrate_property([], [], [])
-
     @staticmethod
     def default_contract_grouping_method():
         return None
-
-    @classmethod
-    def _migrate_property(cls, field_names, value_names, fields):
-        field_names.append('contract_grouping_method')
-        value_names.append('contract_grouping_method')
-        migrate_property(
-            'party.party', field_names, cls, value_names,
-            parent='party', fields=fields)
 
 
 class PartyReplace(metaclass=PoolMeta):
