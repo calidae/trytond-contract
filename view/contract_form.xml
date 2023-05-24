@@ -29,6 +29,8 @@
     <field name="freq"/>
     <label name="interval"/>
     <field name="interval"/>
+    <label name="last_month_day_invoice"/>
+    <field name="last_month_day_invoice"/>
     <newline/>
     <notebook>
         <page string="Contract" id="contract">
