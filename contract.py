@@ -1,6 +1,6 @@
 # The COPYRIGHT file at the top level of this repository contains
 # the full copyright notices and license terms.
-import datetime
+import datetime, calendar
 from dateutil.relativedelta import relativedelta
 from dateutil.rrule import rrule, DAILY, WEEKLY, MONTHLY, YEARLY
 from decimal import Decimal
@@ -166,6 +166,10 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             'required': Bool(Eval('first_review_date')),
             },
         depends=['first_review_date'])
+    last_month_day_invoice = fields.Boolean('Last Month Day Invoice',
+        states={'invisible': ~Eval('freq').in_(['monthly',]),
+                'readonly': Eval('state')!='draft'},
+        depends=['freq', 'state'])
 
     @classmethod
     def __setup__(cls):
@@ -404,11 +408,17 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
     def get_invoice_date(self, last_invoice_date, start_period_date):
         last_invoice_date = todatetime(last_invoice_date)
         start_period_date = todatetime(start_period_date)
+
+        if self.last_month_day_invoice and self.freq == 'monthly':
+            last_invoice_date = last_invoice_date.replace(day=28)
         r = rrule(self.rrule._freq, interval=self.rrule._interval,
             dtstart=last_invoice_date)
         date = last_invoice_date
         while date < start_period_date:
             date = r.after(date)
+        if self.last_month_day_invoice and date.day == 28 and self.freq == 'monthly':
+            date = date.replace(day=calendar.monthrange(date.year,
+                date.month)[1])
         return date.date()
 
     def get_start_period_date(self, start_date):
@@ -526,14 +536,28 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             return (self.start_period_date +
                 relativedelta(months=self.months_renewal))
 
-    @fields.depends('first_invoice_date', 'freq')
+    @fields.depends('first_invoice_date', 'last_month_day_invoice')
+    def on_change_with_first_invoice_date(self, name=None):
+        if self.first_invoice_date and self.last_month_day_invoice:
+            return self.first_invoice_date.replace(day=calendar.monthrange(
+                    self.first_invoice_date.year,
+                    self.first_invoice_date.month)[1])
+        return self.first_invoice_date
+
+    @fields.depends('last_month_day_invoice', 'freq')
+    def on_change_freq(self):
+        if self.freq != 'monthly':
+            self.last_month_day_invoice = False
+
+    @fields.depends('first_invoice_date', 'freq', 'last_month_day_invoice')
     def on_change_notify(self):
         notifications = super().on_change_notify()
         notifications.append(self._notify_first_invoice_date())
         return notifications
 
     def _notify_first_invoice_date(self):
-        if self.freq == 'monthly' and self.first_invoice_date and self.first_invoice_date.day > 28:
+        if (self.freq == 'monthly' and not self.last_month_day_invoice
+                and self.first_invoice_date and self.first_invoice_date.day > 28):
             return ('warning', gettext('contract.msg_warning_first_invoice_date'))
 
 
