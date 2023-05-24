@@ -526,6 +526,16 @@ class Contract(RRuleMixin, Workflow, ModelSQL, ModelView):
             return (self.start_period_date +
                 relativedelta(months=self.months_renewal))
 
+    @fields.depends('first_invoice_date', 'freq')
+    def on_change_notify(self):
+        notifications = super().on_change_notify()
+        notifications.append(self._notify_first_invoice_date())
+        return notifications
+
+    def _notify_first_invoice_date(self):
+        if self.freq == 'monthly' and self.first_invoice_date and self.first_invoice_date.day > 28:
+            return ('warning', gettext('contract.msg_warning_first_invoice_date'))
+
 
 class ContractLine(sequence_ordered(), ModelSQL, ModelView):
     'Contract Line'
