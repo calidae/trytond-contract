@@ -798,12 +798,6 @@ class ContractConsumption(ModelSQL, ModelView):
     def search_contract(cls, name, clause):
         return [('contract_line.contract',) + tuple(clause[1:])]
 
-    def _get_tax_rule_pattern(self):
-        '''
-        Get tax rule pattern
-        '''
-        return {}
-
     def _get_start_end_date(self):
         pool = Pool()
         Lang = pool.get('ir.lang')
@@ -819,26 +813,37 @@ class ContractConsumption(ModelSQL, ModelView):
         pool = Pool()
         InvoiceLine = pool.get('account.invoice.line')
         AccountConfiguration = pool.get('account.configuration')
-        Module = pool.get('ir.module')
-        analytic_invoice_installed = Module.search([
-              ('name', '=', 'analytic_invoice'),
-              ('state', '=', 'activated'),
-                ], limit=1)
-        if analytic_invoice_installed:
+
+        try:
             AnalyticAccountEntry = pool.get('analytic.account.entry')
+        except KeyError:
+            AnalyticAccountEntry = None
+
         account_config = AccountConfiguration(1)
         if (self.invoice_lines and
                 not Transaction().context.get('force_reinvoice', False)):
             return
+
         invoice_line = InvoiceLine()
+        invoice_line.invoice_type = 'out'
         invoice_line.type = 'line'
         invoice_line.origin = self
         invoice_line.company = self.contract_line.contract.company
         invoice_line.currency = self.contract_line.contract.currency
         invoice_line.sequence = self.contract_line.sequence
+        invoice_line.party = self.contract_line.contract.party
+
         invoice_line.product = None
         if self.contract_line.service:
             invoice_line.product = self.contract_line.service.product
+            invoice_line.on_change_product()
+
+            if not invoice_line.account:
+                raise UserError(gettext(
+                    'contract.missing_account_revenue',
+                        contract_line=self.contract_line.rec_name,
+                        product=invoice_line.product.rec_name))
+
         start_date, end_date = self._get_start_end_date()
         invoice_line.description = '[%(start)s - %(end)s] %(name)s' % {
             'start': start_date,
@@ -857,32 +862,14 @@ class ContractConsumption(ModelSQL, ModelView):
                     - self.start_date).total_seconds() /
                 (self.end_period_date + datetime.timedelta(days=1) -
                     self.init_period_date).total_seconds())
-        invoice_line.unit_price = round_price(self.contract_line.unit_price * rate)
-        invoice_line.party = self.contract_line.contract.party
-        taxes = []
+
         if invoice_line.product:
-            invoice_line.unit = invoice_line.product.default_uom
-            party = invoice_line.party
-            pattern = self._get_tax_rule_pattern()
-            for tax in invoice_line.product.customer_taxes_used:
-                if party.customer_tax_rule:
-                    tax_ids = party.customer_tax_rule.apply(tax, pattern)
-                    if tax_ids:
-                        taxes.extend(tax_ids)
-                    continue
-                taxes.append(tax.id)
-            if party.customer_tax_rule:
-                tax_ids = party.customer_tax_rule.apply(None, pattern)
-                if tax_ids:
-                    taxes.extend(tax_ids)
-            invoice_line.account = invoice_line.product.account_revenue_used
             if not invoice_line.account:
                 raise UserError(gettext(
                     'contract.missing_account_revenue',
                         contract_line=self.contract_line.rec_name,
                         product=invoice_line.product.rec_name))
         else:
-            invoice_line.unit = None
             for name in ['default_product_account_revenue',
                     'default_category_account_revenue']:
                 invoice_line.account = account_config.get_multivalue(name)
@@ -893,9 +880,9 @@ class ContractConsumption(ModelSQL, ModelView):
                     'contract.missing_account_revenue_property',
                         contract_line=self.contract_line.rec_name))
 
-        invoice_line.taxes = taxes
-        invoice_line.invoice_type = 'out'
-        if analytic_invoice_installed:
+        invoice_line.unit_price = round_price(self.contract_line.unit_price * rate)
+
+        if AnalyticAccountEntry:
             invoice_line.analytic_accounts = AnalyticAccountEntry.copy(
                 self.contract_line.analytic_accounts, default={
                     'origin': invoice_line.id})
