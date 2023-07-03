@@ -1,5 +1,5 @@
 <tryton>
-    <data depends='analytic_invoice'>
+    <data depends='analytic_account'>
         <record model="ir.ui.view" id="analytic_contract_line_view_list_sequence">
             <field name="model">contract.line</field>
             <field name="inherit" ref="contract.contract_line_view_list_sequence"/>
