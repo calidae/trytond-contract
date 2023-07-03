@@ -30,7 +30,7 @@ def register():
     Pool.register(
         contract.AnalyticAccountEntry,
         contract.AnalyticContractLine,
-        depends=['analytic_invoice'],
+        depends=['analytic_account'],
         module='contract', type_='model')
     Pool.register(
         contract.CreateConsumptions,
