@@ -908,7 +908,7 @@ class ContractConsumption(ModelSQL, ModelView):
 
         invoice_line.unit_price = round_price(self.contract_line.unit_price * rate)
 
-        if AnalyticAccountEntry:
+        if AnalyticAccountEntry and hasattr(InvoiceLine, 'analytic_accounts'):
             invoice_line.analytic_accounts = AnalyticAccountEntry.copy(
                 self.contract_line.analytic_accounts, default={
                     'origin': invoice_line.id})
