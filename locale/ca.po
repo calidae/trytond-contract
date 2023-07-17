@@ -495,8 +495,8 @@ msgstr ""
 "\"%(contract)s\" té consums."
 
 msgctxt "model:ir.message,text:cannot_draft"
-msgid "Contract \"%s\" can not be moved to draft because it has consumptions."
-msgstr "El contracte \"%s\" no es pot passar a esborrany perquè té consums."
+msgid "Contract \"%(contract)s\" can not be moved to draft because it has consumptions."
+msgstr "El contracte \"%(contract)s\" no es pot passar a esborrany perquè té consums."
 
 msgctxt "model:ir.message,text:cannot_finish"
 msgid ""
