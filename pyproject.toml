@@ -7,7 +7,7 @@ name = "trytonspain-contract"
 dependencies = [
     "trytond-account_invoice~=6.8.0",
     "trytond-account_product~=6.8.0",
-    "calidae-activity @ git+https://github.com/calidae/trytond-activity.git@pyproject",
+    "calidae-activity @ git+https://github.com/calidae/trytond-activity.git@6.8",
 ]
 version = "6.8"
 
